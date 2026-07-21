@@ -31,10 +31,10 @@ files; regenerate them with `npm run build`.
 - `src/styles/main.css` contains namespaced injected styles.
 - `scripts/` copies and verifies generated install artifacts.
 
-Rotten Tomatoes data is read from its public search and film pages without an
-API key. Treat this as an unreliable external boundary: use timeouts, cache
-successful results, tolerate missing scores, and never block Letterboxd when
-the source fails.
+Rotten Tomatoes and Metacritic data is read from their public web endpoints
+without user credentials. Treat both as unreliable external boundaries: use
+timeouts, cache successful results, tolerate missing scores, and never block
+Letterboxd when either source fails.
 
 ## Conventions
 
@@ -46,14 +46,16 @@ the source fails.
   page sections dynamically.
 - Prefer stable semantic selectors and data attributes over generated CSS
   module class names.
-- Match Letterboxd's native colors, spacing, typography, and interaction
-  patterns for injected UI.
+- Make every injected interface look and behave as close to Letterboxd's
+  native UI as possible. Reuse its established colors, typography, spacing,
+  section structure, control shapes, states, and interaction patterns before
+  introducing custom visual language.
 - Preserve keyboard navigation, visible focus, ARIA relationships, responsive
   behavior, and `prefers-reduced-motion`.
 - Escape or safely assign external text and URLs before inserting them into the
   DOM.
 - Keep `@connect`, `@match`, and GM grants restricted to actual requirements.
-- Do not imply affiliation with Letterboxd or Rotten Tomatoes.
+- Do not imply affiliation with Letterboxd, Rotten Tomatoes, or Metacritic.
 
 ## Settings
 

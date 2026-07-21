@@ -202,6 +202,18 @@ export function openSettings() {
                 t('popcornmeter'),
                 t('popcornmeterHint'),
               )}
+              ${switchHtml(
+                'showMetacritic',
+                draft.showMetacritic,
+                t('metacritic'),
+                t('metacriticHint'),
+              )}
+              ${switchHtml(
+                'showMetacriticUserScore',
+                draft.showMetacriticUserScore,
+                t('metacriticUserScore'),
+                t('metacriticUserScoreHint'),
+              )}
             </div>
           </section>
           <section id="lbp-panel-cache" data-panel="cache" role="tabpanel" aria-labelledby="lbp-tab-cache" hidden>

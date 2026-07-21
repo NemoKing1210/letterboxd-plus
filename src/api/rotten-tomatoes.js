@@ -75,7 +75,8 @@ function findMovieUrl(html, title, year) {
   const match = exact || sameYear || sameTitle || candidates[0];
 
   if (!match?.href) return null;
-  return new URL(match.href, ROTTEN_TOMATOES_ORIGIN).href;
+  const movieUrl = new URL(match.href, ROTTEN_TOMATOES_ORIGIN);
+  return movieUrl.origin === ROTTEN_TOMATOES_ORIGIN ? movieUrl.href : null;
 }
 
 function parseScorecard(html, url) {
@@ -100,7 +101,8 @@ function parseScorecard(html, url) {
 }
 
 export async function getRottenTomatoesRating({ cacheHours, key, title, year }) {
-  const cached = readCache(key, cacheHours * 60 * 60 * 1000);
+  const cacheKey = `rt:${key}`;
+  const cached = readCache(cacheKey, cacheHours * 60 * 60 * 1000);
   if (cached) return cached;
 
   const query = encodeURIComponent(`${title} ${year || ''}`.trim());
@@ -112,6 +114,6 @@ export async function getRottenTomatoesRating({ cacheHours, key, title, year }) 
 
   const movieHtml = await requestText(movieUrl);
   const rating = parseScorecard(movieHtml, movieUrl);
-  if (rating) writeCache(key, rating);
+  if (rating) writeCache(cacheKey, rating);
   return rating;
 }

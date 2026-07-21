@@ -47,7 +47,7 @@ export function writeCache(key, value) {
   try {
     GM_setValue(storageKey(key), { savedAt: Date.now(), value });
   } catch (error) {
-    console.warn('[Letterboxd Plus] Failed to cache Rotten Tomatoes rating.', error);
+    console.warn('[Letterboxd Plus] Failed to cache external rating.', error);
   }
 }
 

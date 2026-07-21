@@ -3,15 +3,15 @@
 [![CI](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml)
 [![Install userscript](https://img.shields.io/badge/Install-userscript-00e054?style=for-the-badge&labelColor=14181c)](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/letterboxd-plus.user.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-40bcf4?style=for-the-badge&labelColor=14181c)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.3.2-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
+[![Version](https://img.shields.io/badge/version-0.4.0-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
 
 A lightweight userscript that extends
 [Letterboxd](https://letterboxd.com/) with external film ratings and useful
 interface improvements — while keeping the site familiar.
 
-Letterboxd Plus currently adds Rotten Tomatoes scores directly to film pages
-and provides a native-looking settings panel for controlling the integration.
-It requires no API key and runs entirely in your browser.
+Letterboxd Plus adds Rotten Tomatoes and Metacritic scores directly to film
+pages and provides a native-looking settings panel for controlling each
+integration. It requires no API key and runs entirely in your browser.
 
 Compatible with [Tampermonkey](https://www.tampermonkey.net/),
 [Violentmonkey](https://violentmonkey.github.io/),
@@ -20,7 +20,7 @@ Compatible with [Tampermonkey](https://www.tampermonkey.net/),
 `// ==UserScript==` metadata block.
 
 > **Status:** early development. The current release focuses on a reliable
-> foundation, settings, and Rotten Tomatoes ratings. More Letterboxd
+> foundation, settings, and external film ratings. More Letterboxd
 > enhancements can be added as independent feature modules.
 
 ## Quick install
@@ -71,6 +71,19 @@ native sidebar:
 The script uses the film title and release year to disambiguate search results.
 Letterboxd's TMDB identifier is used as the local cache key.
 
+### Metacritic ratings
+
+An independent Metacritic section appears alongside the Rotten Tomatoes data:
+
+- **Metascore** with critic review count;
+- optional **User Score** with rating count;
+- direct link to the strictly matched Metacritic movie page;
+- Metacritic score-band accents, loading skeletons, and non-blocking failures.
+
+Matches require the normalized title and a release year within one year of the
+Letterboxd metadata, which avoids silently selecting unrelated films or
+remakes.
+
 ### Settings
 
 Open **Letterboxd Plus** from:
@@ -82,7 +95,8 @@ Open **Letterboxd Plus** from:
 The accessible tabbed panel follows Letterboxd's visual language and contains:
 
 - **General** — interface language;
-- **Film page** — Rotten Tomatoes and Popcornmeter visibility;
+- **Film page** — Rotten Tomatoes, Popcornmeter, Metacritic, and User Score
+  visibility;
 - **Cache** — storage meter, active and expired entry statistics, cache
   duration, and manual cleanup;
 - **About** — project description, version, license, repository, and author
@@ -111,7 +125,8 @@ can be selected under **Settings → General → Interface language**.
 
 ### Caching and resilience
 
-- Successful Rotten Tomatoes responses are cached through userscript storage.
+- Successful Rotten Tomatoes and Metacritic responses are cached through
+  userscript storage with separate provider keys.
 - Cache duration is configurable from `0` to `168` hours.
 - A duration of `0` always requests fresh data.
 - The cache tab shows current usage against a conservative 5 MB advisory
@@ -141,11 +156,13 @@ Letterboxd film page
         │
         ├── check GM-backed cache
         │
-        └── Rotten Tomatoes search
+        ├── Rotten Tomatoes search and scorecard
+        │
+        └── Metacritic JSON search and movie detail
                     │
-                    ├── match movie by title and release year
-                    ├── fetch the canonical film page
-                    └── read Tomatometer and Popcornmeter scorecard data
+                    ├── strictly match title and release year
+                    ├── read critic and audience/user scores
+                    └── cache each provider independently
                                       │
                                       ▼
                             render in Letterboxd sidebar
@@ -157,13 +174,15 @@ duplicates.
 
 ## Data source and limitations
 
-Rotten Tomatoes does not provide a free public API for this use case.
-Letterboxd Plus reads publicly available Rotten Tomatoes search and film pages
-through `GM_xmlhttpRequest`.
+Rotten Tomatoes and Metacritic do not provide supported public APIs for this
+use case. Letterboxd Plus reads publicly available Rotten Tomatoes pages and
+the JSON endpoints used by Metacritic's own website through
+`GM_xmlhttpRequest`.
 
 This has several practical consequences:
 
-- Rotten Tomatoes markup changes can temporarily break score extraction.
+- Provider markup or JSON schema changes can temporarily break score
+  extraction.
 - Some new, obscure, or unreleased titles may not have a matching page.
 - A title can exist without critic or audience scores.
 - Availability can vary by network or region.
@@ -198,9 +217,13 @@ letterboxd-plus/
 │   ├── cache.js                      # Cache reads, writes, statistics, cleanup
 │   ├── settings.js                   # Settings validation and persistence
 │   ├── api/
-│   │   └── rotten-tomatoes.js        # Search, scorecard parsing, cache access
+│   │   ├── rotten-tomatoes.js        # RT search and scorecard parsing
+│   │   └── metacritic.js             # Metacritic search and score parsing
 │   ├── features/
-│   │   ├── film-rating.js            # Film context and sidebar rendering
+│   │   ├── film-context.js           # Shared Letterboxd film metadata
+│   │   ├── film-rating.js            # Rotten Tomatoes sidebar integration
+│   │   ├── metacritic-rating.js      # Metacritic sidebar integration
+│   │   ├── rating-section.js         # Shared rating section renderer
 │   │   └── settings-panel.js         # Account-menu entry and settings dialog
 │   └── styles/
 │       └── main.css                  # Namespaced Letterboxd-style UI
@@ -232,14 +255,14 @@ letterboxd-plus/
 |-------|-------|
 | `@namespace` | `https://github.com/NemoKing1210/letterboxd-plus` |
 | `@match` | Letterboxd apex and `www` hosts |
-| `@connect` | `rottentomatoes.com`, `www.rottentomatoes.com` |
+| `@connect` | Rotten Tomatoes hosts and `backend.metacritic.com` |
 | `@run-at` | `document-idle` |
 | `@license` | MIT |
 | `@updateURL` / `@downloadURL` | Raw GitHub userscript on `main` |
 
 | Grant | Purpose |
 |-------|---------|
-| `GM_xmlhttpRequest` | Request Rotten Tomatoes pages across origins |
+| `GM_xmlhttpRequest` | Request external rating providers across origins |
 | `GM_getValue` / `GM_setValue` | Persist settings and successful rating cache |
 | `GM_listValues` / `GM_deleteValue` | Measure and clear cached rating entries |
 | `GM_addStyle` | Inject the bundled interface styles |
@@ -275,8 +298,9 @@ localhost update URLs.
 ## Affiliation
 
 Letterboxd Plus is an independent community project. It is **not affiliated
-with or endorsed by Letterboxd, Rotten Tomatoes, Fandango, or their owners**.
-All product names and trademarks belong to their respective owners.
+with or endorsed by Letterboxd, Rotten Tomatoes, Metacritic, Fandango, or
+their owners**. All product names and trademarks belong to their respective
+owners.
 
 ## License
 

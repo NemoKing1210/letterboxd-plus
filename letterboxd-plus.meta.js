@@ -7,15 +7,15 @@
 // @name:fr            Letterboxd Plus
 // @name:zh-CN         Letterboxd Plus
 // @namespace          https://github.com/NemoKing1210/letterboxd-plus
-// @version            0.3.2
+// @version            0.4.2
 // @author             NemoKing1210
-// @description        Extends Letterboxd with Rotten Tomatoes ratings and quality-of-life features
-// @description:ru     Добавляет в Letterboxd рейтинги Rotten Tomatoes и улучшения интерфейса
-// @description:es     Amplía Letterboxd con valoraciones de Rotten Tomatoes y mejoras de interfaz
-// @description:pt-BR  Amplia o Letterboxd com avaliações do Rotten Tomatoes e melhorias de interface
-// @description:de     Erweitert Letterboxd um Rotten-Tomatoes-Bewertungen und Komfortfunktionen
-// @description:fr     Enrichit Letterboxd avec les notes Rotten Tomatoes et des améliorations d'interface
-// @description:zh-CN  为 Letterboxd 添加 Rotten Tomatoes 评分和界面改进
+// @description        Extends Letterboxd with Rotten Tomatoes and Metacritic ratings
+// @description:ru     Добавляет в Letterboxd рейтинги Rotten Tomatoes и Metacritic
+// @description:es     Amplía Letterboxd con valoraciones de Rotten Tomatoes y Metacritic
+// @description:pt-BR  Amplia o Letterboxd com avaliações do Rotten Tomatoes e Metacritic
+// @description:de     Erweitert Letterboxd um Bewertungen von Rotten Tomatoes und Metacritic
+// @description:fr     Enrichit Letterboxd avec les notes Rotten Tomatoes et Metacritic
+// @description:zh-CN  为 Letterboxd 添加 Rotten Tomatoes 和 Metacritic 评分
 // @license            MIT
 // @icon               https://letterboxd.com/favicon.ico
 // @homepage           https://github.com/NemoKing1210/letterboxd-plus
@@ -31,6 +31,7 @@
 // @tag                ratings
 // @connect            www.rottentomatoes.com
 // @connect            rottentomatoes.com
+// @connect            backend.metacritic.com
 // @grant              GM_addStyle
 // @grant              GM_deleteValue
 // @grant              GM_getValue

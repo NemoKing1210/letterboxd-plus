@@ -2,6 +2,7 @@ import { GM_registerMenuCommand } from '$';
 import './styles/main.css';
 import { ROOT_ATTR } from './constants.js';
 import { ensureFilmRating } from './features/film-rating.js';
+import { ensureMetacriticRating } from './features/metacritic-rating.js';
 import {
   ensureSettingsButton,
   openSettings,
@@ -16,6 +17,7 @@ function scanPage() {
   configureLocale(settings.uiLocale);
   ensureSettingsButton();
   void ensureFilmRating(settings);
+  void ensureMetacriticRating(settings);
 }
 
 function scheduleScan() {
