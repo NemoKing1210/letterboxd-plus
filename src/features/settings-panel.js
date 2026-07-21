@@ -1,9 +1,18 @@
-import { CACHE_HOURS_MAX, SCRIPT_VERSION } from '../constants.js';
 import {
   clearCache,
   formatCacheBytes,
   getCacheStats,
 } from '../cache.js';
+import {
+  AUTHOR_AVATAR_URL,
+  AUTHOR_EMAIL,
+  AUTHOR_HANDLE,
+  AUTHOR_NAME,
+  AUTHOR_URL,
+  CACHE_HOURS_MAX,
+  REPO_URL,
+  SCRIPT_VERSION,
+} from '../constants.js';
 import {
   LOCALE_FLAGS,
   LOCALE_NATIVE_NAMES,
@@ -82,7 +91,46 @@ function paintCachePanel(root, cacheHours) {
     current.replaceWith(wrapper.firstElementChild);
   }
   const badge = root.querySelector('[data-cache-tab-badge]');
-  if (badge) badge.textContent = String(stats.totalCount);
+  if (badge) badge.textContent = `${stats.fillPercent}%`;
+}
+
+function aboutHtml() {
+  return `
+    <div class="lbp-about">
+      <div class="lbp-about__card">
+        <div class="lbp-about__brand">
+          <span class="lbp-about__mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <strong>Letterboxd Plus</strong>
+        </div>
+        <p class="lbp-about__description">${t('aboutDescription')}</p>
+        <div class="lbp-about__chips">
+          <span>v${SCRIPT_VERSION}</span>
+          <span>${t('aboutLicense')}</span>
+        </div>
+        <a class="lbp-about__repo" href="${REPO_URL}" target="_blank" rel="noopener noreferrer">
+          <span class="lbp-about__repo-icon" aria-hidden="true">GH</span>
+          <span>
+            <strong>${t('aboutRepository')}</strong>
+            <small>${t('aboutRepositoryHint')}</small>
+          </span>
+          <b aria-hidden="true">↗</b>
+        </a>
+      </div>
+      <div class="lbp-about__card">
+        <p class="lbp-about__label">${t('aboutAuthor')}</p>
+        <div class="lbp-about__author">
+          <a href="${AUTHOR_URL}" target="_blank" rel="noopener noreferrer" aria-label="${AUTHOR_NAME}">
+            <img src="${AUTHOR_AVATAR_URL}" alt="" width="56" height="56" loading="lazy" decoding="async">
+          </a>
+          <span>
+            <a class="lbp-about__author-name" href="${AUTHOR_URL}" target="_blank" rel="noopener noreferrer">${AUTHOR_NAME}</a>
+            <small>@${AUTHOR_HANDLE}</small>
+            <a class="lbp-about__email" href="mailto:${AUTHOR_EMAIL}">${AUTHOR_EMAIL}</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function activateTab(dialog, tabId, shouldFocus = false) {
@@ -122,7 +170,7 @@ export function openSettings() {
         <div class="lbp-settings__tabs" role="tablist" aria-label="${t('settingsSections')}">
           <button type="button" id="lbp-tab-general" class="is-active" data-tab="general" role="tab" aria-selected="true" aria-controls="lbp-panel-general">${t('tabGeneral')}</button>
           <button type="button" id="lbp-tab-film" data-tab="film" role="tab" aria-selected="false" aria-controls="lbp-panel-film" tabindex="-1">${t('tabFilm')}</button>
-          <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheStats.totalCount}</span></button>
+          <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheStats.fillPercent}%</span></button>
           <button type="button" id="lbp-tab-about" data-tab="about" role="tab" aria-selected="false" aria-controls="lbp-panel-about" tabindex="-1">${t('tabAbout')}</button>
         </div>
         <div class="lbp-settings__content">
@@ -178,11 +226,7 @@ export function openSettings() {
           <section id="lbp-panel-about" data-panel="about" role="tabpanel" aria-labelledby="lbp-tab-about" hidden>
             <p class="lbp-settings__kicker">${t('tabAbout')}</p>
             <h3>${t('aboutTitle')}</h3>
-            <div class="lbp-settings__about">
-              <span class="lbp-settings__mark" aria-hidden="true"><i></i><i></i><i></i></span>
-              <p>${t('aboutDescription')}</p>
-              <a href="https://github.com/NemoKing1210/letterboxd-plus" target="_blank" rel="noopener noreferrer">${t('viewSource')}</a>
-            </div>
+            ${aboutHtml()}
           </section>
         </div>
       </div>
