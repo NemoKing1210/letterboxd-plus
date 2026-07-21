@@ -7,7 +7,7 @@
 // @name:fr            Letterboxd Plus
 // @name:zh-CN         Letterboxd Plus
 // @namespace          https://github.com/NemoKing1210/letterboxd-plus
-// @version            0.4.2
+// @version            0.5.0
 // @author             NemoKing1210
 // @description        Extends Letterboxd with Rotten Tomatoes and Metacritic ratings
 // @description:ru     Добавляет в Letterboxd рейтинги Rotten Tomatoes и Metacritic

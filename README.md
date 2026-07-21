@@ -84,6 +84,12 @@ Matches require the normalized title and a release year within one year of the
 Letterboxd metadata, which avoids silently selecting unrelated films or
 remakes.
 
+### Average rating
+
+The final sidebar section combines the Letterboxd rating with every enabled,
+available external score. Values are normalized to Letterboxd's five-point
+scale and averaged equally; unavailable scores are omitted.
+
 ### Settings
 
 Open **Letterboxd Plus** from:
@@ -220,6 +226,7 @@ letterboxd-plus/
 │   │   ├── rotten-tomatoes.js        # RT search and scorecard parsing
 │   │   └── metacritic.js             # Metacritic search and score parsing
 │   ├── features/
+│   │   ├── average-rating.js         # Combined normalized rating
 │   │   ├── film-context.js           # Shared Letterboxd film metadata
 │   │   ├── film-rating.js            # Rotten Tomatoes sidebar integration
 │   │   ├── metacritic-rating.js      # Metacritic sidebar integration

@@ -104,6 +104,11 @@ html.lbp-modal-open {
   padding-left: 8px;
 }
 
+.lbp-rating__score--average .lbp-rating__value {
+  border-left: 3px solid var(--lbp-blue);
+  padding-left: 8px;
+}
+
 .lbp-rating__score--positive .lbp-rating__value {
   border-left-color: var(--lbp-green);
 }

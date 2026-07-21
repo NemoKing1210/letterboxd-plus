@@ -40,6 +40,8 @@ function ratingRow({
     label: t(labelKey),
     detail: score == null ? t('notRated') : detail,
     modifier,
+    score,
+    maxScore,
     tone: scoreTone(score, maxScore),
   };
 }

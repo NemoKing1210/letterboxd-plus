@@ -1,6 +1,7 @@
 import { GM_registerMenuCommand } from '$';
 import './styles/main.css';
 import { ROOT_ATTR } from './constants.js';
+import { ensureAverageRating } from './features/average-rating.js';
 import { ensureFilmRating } from './features/film-rating.js';
 import { ensureMetacriticRating } from './features/metacritic-rating.js';
 import {
@@ -18,6 +19,7 @@ function scanPage() {
   ensureSettingsButton();
   void ensureFilmRating(settings);
   void ensureMetacriticRating(settings);
+  ensureAverageRating();
 }
 
 function scheduleScan() {

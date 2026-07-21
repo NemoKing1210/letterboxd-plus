@@ -33,6 +33,8 @@ function ratingRow(labelKey, score, count, modifier) {
     label: t(labelKey),
     detail: score == null ? t('notRated') : detail,
     modifier,
+    score,
+    maxScore: 100,
   };
 }
 
