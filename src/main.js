@@ -2,6 +2,7 @@ import { GM_registerMenuCommand } from '$';
 import './styles/main.css';
 import { ROOT_ATTR } from './constants.js';
 import { ensureAverageRating } from './features/average-rating.js';
+import { ensureEnhancedCast } from './features/enhanced-cast.js';
 import { ensureFilmRating } from './features/film-rating.js';
 import { ensureMetacriticRating } from './features/metacritic-rating.js';
 import {
@@ -17,6 +18,7 @@ function scanPage() {
   const settings = loadSettings();
   configureLocale(settings.uiLocale);
   ensureSettingsButton();
+  ensureEnhancedCast(settings);
   void ensureFilmRating(settings);
   void ensureMetacriticRating(settings);
   ensureAverageRating();

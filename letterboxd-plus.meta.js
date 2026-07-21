@@ -7,15 +7,15 @@
 // @name:fr            Letterboxd Plus
 // @name:zh-CN         Letterboxd Plus
 // @namespace          https://github.com/NemoKing1210/letterboxd-plus
-// @version            0.5.0
+// @version            0.6.2
 // @author             NemoKing1210
-// @description        Extends Letterboxd with Rotten Tomatoes and Metacritic ratings
-// @description:ru     Добавляет в Letterboxd рейтинги Rotten Tomatoes и Metacritic
-// @description:es     Amplía Letterboxd con valoraciones de Rotten Tomatoes y Metacritic
-// @description:pt-BR  Amplia o Letterboxd com avaliações do Rotten Tomatoes e Metacritic
-// @description:de     Erweitert Letterboxd um Bewertungen von Rotten Tomatoes und Metacritic
-// @description:fr     Enrichit Letterboxd avec les notes Rotten Tomatoes et Metacritic
-// @description:zh-CN  为 Letterboxd 添加 Rotten Tomatoes 和 Metacritic 评分
+// @description        Adds external ratings and enhanced cast cards to Letterboxd
+// @description:ru     Добавляет в Letterboxd внешние рейтинги и карточки актёров
+// @description:es     Añade valoraciones externas y fichas del reparto a Letterboxd
+// @description:pt-BR  Adiciona avaliações externas e cartões do elenco ao Letterboxd
+// @description:de     Ergänzt Letterboxd um externe Wertungen und Besetzungskarten
+// @description:fr     Ajoute des notes externes et des fiches de distribution à Letterboxd
+// @description:zh-CN  为 Letterboxd 添加外部评分和增强演员卡片
 // @license            MIT
 // @icon               https://letterboxd.com/favicon.ico
 // @homepage           https://github.com/NemoKing1210/letterboxd-plus

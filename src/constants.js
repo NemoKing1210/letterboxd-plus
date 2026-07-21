@@ -24,5 +24,6 @@ export const DEFAULT_SETTINGS = Object.freeze({
   showAudienceScore: true,
   showMetacritic: true,
   showMetacriticUserScore: true,
+  enhanceCast: true,
   cacheHours: 24,
 });

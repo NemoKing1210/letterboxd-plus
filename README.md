@@ -3,15 +3,16 @@
 [![CI](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml)
 [![Install userscript](https://img.shields.io/badge/Install-userscript-00e054?style=for-the-badge&labelColor=14181c)](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/letterboxd-plus.user.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-40bcf4?style=for-the-badge&labelColor=14181c)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.4.0-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
+[![Version](https://img.shields.io/badge/version-0.6.2-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
 
 A lightweight userscript that extends
 [Letterboxd](https://letterboxd.com/) with external film ratings and useful
 interface improvements — while keeping the site familiar.
 
 Letterboxd Plus adds Rotten Tomatoes and Metacritic scores directly to film
-pages and provides a native-looking settings panel for controlling each
-integration. It requires no API key and runs entirely in your browser.
+pages, enriches Cast with actor portraits and roles, and provides a
+native-looking settings panel. It requires no API key and runs entirely in
+your browser.
 
 Compatible with [Tampermonkey](https://www.tampermonkey.net/),
 [Violentmonkey](https://violentmonkey.github.io/),
@@ -90,6 +91,14 @@ The final sidebar section combines the Letterboxd rating with every enabled,
 available external score. Values are normalized to Letterboxd's five-point
 scale and averaged equally; unavailable scores are omitted.
 
+### Enhanced cast
+
+The Cast section can display compact cards with each actor's portrait, name,
+and role. Portraits are read from the actor's public Letterboxd page only as
+cards approach the viewport, with at most three page requests in flight.
+The first ten actors are shown initially; the rest remain unloaded until
+**Show All** is selected and their cards approach the viewport.
+
 ### Settings
 
 Open **Letterboxd Plus** from:
@@ -101,8 +110,7 @@ Open **Letterboxd Plus** from:
 The accessible tabbed panel follows Letterboxd's visual language and contains:
 
 - **General** — interface language;
-- **Film page** — Rotten Tomatoes, Popcornmeter, Metacritic, and User Score
-  visibility;
+- **Film page** — rating-provider visibility and enhanced Cast cards;
 - **Cache** — storage meter, active and expired entry statistics, cache
   duration, and manual cleanup;
 - **About** — project description, version, license, repository, and author
@@ -185,6 +193,10 @@ use case. Letterboxd Plus reads publicly available Rotten Tomatoes pages and
 the JSON endpoints used by Metacritic's own website through
 `GM_xmlhttpRequest`.
 
+Enhanced Cast reads public Letterboxd actor pages through same-origin browser
+requests and displays the portrait URL already supplied there. Results are
+kept only in memory; no actor biography or portrait data is persisted.
+
 This has several practical consequences:
 
 - Provider markup or JSON schema changes can temporarily break score
@@ -223,10 +235,12 @@ letterboxd-plus/
 │   ├── cache.js                      # Cache reads, writes, statistics, cleanup
 │   ├── settings.js                   # Settings validation and persistence
 │   ├── api/
+│   │   ├── letterboxd-person.js      # Lazy Letterboxd portrait lookup
 │   │   ├── rotten-tomatoes.js        # RT search and scorecard parsing
 │   │   └── metacritic.js             # Metacritic search and score parsing
 │   ├── features/
 │   │   ├── average-rating.js         # Combined normalized rating
+│   │   ├── enhanced-cast.js          # Cast portrait cards
 │   │   ├── film-context.js           # Shared Letterboxd film metadata
 │   │   ├── film-rating.js            # Rotten Tomatoes sidebar integration
 │   │   ├── metacritic-rating.js      # Metacritic sidebar integration

@@ -1,6 +1,6 @@
 {
   "name": "letterboxd-plus",
-  "version": "0.5.0",
+  "version": "0.6.2",
   "private": true,
   "type": "module",
   "description": "Userscript that extends Letterboxd with external ratings and quality-of-life features",

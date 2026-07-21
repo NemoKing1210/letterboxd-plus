@@ -16,6 +16,7 @@ function normalizeSettings(value) {
     showAudienceScore: raw.showAudienceScore !== false,
     showMetacritic: raw.showMetacritic !== false,
     showMetacriticUserScore: raw.showMetacriticUserScore !== false,
+    enhanceCast: raw.enhanceCast !== false,
     cacheHours: Number.isFinite(cacheHours)
       ? Math.max(0, Math.min(CACHE_HOURS_MAX, cacheHours))
       : DEFAULT_SETTINGS.cacheHours,

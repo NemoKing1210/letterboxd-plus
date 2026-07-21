@@ -214,6 +214,12 @@ export function openSettings() {
                 t('metacriticUserScore'),
                 t('metacriticUserScoreHint'),
               )}
+              ${switchHtml(
+                'enhanceCast',
+                draft.enhanceCast,
+                t('enhancedCast'),
+                t('enhancedCastHint'),
+              )}
             </div>
           </section>
           <section id="lbp-panel-cache" data-panel="cache" role="tabpanel" aria-labelledby="lbp-tab-cache" hidden>
