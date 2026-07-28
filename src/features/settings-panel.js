@@ -22,7 +22,7 @@ import {
 import { loadSettings, saveSettings } from '../settings.js';
 
 const NAV_ID = 'lbp-nav-settings';
-const TABS = ['general', 'film', 'cache', 'about'];
+const TABS = ['general', 'film', 'card', 'cache', 'about'];
 
 function switchHtml(key, isOn, label, hint) {
   return `
@@ -133,6 +133,10 @@ function aboutHtml() {
   `;
 }
 
+function prefersReducedMotion() {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function activateTab(dialog, tabId, shouldFocus = false) {
   if (!TABS.includes(tabId)) return;
   dialog.querySelectorAll('[data-tab]').forEach((tab) => {
@@ -143,7 +147,13 @@ function activateTab(dialog, tabId, shouldFocus = false) {
     if (isActive && shouldFocus) tab.focus();
   });
   dialog.querySelectorAll('[role="tabpanel"]').forEach((panel) => {
-    panel.hidden = panel.dataset.panel !== tabId;
+    const show = panel.dataset.panel === tabId;
+    panel.classList.remove('is-entering');
+    panel.hidden = !show;
+    if (!show) return;
+    if (prefersReducedMotion()) return;
+    void panel.offsetWidth;
+    panel.classList.add('is-entering');
   });
 }
 
@@ -170,6 +180,7 @@ export function openSettings() {
         <div class="lbp-settings__tabs" role="tablist" aria-label="${t('settingsSections')}">
           <button type="button" id="lbp-tab-general" class="is-active" data-tab="general" role="tab" aria-selected="true" aria-controls="lbp-panel-general">${t('tabGeneral')}</button>
           <button type="button" id="lbp-tab-film" data-tab="film" role="tab" aria-selected="false" aria-controls="lbp-panel-film" tabindex="-1">${t('tabFilm')}</button>
+          <button type="button" id="lbp-tab-card" data-tab="card" role="tab" aria-selected="false" aria-controls="lbp-panel-card" tabindex="-1">${t('tabCard')}</button>
           <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheStats.fillPercent}%</span></button>
           <button type="button" id="lbp-tab-about" data-tab="about" role="tab" aria-selected="false" aria-controls="lbp-panel-about" tabindex="-1">${t('tabAbout')}</button>
         </div>
@@ -220,6 +231,12 @@ export function openSettings() {
                 t('enhancedCast'),
                 t('enhancedCastHint'),
               )}
+            </div>
+          </section>
+          <section id="lbp-panel-card" data-panel="card" role="tabpanel" aria-labelledby="lbp-tab-card" hidden>
+            <p class="lbp-settings__kicker">${t('tabCard')}</p>
+            <h3>${t('cardTitle')}</h3>
+            <div class="lbp-settings__card">
               ${switchHtml(
                 'showFilmMiniProfile',
                 draft.showFilmMiniProfile,
@@ -267,11 +284,33 @@ export function openSettings() {
     </div>
   `;
 
-  const close = () => {
+  let closing = false;
+  const finishClose = () => {
     document.removeEventListener('keydown', onDocumentKeydown, true);
     backdrop.remove();
     document.documentElement.classList.remove('lbp-modal-open');
     activeElement?.focus?.();
+  };
+  const close = () => {
+    if (closing) return;
+    closing = true;
+    document.removeEventListener('keydown', onDocumentKeydown, true);
+    if (prefersReducedMotion() || !backdrop.classList.contains('is-open')) {
+      finishClose();
+      return;
+    }
+    backdrop.classList.remove('is-open');
+    backdrop.classList.add('is-leaving');
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      finishClose();
+    };
+    backdrop.addEventListener('transitionend', (event) => {
+      if (event.target === backdrop && event.propertyName === 'opacity') settle();
+    });
+    window.setTimeout(settle, 220);
   };
   const dialog = backdrop.querySelector('.lbp-settings');
   const onDocumentKeydown = (event) => {
@@ -324,8 +363,14 @@ export function openSettings() {
   document.body.appendChild(backdrop);
   document.addEventListener('keydown', onDocumentKeydown, true);
   requestAnimationFrame(() => {
-    backdrop.classList.add('is-open');
-    dialog.querySelector('[data-tab]')?.focus();
+    requestAnimationFrame(() => {
+      backdrop.classList.add('is-open');
+      const activePanel = dialog.querySelector('[role="tabpanel"]:not([hidden])');
+      if (activePanel && !prefersReducedMotion()) {
+        activePanel.classList.add('is-entering');
+      }
+      dialog.querySelector('[data-tab]')?.focus();
+    });
   });
 }
 

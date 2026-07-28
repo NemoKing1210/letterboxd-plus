@@ -3,7 +3,7 @@
 [![CI](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml)
 [![Install userscript](https://img.shields.io/badge/Install-userscript-00e054?style=for-the-badge&labelColor=14181c)](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/letterboxd-plus.user.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-40bcf4?style=for-the-badge&labelColor=14181c)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.7.1-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
+[![Version](https://img.shields.io/badge/version-0.7.3-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
 
 A lightweight userscript that extends
 [Letterboxd](https://letterboxd.com/) with external film ratings and useful
@@ -123,8 +123,8 @@ Open **Letterboxd Plus** from:
 The accessible tabbed panel follows Letterboxd's visual language and contains:
 
 - **General** — interface language;
-- **Film page** — rating-provider visibility, enhanced Cast cards, and film
-  mini-cards;
+- **Film page** — rating-provider visibility and enhanced Cast cards;
+- **Film card** — hover mini-card visibility and preload;
 - **Cache** — storage meter, active and expired entry statistics, cache
   duration, and manual cleanup;
 - **About** — project description, version, license, repository, and author
