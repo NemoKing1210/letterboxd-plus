@@ -38,14 +38,15 @@ export default defineConfig({
         namespace: 'https://github.com/NemoKing1210/letterboxd-plus',
         version: pkg.version,
         description: {
-          '': 'Adds external ratings and enhanced cast cards to Letterboxd',
-          ru: 'Добавляет в Letterboxd внешние рейтинги и карточки актёров',
-          es: 'Añade valoraciones externas y fichas del reparto a Letterboxd',
+          '':
+            'Adds external ratings, film hover mini-cards, and enhanced cast to Letterboxd',
+          ru: 'Добавляет в Letterboxd внешние рейтинги, мини-карточки фильмов и карточки актёров',
+          es: 'Añade valoraciones externas, mini tarjetas de películas y fichas del reparto a Letterboxd',
           'pt-BR':
-            'Adiciona avaliações externas e cartões do elenco ao Letterboxd',
-          de: 'Ergänzt Letterboxd um externe Wertungen und Besetzungskarten',
-          fr: 'Ajoute des notes externes et des fiches de distribution à Letterboxd',
-          'zh-CN': '为 Letterboxd 添加外部评分和增强演员卡片',
+            'Adiciona avaliações externas, mini cartões de filmes e cartões do elenco ao Letterboxd',
+          de: 'Ergänzt Letterboxd um externe Wertungen, Film-Minikarten und Besetzungskarten',
+          fr: 'Ajoute des notes externes, des mini-cartes de films et des fiches de distribution à Letterboxd',
+          'zh-CN': '为 Letterboxd 添加外部评分、影片迷你卡片和增强演员卡片',
         },
         author: 'NemoKing1210',
         tag: ['letterboxd', 'movies', 'ratings'],

@@ -220,6 +220,18 @@ export function openSettings() {
                 t('enhancedCast'),
                 t('enhancedCastHint'),
               )}
+              ${switchHtml(
+                'showFilmMiniProfile',
+                draft.showFilmMiniProfile,
+                t('showFilmMiniProfile'),
+                t('showFilmMiniProfileHint'),
+              )}
+              ${switchHtml(
+                'preloadFilmMiniProfile',
+                draft.preloadFilmMiniProfile,
+                t('preloadFilmMiniProfile'),
+                t('preloadFilmMiniProfileHint'),
+              )}
             </div>
           </section>
           <section id="lbp-panel-cache" data-panel="cache" role="tabpanel" aria-labelledby="lbp-tab-cache" hidden>

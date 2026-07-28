@@ -3,16 +3,16 @@
 [![CI](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml)
 [![Install userscript](https://img.shields.io/badge/Install-userscript-00e054?style=for-the-badge&labelColor=14181c)](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/letterboxd-plus.user.js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-40bcf4?style=for-the-badge&labelColor=14181c)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.6.2-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
+[![Version](https://img.shields.io/badge/version-0.7.1-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
 
 A lightweight userscript that extends
 [Letterboxd](https://letterboxd.com/) with external film ratings and useful
 interface improvements — while keeping the site familiar.
 
 Letterboxd Plus adds Rotten Tomatoes and Metacritic scores directly to film
-pages, enriches Cast with actor portraits and roles, and provides a
-native-looking settings panel. It requires no API key and runs entirely in
-your browser.
+pages, hover mini-cards on poster grids, enriches Cast with actor portraits
+and roles, and provides a native-looking settings panel. It requires no API
+key and runs entirely in your browser.
 
 Compatible with [Tampermonkey](https://www.tampermonkey.net/),
 [Violentmonkey](https://violentmonkey.github.io/),
@@ -99,6 +99,19 @@ cards approach the viewport, with at most three page requests in flight.
 The first ten actors are shown initially; the rest remain unloaded until
 **Show All** is selected and their cards approach the viewport.
 
+### Film mini-cards
+
+Hovering a poster in lists, browse, diary, watchlists, search, and similar
+films opens a compact mini-card with:
+
+- poster, title, year, and Letterboxd average rating;
+- directors and genre chips;
+- Tomatometer and Metascore pills when those providers are enabled;
+- a short synopsis and a direct link to the film page.
+
+The main poster on a film page is excluded. Loading is progressive and
+non-blocking, with optional viewport preload controlled from settings.
+
 ### Settings
 
 Open **Letterboxd Plus** from:
@@ -110,7 +123,8 @@ Open **Letterboxd Plus** from:
 The accessible tabbed panel follows Letterboxd's visual language and contains:
 
 - **General** — interface language;
-- **Film page** — rating-provider visibility and enhanced Cast cards;
+- **Film page** — rating-provider visibility, enhanced Cast cards, and film
+  mini-cards;
 - **Cache** — storage meter, active and expired entry statistics, cache
   duration, and manual cleanup;
 - **About** — project description, version, license, repository, and author
@@ -141,6 +155,8 @@ can be selected under **Settings → General → Interface language**.
 
 - Successful Rotten Tomatoes and Metacritic responses are cached through
   userscript storage with separate provider keys.
+- Film mini-card scrapes are cached under separate `film:mini:` keys using the
+  same configurable duration.
 - Cache duration is configurable from `0` to `168` hours.
 - A duration of `0` always requests fresh data.
 - The cache tab shows current usage against a conservative 5 MB advisory
@@ -235,6 +251,7 @@ letterboxd-plus/
 │   ├── cache.js                      # Cache reads, writes, statistics, cleanup
 │   ├── settings.js                   # Settings validation and persistence
 │   ├── api/
+│   │   ├── film-profile.js           # Film page scrape for mini-cards
 │   │   ├── letterboxd-person.js      # Lazy Letterboxd portrait lookup
 │   │   ├── rotten-tomatoes.js        # RT search and scorecard parsing
 │   │   └── metacritic.js             # Metacritic search and score parsing
@@ -242,11 +259,16 @@ letterboxd-plus/
 │   │   ├── average-rating.js         # Combined normalized rating
 │   │   ├── enhanced-cast.js          # Cast portrait cards
 │   │   ├── film-context.js           # Shared Letterboxd film metadata
+│   │   ├── film-mini-profile.js      # Poster hover mini-cards
 │   │   ├── film-rating.js            # Rotten Tomatoes sidebar integration
 │   │   ├── metacritic-rating.js      # Metacritic sidebar integration
 │   │   ├── rating-section.js         # Shared rating section renderer
 │   │   └── settings-panel.js         # Account-menu entry and settings dialog
+│   ├── utils/
+│   │   ├── debounce.js               # Shared debounce helper
+│   │   └── html.js                   # HTML attribute/text escaping
 │   └── styles/
+│       ├── film-mini-profile.css     # Hover mini-card styles
 │       └── main.css                  # Namespaced Letterboxd-style UI
 ├── scripts/
 │   ├── copy-dist.mjs                 # Copy dist artifacts to repository root
@@ -258,6 +280,7 @@ letterboxd-plus/
 ├── vite.config.js                    # Build and userscript metadata
 ├── package.json                      # Version, dependencies, npm scripts
 ├── AGENTS.md                         # Repository guidance for coding agents
+├── DESIGN.md                         # Visual language and Letterboxd UI tokens
 ├── CLAUDE.md                         # Claude entry point for AGENTS.md
 └── LICENSE                           # MIT license
 ```

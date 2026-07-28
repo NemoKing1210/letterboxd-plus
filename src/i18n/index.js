@@ -74,6 +74,16 @@ const TRANSLATIONS = {
     enhancedCast: 'Enhanced cast',
     enhancedCastHint: 'Show actor portraits, names, and roles in the Cast section.',
     showAllCast: 'Show all cast',
+    showFilmMiniProfile: 'Film mini-cards',
+    showFilmMiniProfileHint:
+      'Show a hover mini-card with ratings when you rest on a poster in lists, browse, and similar films.',
+    preloadFilmMiniProfile: 'Preload mini-cards',
+    preloadFilmMiniProfileHint:
+      'Warm film data for posters near the viewport. Uses more network in the background.',
+    miniFilmRating: 'Letterboxd rating',
+    miniFilmOpen: 'Open film',
+    miniFilmLoading: 'Loading film…',
+    miniFilmError: 'Could not load film',
     aboutTitle: 'A compact companion for Letterboxd',
     aboutDescription:
       'Letterboxd Plus adds useful film context without changing the way Letterboxd feels.',
@@ -147,6 +157,16 @@ const TRANSLATIONS = {
     enhancedCast: 'Расширенный Cast',
     enhancedCastHint: 'Показывать портреты, имена и роли актёров в разделе Cast.',
     showAllCast: 'Показать всех актёров',
+    showFilmMiniProfile: 'Мини-карточки фильмов',
+    showFilmMiniProfileHint:
+      'Показывать мини-карточку с рейтингами при наведении на постер в списках, каталоге и похожих фильмах.',
+    preloadFilmMiniProfile: 'Предзагрузка мини-карточек',
+    preloadFilmMiniProfileHint:
+      'Заранее подгружать данные для постеров рядом с экраном. Использует больше сети в фоне.',
+    miniFilmRating: 'Рейтинг Letterboxd',
+    miniFilmOpen: 'Открыть фильм',
+    miniFilmLoading: 'Загрузка фильма…',
+    miniFilmError: 'Не удалось загрузить фильм',
     aboutTitle: 'Компактное дополнение для Letterboxd',
     aboutDescription:
       'Letterboxd Plus добавляет полезные сведения о фильмах, сохраняя привычный интерфейс Letterboxd.',
@@ -220,6 +240,16 @@ const TRANSLATIONS = {
     enhancedCast: 'Reparto ampliado',
     enhancedCastHint: 'Muestra retratos, nombres y papeles en la sección de reparto.',
     showAllCast: 'Mostrar todo el reparto',
+    showFilmMiniProfile: 'Mini tarjetas de películas',
+    showFilmMiniProfileHint:
+      'Muestra una mini tarjeta con valoraciones al pasar el cursor sobre un póster en listas, catálogo y películas similares.',
+    preloadFilmMiniProfile: 'Precargar mini tarjetas',
+    preloadFilmMiniProfileHint:
+      'Precarga datos de películas para pósters cerca del viewport. Usa más red en segundo plano.',
+    miniFilmRating: 'Valoración de Letterboxd',
+    miniFilmOpen: 'Abrir película',
+    miniFilmLoading: 'Cargando película…',
+    miniFilmError: 'No se pudo cargar la película',
     aboutTitle: 'Un complemento compacto para Letterboxd',
     aboutDescription:
       'Letterboxd Plus añade contexto útil sin cambiar la esencia de Letterboxd.',
@@ -293,6 +323,16 @@ const TRANSLATIONS = {
     enhancedCast: 'Elenco ampliado',
     enhancedCastHint: 'Mostra retratos, nomes e papéis na seção de elenco.',
     showAllCast: 'Mostrar todo o elenco',
+    showFilmMiniProfile: 'Mini cartões de filmes',
+    showFilmMiniProfileHint:
+      'Mostra um mini cartão com avaliações ao passar o mouse sobre um pôster em listas, catálogo e filmes semelhantes.',
+    preloadFilmMiniProfile: 'Pré-carregar mini cartões',
+    preloadFilmMiniProfileHint:
+      'Pré-carrega dados de filmes para pôsteres perto da tela. Usa mais rede em segundo plano.',
+    miniFilmRating: 'Avaliação do Letterboxd',
+    miniFilmOpen: 'Abrir filme',
+    miniFilmLoading: 'Carregando filme…',
+    miniFilmError: 'Não foi possível carregar o filme',
     aboutTitle: 'Um complemento compacto para o Letterboxd',
     aboutDescription:
       'Letterboxd Plus adiciona contexto útil sem mudar a experiência do Letterboxd.',
@@ -366,6 +406,16 @@ const TRANSLATIONS = {
     enhancedCast: 'Erweiterte Besetzung',
     enhancedCastHint: 'Zeigt Porträts, Namen und Rollen im Besetzungsbereich.',
     showAllCast: 'Gesamte Besetzung anzeigen',
+    showFilmMiniProfile: 'Film-Minikarten',
+    showFilmMiniProfileHint:
+      'Zeigt beim Überfahren eines Posters in Listen, im Katalog und bei ähnlichen Filmen eine Minikarte mit Wertungen.',
+    preloadFilmMiniProfile: 'Minikarten vorladen',
+    preloadFilmMiniProfileHint:
+      'Lädt Filmdaten für Poster nahe dem Viewport vor. Nutzt mehr Netzwerk im Hintergrund.',
+    miniFilmRating: 'Letterboxd-Bewertung',
+    miniFilmOpen: 'Film öffnen',
+    miniFilmLoading: 'Film wird geladen…',
+    miniFilmError: 'Film konnte nicht geladen werden',
     aboutTitle: 'Eine kompakte Ergänzung für Letterboxd',
     aboutDescription:
       'Letterboxd Plus ergänzt nützliche Filminformationen, ohne Letterboxd zu verfremden.',
@@ -439,6 +489,16 @@ const TRANSLATIONS = {
     enhancedCast: 'Distribution enrichie',
     enhancedCastHint: 'Affiche portraits, noms et rôles dans la distribution.',
     showAllCast: 'Afficher toute la distribution',
+    showFilmMiniProfile: 'Mini-cartes de films',
+    showFilmMiniProfileHint:
+      'Affiche une mini-carte avec notes au survol d’une affiche dans les listes, le catalogue et les films similaires.',
+    preloadFilmMiniProfile: 'Précharger les mini-cartes',
+    preloadFilmMiniProfileHint:
+      'Précharge les données des films pour les affiches proches de l’écran. Utilise plus de réseau en arrière-plan.',
+    miniFilmRating: 'Note Letterboxd',
+    miniFilmOpen: 'Ouvrir le film',
+    miniFilmLoading: 'Chargement du film…',
+    miniFilmError: 'Impossible de charger le film',
     aboutTitle: 'Un compagnon compact pour Letterboxd',
     aboutDescription:
       "Letterboxd Plus ajoute un contexte utile sans changer l'expérience Letterboxd.",
@@ -509,6 +569,16 @@ const TRANSLATIONS = {
     enhancedCast: '增强演职员表',
     enhancedCastHint: '在演员表中显示演员头像、姓名和角色。',
     showAllCast: '显示全部演员',
+    showFilmMiniProfile: '影片迷你卡片',
+    showFilmMiniProfileHint:
+      '在列表、浏览页和相似影片中将鼠标悬停在海报上时，显示带评分的迷你卡片。',
+    preloadFilmMiniProfile: '预加载迷你卡片',
+    preloadFilmMiniProfileHint:
+      '为靠近视口的海报预加载影片数据。会在后台使用更多网络。',
+    miniFilmRating: 'Letterboxd 评分',
+    miniFilmOpen: '打开影片',
+    miniFilmLoading: '正在加载影片…',
+    miniFilmError: '无法加载影片',
     aboutTitle: '紧凑的 Letterboxd 助手',
     aboutDescription: 'Letterboxd Plus 在不改变网站体验的前提下补充实用影片信息。',
     viewSource: '在 GitHub 查看源代码 ↗',

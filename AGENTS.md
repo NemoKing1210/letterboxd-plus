@@ -29,6 +29,8 @@ files; regenerate them with `npm run build`.
   `GM_xmlhttpRequest`.
 - `src/features/` contains DOM integrations and settings UI.
 - `src/styles/main.css` contains namespaced injected styles.
+- [`DESIGN.md`](DESIGN.md) documents Letterboxd-aligned visual tokens and
+  patterns for injected UI.
 - `scripts/` copies and verifies generated install artifacts.
 
 Rotten Tomatoes and Metacritic data is read from their public web endpoints
@@ -50,6 +52,10 @@ Letterboxd when either source fails.
   native UI as possible. Reuse its established colors, typography, spacing,
   section structure, control shapes, states, and interaction patterns before
   introducing custom visual language.
+- Treat [`DESIGN.md`](DESIGN.md) as the visual source of truth for tokens,
+  surfaces, type, motion, and anti-patterns. Cross-check new or restyled UI
+  against `DESIGN.md`, the live Letterboxd site, and the settings panel in
+  `src/styles/main.css` before shipping.
 - Preserve keyboard navigation, visible focus, ARIA relationships, responsive
   behavior, and `prefers-reduced-motion`.
 - Escape or safely assign external text and URLs before inserting them into the

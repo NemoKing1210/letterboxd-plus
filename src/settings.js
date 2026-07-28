@@ -17,6 +17,8 @@ function normalizeSettings(value) {
     showMetacritic: raw.showMetacritic !== false,
     showMetacriticUserScore: raw.showMetacriticUserScore !== false,
     enhanceCast: raw.enhanceCast !== false,
+    showFilmMiniProfile: raw.showFilmMiniProfile !== false,
+    preloadFilmMiniProfile: raw.preloadFilmMiniProfile === true,
     cacheHours: Number.isFinite(cacheHours)
       ? Math.max(0, Math.min(CACHE_HOURS_MAX, cacheHours))
       : DEFAULT_SETTINGS.cacheHours,

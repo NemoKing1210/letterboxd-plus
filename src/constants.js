@@ -10,6 +10,15 @@ export const METACRITIC_API_ORIGIN = 'https://backend.metacritic.com';
 export const REQUEST_TIMEOUT_MS = 12_000;
 export const CACHE_HOURS_MAX = 168;
 export const CACHE_SOFT_LIMIT_BYTES = 5 * 1024 * 1024;
+export const FAVICON_URL =
+  'https://www.google.com/s2/favicons?domain={domain}&sz=32';
+export const FILM_HOVER_OPEN_MS = 280;
+export const FILM_HOVER_CLOSE_MS = 180;
+export const FILM_LEAVE_MS = 300;
+export const FILM_FETCH_CONCURRENCY = 2;
+export const FILM_PRELOAD_ROOT_MARGIN = '160px 0px';
+export const FILM_POSTER_SKIP_ANCESTOR =
+  '#js-poster-col, .modal-dialog, .lbp-settings-backdrop';
 export const REPO_URL = 'https://github.com/NemoKing1210/letterboxd-plus';
 export const AUTHOR_NAME = 'NemoKing';
 export const AUTHOR_HANDLE = 'NemoKing1210';
@@ -25,5 +34,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   showMetacritic: true,
   showMetacriticUserScore: true,
   enhanceCast: true,
+  showFilmMiniProfile: true,
+  preloadFilmMiniProfile: false,
   cacheHours: 24,
 });
