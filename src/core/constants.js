@@ -1,4 +1,4 @@
-import pkg from '../package.json' with { type: 'json' };
+import pkg from '../../package.json' with { type: 'json' };
 
 export const SCRIPT_VERSION = pkg.version;
 export const ROOT_ATTR = 'data-lbp-root';

@@ -1,13 +1,13 @@
-import { getRottenTomatoesRating } from '../api/rotten-tomatoes.js';
-import { ROTTEN_TOMATOES_ORIGIN } from '../constants.js';
-import { formatNumber, t } from '../i18n/index.js';
+import { getRottenTomatoesRating } from '../../api/rotten-tomatoes.js';
+import { ROTTEN_TOMATOES_ORIGIN } from '../../core/constants.js';
+import { formatNumber, t } from '../../i18n/index.js';
 import { getFilmContext } from './film-context.js';
 import {
   createRatingSection as createRatingSectionBase,
   mountRatingSection,
   renderRatingMessage,
   renderRatingRows,
-} from './rating-section.js';
+} from './section.js';
 
 const RATING_ID = 'lbp-rotten-tomatoes';
 

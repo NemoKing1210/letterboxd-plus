@@ -1,10 +1,10 @@
-import { t } from '../i18n/index.js';
+import { t } from '../../i18n/index.js';
 import {
   createRatingSection,
   mountRatingSection,
   RATINGS_CHANGED_EVENT,
   renderRatingLoading,
-} from './rating-section.js';
+} from './section.js';
 
 const RATING_ID = 'lbp-average-rating';
 const LETTERBOXD_MAX_SCORE = 5;

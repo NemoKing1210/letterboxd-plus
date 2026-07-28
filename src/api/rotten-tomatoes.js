@@ -2,8 +2,9 @@ import { GM_xmlhttpRequest } from '$';
 import {
   REQUEST_TIMEOUT_MS,
   ROTTEN_TOMATOES_ORIGIN,
-} from '../constants.js';
-import { readCache, writeCache } from '../cache.js';
+} from '../core/constants.js';
+import { readCache, writeCache } from '../core/cache.js';
+import { normalizeTitle } from './normalize-title.js';
 
 function requestText(url) {
   return new Promise((resolve, reject) => {
@@ -25,14 +26,6 @@ function requestText(url) {
       ontimeout: () => reject(new Error('Rotten Tomatoes request timed out.')),
     });
   });
-}
-
-function normalizeTitle(value) {
-  return String(value || '')
-    .normalize('NFKD')
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .trim()
-    .toLowerCase();
 }
 
 function readCandidate(row) {

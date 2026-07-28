@@ -1,6 +1,11 @@
 import { GM_getValue, GM_setValue } from '$';
-import { CACHE_HOURS_MAX, DEFAULT_SETTINGS, SETTINGS_KEY, TOAST_POSITIONS } from './constants.js';
-import { SUPPORTED_LOCALES } from './i18n/index.js';
+import {
+  CACHE_HOURS_MAX,
+  DEFAULT_SETTINGS,
+  SETTINGS_KEY,
+  TOAST_POSITIONS,
+} from './constants.js';
+import { SUPPORTED_LOCALES } from '../i18n/meta.js';
 
 function normalizeSettings(value) {
   const raw = value && typeof value === 'object' ? value : {};

@@ -21,14 +21,16 @@ files; regenerate them with `npm run build`.
 ## Architecture
 
 - `src/main.js` initializes the userscript, registers the settings command,
-  and rescans dynamic Letterboxd pages.
-- `src/constants.js` contains storage keys, defaults, URLs, and timeouts.
-- `src/cache.js` owns rating cache persistence, usage statistics, and cleanup.
-- `src/settings.js` validates and persists settings through GM storage.
+  and rescans dynamic Letterboxd pages via `src/features/index.js`.
+- `src/core/constants.js` contains storage keys, defaults, URLs, and timeouts.
+- `src/core/cache.js` owns rating cache persistence, usage statistics, and cleanup.
+- `src/core/settings.js` validates and persists settings through GM storage.
 - `src/api/` contains external integrations. Cross-origin requests use
   `GM_xmlhttpRequest`.
-- `src/features/` contains DOM integrations and settings UI.
-- `src/styles/main.css` contains namespaced injected styles.
+- `src/features/` contains DOM integrations grouped by concern (`ratings/`,
+  `cast/`, `film-mini-profile/`, `settings/`, `toast/`), with co-located CSS.
+- `src/styles/tokens.css` holds shared design tokens and cross-feature media
+  queries.
 - [`DESIGN.md`](DESIGN.md) documents Letterboxd-aligned visual tokens and
   patterns for injected UI.
 - `scripts/` copies and verifies generated install artifacts.
@@ -55,7 +57,7 @@ Letterboxd when either source fails.
 - Treat [`DESIGN.md`](DESIGN.md) as the visual source of truth for tokens,
   surfaces, type, motion, and anti-patterns. Cross-check new or restyled UI
   against `DESIGN.md`, the live Letterboxd site, and the settings panel in
-  `src/styles/main.css` before shipping.
+  `src/features/settings/settings.css` before shipping.
 - Preserve keyboard navigation, visible focus, ARIA relationships, responsive
   behavior, and `prefers-reduced-motion`.
 - Escape or safely assign external text and URLs before inserting them into the
@@ -70,15 +72,16 @@ account dropdown immediately after Letterboxd's native `/settings/` item and is
 also available through `GM_registerMenuCommand`.
 
 Add defaults to `DEFAULT_SETTINGS`, normalize persisted values in
-`src/settings.js`, and expose user-facing controls in
-`src/features/settings-panel.js`.
+`src/core/settings.js`, and expose user-facing controls in
+`src/features/settings/`.
 
 ## Localization
 
 Supported UI locales are `en`, `ru`, `es`, `pt-BR`, `de`, `fr`, and `zh-CN`;
 `auto` detects the browser language and falls back to English. Keep every
-user-facing string in `src/i18n/index.js` and add each new key to all seven
-translation maps. Do not hardcode interface copy in feature modules.
+user-facing string in `src/i18n/locales/*.js` (one file per locale) and add
+each new key to all seven locale files. Runtime helpers live in
+`src/i18n/index.js`. Do not hardcode interface copy in feature modules.
 
 ## Versioning
 

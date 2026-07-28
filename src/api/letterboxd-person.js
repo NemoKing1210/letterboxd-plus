@@ -1,4 +1,4 @@
-import { REQUEST_TIMEOUT_MS } from '../constants.js';
+import { REQUEST_TIMEOUT_MS } from '../core/constants.js';
 
 const MAX_CONCURRENT_REQUESTS = 3;
 const ALLOWED_IMAGE_HOSTS = new Set(['a.ltrbxd.com', 'image.tmdb.org']);

@@ -1,13 +1,13 @@
-import { getMetacriticRating } from '../api/metacritic.js';
-import { METACRITIC_ORIGIN } from '../constants.js';
-import { formatNumber, t } from '../i18n/index.js';
+import { getMetacriticRating } from '../../api/metacritic.js';
+import { METACRITIC_ORIGIN } from '../../core/constants.js';
+import { formatNumber, t } from '../../i18n/index.js';
 import { getFilmContext } from './film-context.js';
 import {
   createRatingSection,
   mountRatingSection,
   renderRatingMessage,
   renderRatingRows,
-} from './rating-section.js';
+} from './section.js';
 
 const RATING_ID = 'lbp-metacritic';
 

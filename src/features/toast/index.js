@@ -1,6 +1,7 @@
-import { DEFAULT_SETTINGS, TOAST_POSITIONS } from '../constants.js';
-import { t } from '../i18n/index.js';
-import { loadSettings } from '../settings.js';
+import './toast.css';
+import { DEFAULT_SETTINGS, TOAST_POSITIONS } from '../../core/constants.js';
+import { t } from '../../i18n/index.js';
+import { loadSettings } from '../../core/settings.js';
 
 const HOST_CLASS = 'lbp-toast-host';
 const QUEUE_KEY = 'lbp_pending_toasts';

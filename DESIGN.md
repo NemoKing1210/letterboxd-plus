@@ -6,7 +6,8 @@ Prefer matching the live site and the existing settings panel over inventing
 new visual language.
 
 When in doubt: open Letterboxd, compare against this document and
-`src/styles/main.css` (especially `.lbp-settings*`), then reuse those tokens.
+`src/features/settings/settings.css` (especially `.lbp-settings*`), then reuse
+those tokens. Shared tokens live in `src/styles/tokens.css`.
 
 ## Design goal
 
@@ -17,7 +18,7 @@ pops, neon gradients, pill-heavy chrome, multi-layer glow.
 
 ## Palette
 
-Canonical tokens already live on `:root` in `src/styles/main.css`:
+Canonical tokens already live on `:root` in `src/styles/tokens.css`:
 
 | Token / role | Hex / value | Use |
 |--------------|-------------|-----|
@@ -135,11 +136,11 @@ large regions.
 
 | Surface | Where to copy from |
 |---------|--------------------|
-| Tokens | `:root` in `src/styles/main.css` |
-| Dialog / cards / switches / footer CTA | `.lbp-settings*` |
-| Sidebar score rows | `.lbp-rating*` |
-| Compact grid cards | `.lbp-cast-*` |
-| Hover film mini-card | `.lbp-fmp*` in `src/styles/film-mini-profile.css` |
+| Tokens | `:root` in `src/styles/tokens.css` |
+| Dialog / cards / switches / footer CTA | `.lbp-settings*` in `src/features/settings/settings.css` |
+| Sidebar score rows | `.lbp-rating*` in `src/features/ratings/ratings.css` |
+| Compact grid cards | `.lbp-cast-*` in `src/features/cast/cast.css` |
+| Hover film mini-card | `.lbp-fmp*` in `src/features/film-mini-profile/film-mini-profile.css` |
 
 Before finishing UI work, compare the result to Letterboxd’s own modals,
 section headings, and the settings panel side by side.

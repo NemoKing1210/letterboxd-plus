@@ -1,0 +1,110 @@
+:root {
+  --lbp-bg: #14181c;
+  --lbp-panel: #1f252b;
+  --lbp-panel-2: #2c3440;
+  --lbp-text: #f3f6f8;
+  --lbp-muted: #9ab;
+  --lbp-green: #00e054;
+  --lbp-blue: #40bcf4;
+  --lbp-orange: #ff8000;
+  --lbp-line: rgba(255, 255, 255, 0.1);
+}
+
+html.lbp-modal-open {
+  overflow: hidden;
+}
+
+@media (max-width: 620px) {
+  .lbp-settings__tabs {
+    padding: 8px 10px;
+  }
+
+  .lbp-settings__tabs button {
+    flex: 0 0 auto;
+  }
+
+  .lbp-settings__tabs button.is-active {
+    box-shadow: inset 0 -2px var(--lbp-blue);
+  }
+
+  .lbp-settings__content {
+    padding: 22px 18px 26px;
+  }
+
+  .lbp-cache-meter__legend {
+    grid-template-columns: 1fr;
+  }
+
+  .lbp-cache-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .lbp-settings__footer {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .lbp-settings__footer-actions {
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lbp-settings__footer > [data-reset] {
+    order: 1;
+  }
+
+  .lbp-toast-host[data-position='top-right'],
+  .lbp-toast-host[data-position='top-left'],
+  .lbp-toast-host[data-position='top-center'] {
+    top: 12px;
+  }
+
+  .lbp-toast-host[data-position='bottom-right'],
+  .lbp-toast-host[data-position='bottom-left'],
+  .lbp-toast-host[data-position='bottom-center'] {
+    bottom: 12px;
+  }
+
+  .lbp-toast-host[data-position='top-right'],
+  .lbp-toast-host[data-position='bottom-right'] {
+    right: 12px;
+  }
+
+  .lbp-toast-host[data-position='top-left'],
+  .lbp-toast-host[data-position='bottom-left'] {
+    left: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lbp-settings-backdrop,
+  .lbp-settings,
+  .lbp-settings__close,
+  .lbp-settings__tabs button,
+  .lbp-settings__tab-badge,
+  .lbp-setting-row,
+  .lbp-settings__footer button,
+  .lbp-cache-actions__clear,
+  .lbp-switch,
+  .lbp-switch span,
+  .lbp-settings__content [role='tabpanel'].is-entering,
+  .lbp-settings__content [role='tabpanel'].is-entering > *,
+  .lbp-rating__skeleton,
+  .lbp-cast-card,
+  .lbp-cast-card__portrait::after,
+  .lbp-cast-card__portrait img,
+  .lbp-toast {
+    animation: none !important;
+    filter: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .lbp-toast-host[data-position='top-center'],
+  .lbp-toast-host[data-position='bottom-center'] {
+    transform: translateX(-50%);
+  }
+}

@@ -1,19 +1,14 @@
 import { GM_registerMenuCommand } from '$';
-import './styles/main.css';
-import './styles/film-mini-profile.css';
-import { ROOT_ATTR } from './constants.js';
-import { ensureAverageRating } from './features/average-rating.js';
-import { ensureEnhancedCast } from './features/enhanced-cast.js';
-import { ensureFilmRating } from './features/film-rating.js';
-import { scheduleFilmMiniProfiles } from './features/film-mini-profile.js';
-import { ensureMetacriticRating } from './features/metacritic-rating.js';
+import './styles/tokens.css';
+import { ROOT_ATTR } from './core/constants.js';
+import { loadSettings } from './core/settings.js';
 import {
-  ensureSettingsButton,
+  configureToastPosition,
+  flushQueuedToasts,
   openSettings,
-} from './features/settings-panel.js';
-import { flushQueuedToasts, configureToastPosition } from './features/toast.js';
+  pageFeatures,
+} from './features/index.js';
 import { configureLocale, t } from './i18n/index.js';
-import { loadSettings } from './settings.js';
 
 const IGNORE_MUTATION_SELECTOR =
   '#lbp-film-mini-profile, .lbp-fmp, .lbp-settings-backdrop, .lbp-toast-host';
@@ -44,12 +39,9 @@ function shouldIgnoreMutation(mutation) {
 function scanPage() {
   const settings = loadSettings();
   configureLocale(settings.uiLocale);
-  ensureSettingsButton();
-  ensureEnhancedCast(settings);
-  scheduleFilmMiniProfiles(settings);
-  void ensureFilmRating(settings);
-  void ensureMetacriticRating(settings);
-  ensureAverageRating();
+  for (const feature of pageFeatures) {
+    feature.scan(settings);
+  }
 }
 
 function scheduleScan(mutations) {

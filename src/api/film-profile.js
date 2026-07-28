@@ -1,5 +1,5 @@
-import { REQUEST_TIMEOUT_MS } from '../constants.js';
-import { readCache, writeCache } from '../cache.js';
+import { REQUEST_TIMEOUT_MS } from '../core/constants.js';
+import { readCache, writeCache } from '../core/cache.js';
 
 const DESC_MAX = 180;
 const DIRECTORS_MAX = 4;

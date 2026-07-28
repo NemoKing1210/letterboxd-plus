@@ -247,29 +247,32 @@ To publish a release:
 letterboxd-plus/
 ├── src/
 │   ├── main.js                       # Bootstrap and DOM observer
-│   ├── constants.js                  # Settings defaults, keys, URLs, timeouts
-│   ├── cache.js                      # Cache reads, writes, statistics, cleanup
-│   ├── settings.js                   # Settings validation and persistence
+│   ├── core/
+│   │   ├── constants.js              # Settings defaults, keys, URLs, timeouts
+│   │   ├── cache.js                  # Cache reads, writes, statistics, cleanup
+│   │   └── settings.js               # Settings validation and persistence
 │   ├── api/
+│   │   ├── normalize-title.js        # Shared title normalization
 │   │   ├── film-profile.js           # Film page scrape for mini-cards
 │   │   ├── letterboxd-person.js      # Lazy Letterboxd portrait lookup
 │   │   ├── rotten-tomatoes.js        # RT search and scorecard parsing
 │   │   └── metacritic.js             # Metacritic search and score parsing
 │   ├── features/
-│   │   ├── average-rating.js         # Combined normalized rating
-│   │   ├── enhanced-cast.js          # Cast portrait cards
-│   │   ├── film-context.js           # Shared Letterboxd film metadata
-│   │   ├── film-mini-profile.js      # Poster hover mini-cards
-│   │   ├── film-rating.js            # Rotten Tomatoes sidebar integration
-│   │   ├── metacritic-rating.js      # Metacritic sidebar integration
-│   │   ├── rating-section.js         # Shared rating section renderer
-│   │   └── settings-panel.js         # Account-menu entry and settings dialog
+│   │   ├── index.js                  # Page-scan feature registry
+│   │   ├── ratings/                  # Sidebar RT / Metacritic / average
+│   │   ├── cast/                     # Enhanced cast portraits
+│   │   ├── film-mini-profile/        # Poster hover mini-cards
+│   │   ├── settings/                 # Account-menu entry and settings dialog
+│   │   └── toast/                    # Toast notifications
+│   ├── i18n/
+│   │   ├── meta.js                   # Locale lists, names, flags, aliases
+│   │   ├── locales/                  # One message map per locale
+│   │   └── index.js                  # t(), configureLocale, formatNumber
 │   ├── utils/
 │   │   ├── debounce.js               # Shared debounce helper
 │   │   └── html.js                   # HTML attribute/text escaping
 │   └── styles/
-│       ├── film-mini-profile.css     # Hover mini-card styles
-│       └── main.css                  # Namespaced Letterboxd-style UI
+│       └── tokens.css                # Shared design tokens and media queries
 ├── scripts/
 │   ├── copy-dist.mjs                 # Copy dist artifacts to repository root
 │   ├── verify-artifacts.mjs          # Verify dist and root files match

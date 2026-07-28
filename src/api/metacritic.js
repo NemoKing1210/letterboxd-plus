@@ -3,8 +3,9 @@ import {
   METACRITIC_API_ORIGIN,
   METACRITIC_ORIGIN,
   REQUEST_TIMEOUT_MS,
-} from '../constants.js';
-import { readCache, writeCache } from '../cache.js';
+} from '../core/constants.js';
+import { readCache, writeCache } from '../core/cache.js';
+import { normalizeTitle } from './normalize-title.js';
 
 const MOVIE_TYPE_ID = 2;
 const MAX_YEAR_DIFFERENCE = 1;
@@ -34,14 +35,6 @@ function requestJson(url) {
       ontimeout: () => reject(new Error('Metacritic request timed out.')),
     });
   });
-}
-
-function normalizeTitle(value) {
-  return String(value || '')
-    .normalize('NFKD')
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .trim()
-    .toLowerCase();
 }
 
 function componentData(response, name) {

@@ -1,5 +1,6 @@
-import { getLetterboxdPersonPortrait } from '../api/letterboxd-person.js';
-import { t } from '../i18n/index.js';
+import './cast.css';
+import { getLetterboxdPersonPortrait } from '../../api/letterboxd-person.js';
+import { t } from '../../i18n/index.js';
 
 const CARD_CLASS = 'lbp-cast-card';
 const ENHANCED_LIST_CLASS = 'lbp-cast-list--enhanced';
