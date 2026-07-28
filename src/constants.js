@@ -29,6 +29,7 @@ export const AUTHOR_AVATAR_URL =
 
 export const DEFAULT_SETTINGS = Object.freeze({
   uiLocale: 'auto',
+  toastPosition: 'top-right',
   showRottenTomatoes: true,
   showAudienceScore: true,
   showMetacritic: true,
@@ -38,3 +39,12 @@ export const DEFAULT_SETTINGS = Object.freeze({
   preloadFilmMiniProfile: false,
   cacheHours: 24,
 });
+
+export const TOAST_POSITIONS = Object.freeze([
+  'top-right',
+  'top-left',
+  'top-center',
+  'bottom-right',
+  'bottom-left',
+  'bottom-center',
+]);

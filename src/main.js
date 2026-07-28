@@ -11,8 +11,12 @@ import {
   ensureSettingsButton,
   openSettings,
 } from './features/settings-panel.js';
+import { flushQueuedToasts, configureToastPosition } from './features/toast.js';
 import { configureLocale, t } from './i18n/index.js';
 import { loadSettings } from './settings.js';
+
+const IGNORE_MUTATION_SELECTOR =
+  '#lbp-film-mini-profile, .lbp-fmp, .lbp-settings-backdrop, .lbp-toast-host';
 
 let scanTimer = 0;
 
@@ -24,15 +28,15 @@ function shouldIgnoreMutation(mutation) {
   ];
   return nodes.some((node) => {
     if (!node || node.nodeType !== 1) {
-      return node?.parentElement?.closest?.(
-        '#lbp-film-mini-profile, .lbp-fmp, .lbp-settings-backdrop',
-      );
+      return node?.parentElement?.closest?.(IGNORE_MUTATION_SELECTOR);
     }
     return Boolean(
-      node.closest?.('#lbp-film-mini-profile, .lbp-fmp, .lbp-settings-backdrop') ||
+      node.closest?.(IGNORE_MUTATION_SELECTOR) ||
         node.id === 'lbp-film-mini-profile' ||
         node.classList?.contains('lbp-fmp') ||
-        node.classList?.contains('lbp-settings-backdrop'),
+        node.classList?.contains('lbp-settings-backdrop') ||
+        node.classList?.contains('lbp-toast-host') ||
+        node.classList?.contains('lbp-toast'),
     );
   });
 }
@@ -66,6 +70,8 @@ function init() {
 
   const settings = loadSettings();
   configureLocale(settings.uiLocale);
+  configureToastPosition(settings.toastPosition);
+  flushQueuedToasts();
 
   if (typeof GM_registerMenuCommand === 'function') {
     GM_registerMenuCommand(t('menuSettings'), openSettings);

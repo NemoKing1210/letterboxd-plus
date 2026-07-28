@@ -12,6 +12,7 @@ import {
   CACHE_HOURS_MAX,
   REPO_URL,
   SCRIPT_VERSION,
+  TOAST_POSITIONS,
 } from '../constants.js';
 import {
   LOCALE_FLAGS,
@@ -19,10 +20,20 @@ import {
   SUPPORTED_LOCALES,
   t,
 } from '../i18n/index.js';
-import { loadSettings, saveSettings } from '../settings.js';
+import { loadSettings, resetSettings, saveSettings } from '../settings.js';
+import { configureToastPosition, queueToast, showToast } from './toast.js';
 
 const NAV_ID = 'lbp-nav-settings';
 const TABS = ['general', 'film', 'card', 'cache', 'about'];
+
+const TOAST_POSITION_I18N = Object.freeze({
+  'top-right': 'toastPositionTopRight',
+  'top-left': 'toastPositionTopLeft',
+  'top-center': 'toastPositionTopCenter',
+  'bottom-right': 'toastPositionBottomRight',
+  'bottom-left': 'toastPositionBottomLeft',
+  'bottom-center': 'toastPositionBottomCenter',
+});
 
 function switchHtml(key, isOn, label, hint) {
   return `
@@ -165,6 +176,10 @@ export function openSettings() {
     (locale) =>
       `<option value="${locale}"${draft.uiLocale === locale ? ' selected' : ''}>${LOCALE_FLAGS[locale]} ${LOCALE_NATIVE_NAMES[locale]}</option>`,
   ).join('');
+  const toastPositionOptions = TOAST_POSITIONS.map(
+    (position) =>
+      `<option value="${position}"${draft.toastPosition === position ? ' selected' : ''}>${t(TOAST_POSITION_I18N[position])}</option>`,
+  ).join('');
   const cacheStats = getCacheStats(draft.cacheHours);
   const activeElement = document.activeElement;
   const backdrop = document.createElement('div');
@@ -194,6 +209,13 @@ export function openSettings() {
               <select id="lbp-ui-locale">
                 <option value="auto"${draft.uiLocale === 'auto' ? ' selected' : ''}>🌐 ${t('uiLanguageAuto')}</option>
                 ${localeOptions}
+              </select>
+            </label>
+            <label class="lbp-field" for="lbp-toast-position">
+              <span>${t('toastPosition')}</span>
+              <small>${t('toastPositionHint')}</small>
+              <select id="lbp-toast-position">
+                ${toastPositionOptions}
               </select>
             </label>
           </section>
@@ -278,20 +300,80 @@ export function openSettings() {
         </div>
       </div>
       <footer class="lbp-settings__footer">
-        <button type="button" data-close>${t('cancel')}</button>
-        <button type="button" class="is-primary" data-save>${t('saveReload')}</button>
+        <button type="button" data-reset>${t('resetDefaults')}</button>
+        <div class="lbp-settings__footer-actions">
+          <button type="button" data-close>${t('cancel')}</button>
+          <button type="button" class="is-primary" data-save>${t('saveReload')}</button>
+        </div>
       </footer>
+      <div class="lbp-confirm" data-confirm hidden>
+        <div
+          class="lbp-confirm__card"
+          role="alertdialog"
+          aria-modal="true"
+          aria-labelledby="lbp-confirm-title"
+          aria-describedby="lbp-confirm-desc"
+        >
+          <h3 id="lbp-confirm-title">${t('resetConfirmTitle')}</h3>
+          <p id="lbp-confirm-desc">${t('resetConfirmMessage')}</p>
+          <div class="lbp-confirm__actions">
+            <button type="button" data-confirm-cancel>${t('cancel')}</button>
+            <button type="button" class="is-danger" data-confirm-ok>${t('resetConfirmAction')}</button>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
   let closing = false;
+  let confirmOpen = false;
+  const confirm = backdrop.querySelector('[data-confirm]');
   const finishClose = () => {
     document.removeEventListener('keydown', onDocumentKeydown, true);
+    configureToastPosition(loadSettings().toastPosition);
     backdrop.remove();
     document.documentElement.classList.remove('lbp-modal-open');
     activeElement?.focus?.();
   };
+  const closeConfirm = () => {
+    if (!confirmOpen) return;
+    confirmOpen = false;
+    confirm.hidden = true;
+    dialog.querySelector('[data-reset]')?.focus();
+  };
+  const openConfirm = () => {
+    confirmOpen = true;
+    confirm.hidden = false;
+    confirm.querySelector('[data-confirm-cancel]')?.focus();
+  };
   const close = () => {
+    if (closing) return;
+    if (confirmOpen) {
+      closeConfirm();
+      return;
+    }
+    closing = true;
+    document.removeEventListener('keydown', onDocumentKeydown, true);
+    if (prefersReducedMotion() || !backdrop.classList.contains('is-open')) {
+      finishClose();
+      return;
+    }
+    backdrop.classList.remove('is-open');
+    backdrop.classList.add('is-leaving');
+    let settled = false;
+    const settle = () => {
+      if (settled) return;
+      settled = true;
+      finishClose();
+    };
+    backdrop.addEventListener('transitionend', (event) => {
+      if (event.target === backdrop && event.propertyName === 'opacity') settle();
+    });
+    window.setTimeout(settle, 220);
+  };
+  const forceClose = () => {
+    confirmOpen = false;
+    confirm.hidden = true;
     if (closing) return;
     closing = true;
     document.removeEventListener('keydown', onDocumentKeydown, true);
@@ -314,11 +396,22 @@ export function openSettings() {
   };
   const dialog = backdrop.querySelector('.lbp-settings');
   const onDocumentKeydown = (event) => {
-    if (event.key === 'Escape') close();
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      if (confirmOpen) closeConfirm();
+      else forceClose();
+    }
   };
 
   backdrop.addEventListener('click', (event) => {
-    if (event.target === backdrop || event.target.closest('[data-close]')) close();
+    if (event.target.closest('[data-close]')) {
+      forceClose();
+      return;
+    }
+    if (event.target === backdrop) close();
+  });
+  confirm.addEventListener('click', (event) => {
+    if (event.target === confirm) closeConfirm();
   });
   dialog.querySelector('.lbp-settings__tabs').addEventListener('click', (event) => {
     const tab = event.target.closest('[data-tab]');
@@ -342,20 +435,48 @@ export function openSettings() {
       button.setAttribute('aria-checked', String(draft[key]));
     });
   });
+  dialog.querySelector('#lbp-toast-position').addEventListener('change', (event) => {
+    draft.toastPosition = event.target.value;
+    configureToastPosition(draft.toastPosition);
+  });
   dialog.querySelector('#lbp-cache-hours').addEventListener('input', (event) => {
     paintCachePanel(dialog, Number(event.target.value));
   });
   dialog.querySelector('[data-clear-cache]').addEventListener('click', () => {
     const removed = clearCache();
     paintCachePanel(dialog, Number(dialog.querySelector('#lbp-cache-hours').value));
-    dialog.querySelector('[data-cache-status]').textContent = removed
+    const status = removed
       ? t('cacheCleared', { count: removed })
       : t('cacheAlreadyEmpty');
+    dialog.querySelector('[data-cache-status]').textContent = status;
+    showToast({
+      title: t('cacheClearedTitle'),
+      message: status,
+    });
+  });
+  dialog.querySelector('[data-reset]').addEventListener('click', () => {
+    openConfirm();
+  });
+  confirm.querySelector('[data-confirm-cancel]').addEventListener('click', () => {
+    closeConfirm();
+  });
+  confirm.querySelector('[data-confirm-ok]').addEventListener('click', () => {
+    resetSettings();
+    queueToast({
+      title: t('settingsResetTitle'),
+      message: t('settingsResetMessage'),
+    });
+    location.reload();
   });
   dialog.querySelector('[data-save]').addEventListener('click', () => {
     draft.uiLocale = dialog.querySelector('#lbp-ui-locale').value;
+    draft.toastPosition = dialog.querySelector('#lbp-toast-position').value;
     draft.cacheHours = Number(dialog.querySelector('#lbp-cache-hours').value);
     saveSettings(draft);
+    queueToast({
+      title: t('settingsSavedTitle'),
+      message: t('settingsSavedMessage'),
+    });
     location.reload();
   });
 

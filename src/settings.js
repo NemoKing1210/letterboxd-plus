@@ -1,5 +1,5 @@
 import { GM_getValue, GM_setValue } from '$';
-import { CACHE_HOURS_MAX, DEFAULT_SETTINGS, SETTINGS_KEY } from './constants.js';
+import { CACHE_HOURS_MAX, DEFAULT_SETTINGS, SETTINGS_KEY, TOAST_POSITIONS } from './constants.js';
 import { SUPPORTED_LOCALES } from './i18n/index.js';
 
 function normalizeSettings(value) {
@@ -9,9 +9,13 @@ function normalizeSettings(value) {
     raw.uiLocale === 'auto' || SUPPORTED_LOCALES.includes(raw.uiLocale)
       ? raw.uiLocale
       : DEFAULT_SETTINGS.uiLocale;
+  const toastPosition = TOAST_POSITIONS.includes(raw.toastPosition)
+    ? raw.toastPosition
+    : DEFAULT_SETTINGS.toastPosition;
 
   return {
     uiLocale,
+    toastPosition,
     showRottenTomatoes: raw.showRottenTomatoes !== false,
     showAudienceScore: raw.showAudienceScore !== false,
     showMetacritic: raw.showMetacritic !== false,
@@ -38,4 +42,8 @@ export function saveSettings(value) {
   const settings = normalizeSettings(value);
   GM_setValue(SETTINGS_KEY, settings);
   return settings;
+}
+
+export function resetSettings() {
+  return saveSettings({ ...DEFAULT_SETTINGS });
 }
