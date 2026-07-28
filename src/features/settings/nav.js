@@ -19,9 +19,11 @@ export function ensureSettingsButton() {
     openSettings();
   });
 
-  const nativeSettings = [...accountMenu.querySelectorAll(':scope > li > a')].find(
-    (link) => link.getAttribute('href') === '/settings/',
-  );
-  nativeSettings?.parentElement?.insertAdjacentElement('afterend', item);
-  if (!item.isConnected) accountMenu.appendChild(item);
+  const profileItem = accountMenu.querySelector(':scope > li');
+  if (profileItem) {
+    profileItem.after(item);
+    return;
+  }
+
+  accountMenu.prepend(item);
 }

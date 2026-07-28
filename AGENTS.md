@@ -68,8 +68,8 @@ Letterboxd when either source fails.
 ## Settings
 
 Settings are stored under `lbp_settings`. The settings entry belongs in the
-account dropdown immediately after Letterboxd's native `/settings/` item and is
-also available through `GM_registerMenuCommand`.
+account dropdown immediately after the profile/avatar item (highlighted in brand
+green) and is also available through `GM_registerMenuCommand`.
 
 Add defaults to `DEFAULT_SETTINGS`, normalize persisted values in
 `src/core/settings.js`, and expose user-facing controls in

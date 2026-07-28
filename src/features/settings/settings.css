@@ -868,3 +868,20 @@
   border-color: transparent;
   filter: brightness(1.06);
 }
+
+.main-nav .nav-account > .subnav > .lbp-nav-settings,
+.main-nav .nav-account > .subnav > .lbp-nav-settings > a {
+  border: none;
+  box-shadow: none;
+}
+
+.main-nav .nav-account > .subnav > .lbp-nav-settings > a {
+  color: #00e054;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.main-nav .nav-account > .subnav > .lbp-nav-settings > a:hover,
+.main-nav .nav-account > .subnav > .lbp-nav-settings > a:focus-visible {
+  color: #00e054;
+}
