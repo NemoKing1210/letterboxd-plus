@@ -468,12 +468,48 @@ a.lbp-fmp__cast-name:focus-visible {
   outline-offset: 2px;
 }
 
+.lbp-fmp__card.is-skeleton-loading .lbp-fmp__body {
+  min-height: 220px;
+}
+
+.lbp-fmp__skel-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
 .lbp-fmp__bone {
   display: inline-block;
+  vertical-align: middle;
   border-radius: 2px;
   background: linear-gradient(90deg, #303943 20%, #3d4853 50%, #303943 80%);
   background-size: 220% 100%;
   animation: lbp-fmp-shimmer 1.25s ease-in-out infinite;
+}
+
+.lbp-fmp__bone--cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+}
+
+.lbp-fmp__bone--title {
+  display: block;
+  width: 78%;
+  height: 14px;
+  margin-top: 2px;
+}
+
+.lbp-fmp__bone--year {
+  width: 34px;
+  height: 11px;
+}
+
+.lbp-fmp__bone--runtime {
+  width: 48px;
+  height: 11px;
 }
 
 .lbp-fmp__bone--rating {
@@ -488,9 +524,14 @@ a.lbp-fmp__cast-name:focus-visible {
   margin-bottom: 8px;
 }
 
+.lbp-fmp__bone--line-short {
+  width: 48%;
+}
+
 .lbp-fmp__bone--chip {
   width: 52px;
   height: 18px;
+  border-radius: 3px;
 }
 
 .lbp-fmp__bone--score {

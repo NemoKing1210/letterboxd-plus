@@ -361,8 +361,8 @@ these React islands.
 
 Also: `AddMenu`, `AddToListModalTrigger`, `MenuLogEntry` React components.
 
-**JSON complement:** `GET /film/{slug}/json/` (`data-details-endpoint`) may
-carry relationship fields when HTML is incomplete.
+Letterboxd Plus reads relationship state from this HTML panel only (no
+`/film/{slug}/json/` fallback).
 
 **Used by:** `parseUserStateFromDoc`, `fetchFilmUserState` in `film-profile.js`.
 
@@ -426,13 +426,13 @@ What `parseFilmMiniProfileDoc` already pulls vs what the page still offers:
 
 ## 16. Recommended selector priority (parsing)
 
-When fetching `/film/{slug}/` HTML for the mini card:
+When fetching `/film/{slug}/` HTML for the mini card (Letterboxd Plus):
 
-1. **Identity:** `body[data-type]`, `data-tmdb-id`, slug from URL / LazyPoster.
-2. **Bulk metadata:** JSON-LD `Movie` (title, image, rating, runtime, cast names, genres).
-3. **Metas:** `production:*`, `twitter:data2`, `og:*`.
-4. **DOM enrichment:** tagline, cast **roles**, production stats, user panel.
-5. **Optional:** `/film/{slug}/json/` for user relationship / poster metadata.
+1. **Identity:** `body[data-type]`, `data-tmdb-id`, slug from LazyPoster / `og:url`.
+2. **DOM / metas first:** masthead, histogram, cast tab (+ roles), genres tab,
+   tagline, synopsis, production stats, `#userpanel`.
+3. **JSON-LD `Movie` as fallback:** runtime (primary), and any field missing from DOM.
+4. **Do not** call `/film/{slug}/json/` for mini-profile or user state.
 
 ---
 
@@ -456,3 +456,4 @@ When fetching `/film/{slug}/` HTML for the mini card:
 | Date | Change |
 |------|--------|
 | 2026-07-29 | Initial map from *The Odyssey* (2026) film page HTML |
+| 2026-07-29 | LBP mini-profile: DOM-first parsing; no `/film/{slug}/json/` |

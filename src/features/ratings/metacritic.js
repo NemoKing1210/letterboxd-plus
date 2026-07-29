@@ -103,6 +103,7 @@ export async function ensureMetacriticRating(settings) {
     const rating = await getMetacriticRating({
       ...context,
       cacheHours: settings.cacheHours,
+      cacheEnabled: settings.cacheMetacritic !== false,
     });
     if (section.isConnected) {
       renderRating(section, rating, settings.showMetacriticUserScore);

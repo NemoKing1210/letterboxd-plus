@@ -103,10 +103,19 @@ function parseRating(detailResponse, movie) {
   };
 }
 
-export async function getMetacriticRating({ cacheHours, key, title, year }) {
+export async function getMetacriticRating({
+  cacheHours,
+  cacheEnabled = true,
+  key,
+  title,
+  year,
+}) {
   const cacheKey = `metacritic:${key}`;
-  const cached = readCache(cacheKey, cacheHours * 60 * 60 * 1000);
-  if (cached) return cached;
+  const persist = cacheEnabled !== false;
+  if (persist) {
+    const cached = readCache(cacheKey, cacheHours * 60 * 60 * 1000);
+    if (cached) return cached;
+  }
 
   const searchUrl =
     `${METACRITIC_API_ORIGIN}/composer/metacritic/pages/search/` +
@@ -120,6 +129,6 @@ export async function getMetacriticRating({ cacheHours, key, title, year }) {
     `${movie.slug}/web`;
   const detailResponse = await requestJson(detailUrl);
   const rating = parseRating(detailResponse, movie);
-  if (rating) writeCache(cacheKey, rating);
+  if (rating && persist) writeCache(cacheKey, rating);
   return rating;
 }

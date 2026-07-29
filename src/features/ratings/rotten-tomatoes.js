@@ -84,6 +84,7 @@ export async function ensureFilmRating(settings) {
     const rating = await getRottenTomatoesRating({
       ...context,
       cacheHours: settings.cacheHours,
+      cacheEnabled: settings.cacheRottenTomatoes !== false,
     });
     if (section.isConnected) {
       renderRating(section, rating, settings.showAudienceScore);

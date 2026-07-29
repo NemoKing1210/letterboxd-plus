@@ -15,12 +15,15 @@ export function ensureProfileFetch(slug) {
     .toLowerCase();
   if (!key) return Promise.resolve(null);
   const settings = currentSettings();
-  const cached = peekCachedFilmMiniProfile(key, settings.cacheHours);
-  if (cached) return Promise.resolve(cached);
+  const persistCache = settings.cacheFilmMiniProfile !== false;
+  if (persistCache) {
+    const cached = peekCachedFilmMiniProfile(key, settings.cacheHours);
+    if (cached) return Promise.resolve(cached);
+  }
   let pending = state.profileFetches.get(key);
   if (pending) return pending;
   pending = enqueueFetch(() =>
-    fetchFilmMiniProfile(key, settings.cacheHours),
+    fetchFilmMiniProfile(key, settings.cacheHours, { persistCache }),
   ).finally(() => {
     state.profileFetches.delete(key);
   });
@@ -38,13 +41,29 @@ export function ensureUserStateFetch(slug) {
   }
 
   const cached = peekCachedUserState(key);
-  if (cached?.rating != null) return Promise.resolve(cached);
+  if (cached) return Promise.resolve(cached);
 
   let pending = state.userStateFetches.get(key);
   if (pending) return pending;
-  pending = enqueueFetch(() => ensureFilmUserState(key)).finally(() => {
+
+  pending = (async () => {
+    // Prefer the shared profile HTML fetch so we do not hit the page twice.
+    const profilePending = state.profileFetches.get(key);
+    if (profilePending) {
+      await profilePending;
+      const fromShared = peekCachedUserState(key);
+      if (fromShared) return fromShared;
+    } else if (!peekCachedFilmMiniProfile(key, currentSettings().cacheHours)) {
+      await ensureProfileFetch(key);
+      const fromProfile = peekCachedUserState(key);
+      if (fromProfile) return fromProfile;
+    }
+
+    return enqueueFetch(() => ensureFilmUserState(key));
+  })().finally(() => {
     state.userStateFetches.delete(key);
   });
+
   state.userStateFetches.set(key, pending);
   return pending;
 }
@@ -81,10 +100,16 @@ export function ensureScoreEnrich({ slug, title, year, tmdbId }) {
 
     const [rt, mc] = await Promise.all([
       wantsRt
-        ? getRottenTomatoesRating(payload).catch(() => null)
+        ? getRottenTomatoesRating({
+            ...payload,
+            cacheEnabled: settings.cacheRottenTomatoes !== false,
+          }).catch(() => null)
         : Promise.resolve(null),
       wantsMc
-        ? getMetacriticRating(payload).catch(() => null)
+        ? getMetacriticRating({
+            ...payload,
+            cacheEnabled: settings.cacheMetacritic !== false,
+          }).catch(() => null)
         : Promise.resolve(null),
     ]);
     return { rt, mc };

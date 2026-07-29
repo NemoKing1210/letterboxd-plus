@@ -88,6 +88,7 @@ html.lbp-modal-open {
   .lbp-setting-row,
   .lbp-settings__footer button,
   .lbp-cache-actions__clear,
+  .lbp-cache-entity__chevron,
   .lbp-switch,
   .lbp-switch span,
   .lbp-settings__content [role='tabpanel'].is-entering,

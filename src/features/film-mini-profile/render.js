@@ -50,24 +50,37 @@ function formatStars(value) {
 function renderHero(ctx) {
   const settings = currentSettings();
   const profile = ctx.profile;
-  const title = profile?.title || ctx.titleHint || ctx.slug;
+  const loading = Boolean(ctx.loadingProfile && !profile);
+  const title = profile?.title || ctx.titleHint || '';
   const year = profile?.year || ctx.yearHint || '';
   const posterUrl = profile?.posterUrl || ctx.posterHint || '';
   const filmUrl = profile?.filmUrl || filmUrlForSlug(ctx.slug);
   const img = posterUrl
     ? `<img src="${escapeAttr(posterUrl)}" alt="" loading="lazy" decoding="async">`
-    : `<span class="lbp-fmp__cover-ph"></span>`;
+    : loading
+      ? skelBone('lbp-fmp__bone--cover')
+      : `<span class="lbp-fmp__cover-ph"></span>`;
+
+  const titleHtml = title
+    ? `<a class="lbp-fmp__title" href="${escapeAttr(filmUrl)}">${escapeHtml(title)}</a>`
+    : loading
+      ? `<div class="lbp-fmp__title" aria-hidden="true">${skelBone('lbp-fmp__bone--title')}</div>`
+      : `<a class="lbp-fmp__title" href="${escapeAttr(filmUrl)}">${escapeHtml(ctx.slug)}</a>`;
 
   const yearHtml = year
     ? `<span class="lbp-fmp__year">${escapeHtml(String(year))}</span>`
-    : '';
+    : loading
+      ? skelBone('lbp-fmp__bone--year')
+      : '';
   const runtimeLabel =
     settings.fmpShowRuntime !== false && profile?.runtimeMins
       ? formatRuntime(profile.runtimeMins)
       : '';
   const runtimeHtml = runtimeLabel
     ? `<span class="lbp-fmp__runtime">${yearHtml ? '<span class="lbp-fmp__sep" aria-hidden="true">·</span>' : ''}${escapeHtml(runtimeLabel)}</span>`
-    : '';
+    : loading && settings.fmpShowRuntime !== false
+      ? `<span class="lbp-fmp__runtime" aria-hidden="true">${yearHtml ? '<span class="lbp-fmp__sep" aria-hidden="true">·</span>' : ''}${skelBone('lbp-fmp__bone--runtime')}</span>`
+      : '';
   const rating =
     settings.fmpShowCommunityRating !== false ? profile?.rating : null;
   const ratingTitle =
@@ -79,7 +92,7 @@ function renderHero(ctx) {
   const ratingHtml =
     rating != null
       ? `<span class="lbp-fmp__rating" title="${escapeAttr(ratingTitle)}">${escapeHtml(formatStars(rating))}</span>`
-      : ctx.loadingProfile && settings.fmpShowCommunityRating !== false
+      : loading && settings.fmpShowCommunityRating !== false
         ? skelBone('lbp-fmp__bone--rating')
         : '';
 
@@ -98,7 +111,7 @@ function renderHero(ctx) {
         <div class="lbp-fmp__cover">${img}</div>
       </a>
       <div class="lbp-fmp__hero-meta">
-        <a class="lbp-fmp__title" href="${escapeAttr(filmUrl)}">${escapeHtml(title)}</a>
+        ${titleHtml}
         <div class="lbp-fmp__sub">
           ${yearHtml}
           ${runtimeHtml}
@@ -117,7 +130,7 @@ function renderUserStatus(ctx) {
   const user = ctx.user;
   if (!user && ctx.loadingUser) {
     return `
-      <div class="lbp-fmp__section lbp-fmp__user" aria-hidden="true">
+      <div class="lbp-fmp__section lbp-fmp__user lbp-fmp__skel-row" aria-hidden="true">
         ${skelBone('lbp-fmp__bone--chip')}
         ${skelBone('lbp-fmp__bone--chip')}
         ${skelBone('lbp-fmp__bone--chip')}
@@ -155,8 +168,10 @@ function renderCast(ctx) {
   if (!profile && ctx.loadingProfile) {
     return `
       <div class="lbp-fmp__section lbp-fmp__cast" aria-hidden="true">
+        <div class="lbp-fmp__section-label">${skelBone('lbp-fmp__bone--label')}</div>
         ${skelBone('lbp-fmp__bone--line')}
         ${skelBone('lbp-fmp__bone--line')}
+        ${skelBone('lbp-fmp__bone--line lbp-fmp__bone--line-short')}
       </div>
     `;
   }
@@ -194,12 +209,16 @@ function renderMeta(ctx) {
   if (!profile && ctx.loadingProfile) {
     return `
       <div class="lbp-fmp__section" aria-hidden="true">
-        ${skelBone('lbp-fmp__bone--line')}
-        <div class="lbp-fmp__chips">
+        ${showDirectors ? skelBone('lbp-fmp__bone--line') : ''}
+        ${
+          showGenres
+            ? `<div class="lbp-fmp__chips lbp-fmp__skel-row">
           ${skelBone('lbp-fmp__bone--chip')}
           ${skelBone('lbp-fmp__bone--chip')}
           ${skelBone('lbp-fmp__bone--chip')}
-        </div>
+        </div>`
+            : ''
+        }
       </div>
     `;
   }
@@ -434,8 +453,10 @@ export function renderCard(ctx) {
     const html = section.render(ctx);
     if (html) parts.push(html);
   }
+  const loadingClass =
+    ctx.loadingProfile && !ctx.profile ? ' is-skeleton-loading' : '';
   return `
-    <div class="lbp-fmp__card">
+    <div class="lbp-fmp__card${loadingClass}">
       <div class="lbp-fmp__body">${parts.join('')}</div>
       ${renderFooter(ctx)}
     </div>

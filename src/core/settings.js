@@ -43,6 +43,9 @@ function normalizeSettings(value) {
     cacheHours: Number.isFinite(cacheHours)
       ? Math.max(0, Math.min(CACHE_HOURS_MAX, cacheHours))
       : DEFAULT_SETTINGS.cacheHours,
+    cacheFilmMiniProfile: raw.cacheFilmMiniProfile !== false,
+    cacheRottenTomatoes: raw.cacheRottenTomatoes !== false,
+    cacheMetacritic: raw.cacheMetacritic !== false,
   };
 }
 

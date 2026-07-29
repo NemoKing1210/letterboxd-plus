@@ -93,10 +93,19 @@ function parseScorecard(html, url) {
   };
 }
 
-export async function getRottenTomatoesRating({ cacheHours, key, title, year }) {
+export async function getRottenTomatoesRating({
+  cacheHours,
+  cacheEnabled = true,
+  key,
+  title,
+  year,
+}) {
   const cacheKey = `rt:${key}`;
-  const cached = readCache(cacheKey, cacheHours * 60 * 60 * 1000);
-  if (cached) return cached;
+  const persist = cacheEnabled !== false;
+  if (persist) {
+    const cached = readCache(cacheKey, cacheHours * 60 * 60 * 1000);
+    if (cached) return cached;
+  }
 
   const query = encodeURIComponent(`${title} ${year || ''}`.trim());
   const searchHtml = await requestText(
@@ -107,6 +116,6 @@ export async function getRottenTomatoesRating({ cacheHours, key, title, year }) 
 
   const movieHtml = await requestText(movieUrl);
   const rating = parseScorecard(movieHtml, movieUrl);
-  if (rating) writeCache(cacheKey, rating);
+  if (rating && persist) writeCache(cacheKey, rating);
   return rating;
 }

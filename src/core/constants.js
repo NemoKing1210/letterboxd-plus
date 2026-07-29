@@ -50,6 +50,9 @@ export const DEFAULT_SETTINGS = Object.freeze({
   fmpShowExternalLinks: true,
   fmpShowQuickLinks: true,
   cacheHours: 24,
+  cacheFilmMiniProfile: true,
+  cacheRottenTomatoes: true,
+  cacheMetacritic: true,
 });
 
 export const TOAST_POSITIONS = Object.freeze([

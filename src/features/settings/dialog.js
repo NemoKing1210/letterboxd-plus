@@ -17,9 +17,11 @@ import {
 } from '../toast/index.js';
 import {
   aboutHtml,
+  cacheEntitiesHtml,
   cacheMeterHtml,
   clearCache,
-  getCacheStats,
+  clearCacheByType,
+  getCacheStatsByType,
   paintCachePanel,
   switchHtml,
 } from './html.js';
@@ -46,7 +48,7 @@ export function openSettings() {
     (position) =>
       `<option value="${position}"${draft.toastPosition === position ? ' selected' : ''}>${t(TOAST_POSITION_I18N[position])}</option>`,
   ).join('');
-  const cacheStats = getCacheStats(draft.cacheHours);
+  const cacheTyped = getCacheStatsByType(draft.cacheHours);
   const activeElement = document.activeElement;
   const backdrop = document.createElement('div');
   backdrop.className = 'lbp-settings-backdrop';
@@ -62,7 +64,7 @@ export function openSettings() {
           <button type="button" id="lbp-tab-general" class="is-active" data-tab="general" role="tab" aria-selected="true" aria-controls="lbp-panel-general">${t('tabGeneral')}</button>
           <button type="button" id="lbp-tab-film" data-tab="film" role="tab" aria-selected="false" aria-controls="lbp-panel-film" tabindex="-1">${t('tabFilm')}</button>
           <button type="button" id="lbp-tab-card" data-tab="card" role="tab" aria-selected="false" aria-controls="lbp-panel-card" tabindex="-1">${t('tabCard')}</button>
-          <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheStats.fillPercent}%</span></button>
+          <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheTyped.fillPercent}%</span></button>
           <button type="button" id="lbp-tab-about" data-tab="about" role="tab" aria-selected="false" aria-controls="lbp-panel-about" tabindex="-1">${t('tabAbout')}</button>
         </div>
         <div class="lbp-settings__content">
@@ -215,7 +217,7 @@ export function openSettings() {
             <p class="lbp-settings__kicker">${t('tabCache')}</p>
             <h3>${t('cacheTitle')}</h3>
             <p class="lbp-settings__intro">${t('cacheDescription')}</p>
-            ${cacheMeterHtml(cacheStats)}
+            ${cacheMeterHtml(cacheTyped)}
             <label class="lbp-field" for="lbp-cache-hours">
               <span>${t('cacheDuration')}</span>
               <small>${t('cacheHint')}</small>
@@ -224,6 +226,7 @@ export function openSettings() {
                 <span>${t('hours')}</span>
               </span>
             </label>
+            ${cacheEntitiesHtml(draft, cacheTyped)}
             <div class="lbp-cache-actions">
               <button type="button" class="lbp-cache-actions__clear" data-clear-cache>${t('clearCache')}</button>
               <span>${t('cacheClearHint')}</span>
@@ -365,24 +368,65 @@ export function openSettings() {
     const next = tabs[(index + direction + tabs.length) % tabs.length];
     activateTab(dialog, next.dataset.tab, true);
   });
-  dialog.querySelectorAll('[data-setting]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const key = button.dataset.setting;
+  dialog.addEventListener('click', (event) => {
+    const switchBtn = event.target.closest('[data-setting]');
+    if (switchBtn && dialog.contains(switchBtn)) {
+      const key = switchBtn.dataset.setting;
       draft[key] = !draft[key];
-      button.classList.toggle('is-on', draft[key]);
-      button.setAttribute('aria-checked', String(draft[key]));
-    });
+      switchBtn.classList.toggle('is-on', draft[key]);
+      switchBtn.setAttribute('aria-checked', String(draft[key]));
+      return;
+    }
+
+    const clearTypeBtn = event.target.closest('[data-clear-cache-type]');
+    if (clearTypeBtn && dialog.contains(clearTypeBtn)) {
+      const type = clearTypeBtn.dataset.clearCacheType;
+      const removed = clearCacheByType(type);
+      paintCachePanel(
+        dialog,
+        Number(dialog.querySelector('#lbp-cache-hours').value),
+        draft,
+      );
+      const status = removed
+        ? t('cacheCleared', { count: removed })
+        : t('cacheAlreadyEmpty');
+      dialog.querySelector('[data-cache-status]').textContent = status;
+      showToast({
+        title: t('cacheClearedTitle'),
+        message: status,
+      });
+      return;
+    }
+
+    const toggleBtn = event.target.closest('[data-cache-entity-toggle]');
+    if (toggleBtn && dialog.contains(toggleBtn)) {
+      const entity = toggleBtn.closest('[data-cache-entity]');
+      if (!entity) return;
+      const expanded = entity.classList.toggle('is-collapsed') === false;
+      toggleBtn.setAttribute('aria-expanded', String(expanded));
+      const count = entity.querySelectorAll('.lbp-cache-entry').length;
+      const label = toggleBtn.querySelector('.lbp-cache-entity__toggle-label');
+      if (label) {
+        label.textContent = expanded
+          ? t('cacheEntriesHide')
+          : t('cacheEntriesShow', { count });
+      }
+    }
   });
   dialog.querySelector('#lbp-toast-position').addEventListener('change', (event) => {
     draft.toastPosition = event.target.value;
     configureToastPosition(draft.toastPosition);
   });
   dialog.querySelector('#lbp-cache-hours').addEventListener('input', (event) => {
-    paintCachePanel(dialog, Number(event.target.value));
+    paintCachePanel(dialog, Number(event.target.value), draft);
   });
   dialog.querySelector('[data-clear-cache]').addEventListener('click', () => {
     const removed = clearCache();
-    paintCachePanel(dialog, Number(dialog.querySelector('#lbp-cache-hours').value));
+    paintCachePanel(
+      dialog,
+      Number(dialog.querySelector('#lbp-cache-hours').value),
+      draft,
+    );
     const status = removed
       ? t('cacheCleared', { count: removed })
       : t('cacheAlreadyEmpty');
