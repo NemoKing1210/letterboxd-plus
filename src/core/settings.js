@@ -28,6 +28,18 @@ function normalizeSettings(value) {
     enhanceCast: raw.enhanceCast !== false,
     showFilmMiniProfile: raw.showFilmMiniProfile !== false,
     preloadFilmMiniProfile: raw.preloadFilmMiniProfile === true,
+    fmpShowCommunityRating: raw.fmpShowCommunityRating !== false,
+    fmpShowUserStatus: raw.fmpShowUserStatus !== false,
+    fmpShowCast: raw.fmpShowCast !== false,
+    fmpShowDirectors: raw.fmpShowDirectors !== false,
+    fmpShowGenres: raw.fmpShowGenres !== false,
+    fmpShowTagline: raw.fmpShowTagline !== false,
+    fmpShowRuntime: raw.fmpShowRuntime !== false,
+    fmpShowDescription: raw.fmpShowDescription !== false,
+    fmpShowStats: raw.fmpShowStats === true,
+    fmpShowExternalScores: raw.fmpShowExternalScores !== false,
+    fmpShowExternalLinks: raw.fmpShowExternalLinks !== false,
+    fmpShowQuickLinks: raw.fmpShowQuickLinks !== false,
     cacheHours: Number.isFinite(cacheHours)
       ? Math.max(0, Math.min(CACHE_HOURS_MAX, cacheHours))
       : DEFAULT_SETTINGS.cacheHours,

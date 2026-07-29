@@ -1,6 +1,8 @@
 import {
+  ensureFilmUserState,
   fetchFilmMiniProfile,
   peekCachedFilmMiniProfile,
+  peekCachedUserState,
 } from '../../api/film-profile.js';
 import { getMetacriticRating } from '../../api/metacritic.js';
 import { getRottenTomatoesRating } from '../../api/rotten-tomatoes.js';
@@ -26,8 +28,32 @@ export function ensureProfileFetch(slug) {
   return pending;
 }
 
+export function ensureUserStateFetch(slug) {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase();
+  if (!key) return Promise.resolve(null);
+  if (currentSettings().fmpShowUserStatus === false) {
+    return Promise.resolve(null);
+  }
+
+  const cached = peekCachedUserState(key);
+  if (cached?.rating != null) return Promise.resolve(cached);
+
+  let pending = state.userStateFetches.get(key);
+  if (pending) return pending;
+  pending = enqueueFetch(() => ensureFilmUserState(key)).finally(() => {
+    state.userStateFetches.delete(key);
+  });
+  state.userStateFetches.set(key, pending);
+  return pending;
+}
+
 export function ensureScoreEnrich({ slug, title, year, tmdbId }) {
   const settings = currentSettings();
+  if (settings.fmpShowExternalScores === false) {
+    return Promise.resolve({ rt: null, mc: null });
+  }
   const wantsRt = settings.showRottenTomatoes !== false;
   const wantsMc = settings.showMetacritic !== false;
   if (!wantsRt && !wantsMc) {

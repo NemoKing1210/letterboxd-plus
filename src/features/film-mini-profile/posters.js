@@ -91,6 +91,37 @@ export function posterImgUrl(poster) {
   return src;
 }
 
+function readBoolAttr(el, name) {
+  if (!el?.getAttribute) return null;
+  const raw = el.getAttribute(name);
+  if (raw == null) return null;
+  const value = String(raw).trim().toLowerCase();
+  if (value === 'true' || value === '1') return true;
+  if (value === 'false' || value === '0') return false;
+  return null;
+}
+
+export function parsePosterUserHints(poster) {
+  const roots = [
+    poster,
+    poster.querySelector?.('.poster.film-poster, .film-poster'),
+    poster.closest?.('.poster.film-poster, .film-poster'),
+  ].filter(Boolean);
+
+  let watched = null;
+  let inWatchlist = null;
+  for (const root of roots) {
+    if (watched == null) watched = readBoolAttr(root, 'data-watched');
+    if (inWatchlist == null) {
+      inWatchlist = readBoolAttr(root, 'data-in-watchlist');
+    }
+    if (watched != null && inWatchlist != null) break;
+  }
+
+  if (watched == null && inWatchlist == null) return null;
+  return { watched, inWatchlist, liked: null, rating: null };
+}
+
 export function clearPosterMark(poster) {
   if (!poster?.removeAttribute) return;
   poster.removeAttribute(MARK_ATTR);
@@ -128,11 +159,13 @@ export function markPoster(poster) {
     title: parsePosterTitle(poster, slug),
     year: parsePosterYear(poster),
     posterHint: posterImgUrl(poster),
+    userHint: parsePosterUserHints(poster),
   };
 }
 
 export function clearAllPosterMarks() {
   state.profileFetches.clear();
+  state.userStateFetches.clear();
   document
     .querySelectorAll(`[${MARK_ATTR}], [${HOVER_ATTR}], [${PRELOAD_ATTR}]`)
     .forEach((el) => clearPosterMark(el));

@@ -2,12 +2,18 @@ import { REQUEST_TIMEOUT_MS } from '../core/constants.js';
 import { readCache, writeCache } from '../core/cache.js';
 
 const DESC_MAX = 180;
+const TAGLINE_MAX = 120;
 const DIRECTORS_MAX = 4;
 const GENRES_MAX = 8;
+const CAST_MAX = 4;
+const USER_STATE_TTL_MS = 5 * 60 * 1000;
+
 const inFlight = new Map();
+const userStateCache = new Map();
+const userStateInFlight = new Map();
 
 export function filmMiniCacheKey(slug) {
-  return `film:mini:${String(slug || '')
+  return `film:mini:v2:${String(slug || '')
     .trim()
     .toLowerCase()}`;
 }
@@ -24,6 +30,28 @@ export function peekCachedFilmMiniProfile(slug, cacheHours) {
   return cached?.slug ? cached : null;
 }
 
+export function peekCachedUserState(slug) {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase();
+  if (!key) return null;
+  const entry = userStateCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.at > USER_STATE_TTL_MS) {
+    userStateCache.delete(key);
+    return null;
+  }
+  return entry.user;
+}
+
+export function rememberUserState(slug, user) {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase();
+  if (!key || !user) return;
+  userStateCache.set(key, { at: Date.now(), user });
+}
+
 function textOf(el) {
   return (el?.textContent || '').replace(/\s+/g, ' ').trim();
 }
@@ -38,13 +66,29 @@ function absUrl(url, base = window.location.origin) {
   }
 }
 
-function truncateText(value) {
+function truncateText(value, max = DESC_MAX) {
   const text = String(value || '')
     .replace(/\s+/g, ' ')
     .trim();
   if (!text) return '';
-  if (text.length <= DESC_MAX) return text;
-  return `${text.slice(0, DESC_MAX - 1).trimEnd()}…`;
+  if (text.length <= max) return text;
+  return `${text.slice(0, max - 1).trimEnd()}…`;
+}
+
+function parseCompactCount(raw) {
+  const text = String(raw || '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!text) return null;
+  const match = text.replace(/,/g, '').match(/([\d.]+)\s*([KMB])?/i);
+  if (!match) return null;
+  const base = Number(match[1]);
+  if (!Number.isFinite(base)) return null;
+  const suffix = (match[2] || '').toUpperCase();
+  const mult =
+    suffix === 'B' ? 1e9 : suffix === 'M' ? 1e6 : suffix === 'K' ? 1e3 : 1;
+  return Math.round(base * mult);
 }
 
 function readJsonLd(doc) {
@@ -52,7 +96,8 @@ function readJsonLd(doc) {
     'script[type="application/ld+json"]',
   )) {
     try {
-      const raw = script.textContent?.replace(/^\s*\/\*\s*<!\[CDATA\[\s*/, '')
+      const raw = script.textContent
+        ?.replace(/^\s*\/\*\s*<!\[CDATA\[\s*/, '')
         .replace(/\s*\]\]>\s*\*\/\s*$/, '')
         .trim();
       if (!raw) continue;
@@ -84,8 +129,10 @@ function parseYear(doc, jsonLd) {
     doc.querySelector('meta[name="production:name-and-year"]')?.content || '';
   const yearMatch = titleAndYear.match(/\((\d{4})\)\s*$/);
   if (yearMatch) return yearMatch[1];
-  if (jsonLd?.datePublished) {
-    const match = String(jsonLd.datePublished).match(/\b(19|20)\d{2}\b/);
+  if (jsonLd?.datePublished || jsonLd?.dateCreated) {
+    const match = String(
+      jsonLd.datePublished || jsonLd.dateCreated,
+    ).match(/\b(19|20)\d{2}\b/);
     if (match) return match[0];
   }
   return '';
@@ -111,10 +158,89 @@ function parsePosterUrl(doc, jsonLd) {
   );
 }
 
-function parseRating(jsonLd) {
-  const value = Number(jsonLd?.aggregateRating?.ratingValue);
-  if (!Number.isFinite(value) || value <= 0) return null;
-  return Math.max(0, Math.min(5, Math.round(value * 100) / 100));
+function clampRating(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.max(0, Math.min(5, Math.round(n * 100) / 100));
+}
+
+function parseRatingFromHistogram(doc) {
+  const el = doc.querySelector(
+    '.rating-histogram a.averagerating, a.averagerating.tooltip, a.averagerating',
+  );
+  if (!el) return { rating: null, ratingCount: null };
+
+  const tip =
+    el.getAttribute('data-original-title') ||
+    el.getAttribute('title') ||
+    '';
+  // "Weighted average of 4.40 based on 2,307,162 ratings"
+  const tipMatch = tip.match(
+    /(?:weighted\s+)?average\s+of\s+([\d.]+)\s+based\s+on\s+([\d,.\s]+)\s*ratings/i,
+  );
+  let rating = tipMatch ? Number(tipMatch[1]) : null;
+  let ratingCount = tipMatch
+    ? Number(String(tipMatch[2]).replace(/[,\s]/g, ''))
+    : null;
+
+  if (!Number.isFinite(rating) || rating <= 0) {
+    const textMatch = textOf(el).match(/([\d]+(?:[.,]\d+)?)/);
+    if (textMatch) {
+      rating = Number(String(textMatch[1]).replace(',', '.'));
+    }
+  }
+
+  return {
+    rating: clampRating(rating),
+    ratingCount:
+      Number.isFinite(ratingCount) && ratingCount > 0
+        ? Math.round(ratingCount)
+        : null,
+  };
+}
+
+function parseRatingFromMeta(doc) {
+  const twitter =
+    doc.querySelector('meta[name="twitter:data2"]')?.getAttribute('content') ||
+    '';
+  // "4.45 out of 5"
+  const match = twitter.match(/([\d.]+)\s*out\s*of\s*5/i);
+  return clampRating(match ? match[1] : null);
+}
+
+function parseRating(doc, jsonLd) {
+  const fromJson = clampRating(jsonLd?.aggregateRating?.ratingValue);
+  if (fromJson != null) return fromJson;
+  const fromHistogram = parseRatingFromHistogram(doc).rating;
+  if (fromHistogram != null) return fromHistogram;
+  return parseRatingFromMeta(doc);
+}
+
+function parseRatingCount(doc, jsonLd) {
+  const value = Number(jsonLd?.aggregateRating?.ratingCount);
+  if (Number.isFinite(value) && value > 0) return Math.round(value);
+  return parseRatingFromHistogram(doc).ratingCount;
+}
+
+function parseRuntimeMins(jsonLd) {
+  const duration = String(jsonLd?.duration || '').trim();
+  if (!duration) return null;
+  const match = duration.match(
+    /^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$/i,
+  );
+  if (!match) return null;
+  const hours = Number(match[1] || 0);
+  const mins = Number(match[2] || 0);
+  const secs = Number(match[3] || 0);
+  const total = hours * 60 + mins + (secs >= 30 ? 1 : 0);
+  return total > 0 ? total : null;
+}
+
+function parseTagline(doc) {
+  const el = doc.querySelector(
+    '.production-synopsis h4.tagline, h4.tagline',
+  );
+  return truncateText(textOf(el), TAGLINE_MAX);
 }
 
 function parseDirectors(doc, jsonLd) {
@@ -169,11 +295,293 @@ function parseGenres(doc) {
   return out;
 }
 
+function parseCast(doc, jsonLd) {
+  const out = [];
+  const seen = new Set();
+
+  const push = (name, href = '', role = '') => {
+    const label = String(name || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!label) return;
+    const key = label.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({
+      name: label,
+      href: absUrl(href) || href || '',
+      role: String(role || '')
+        .replace(/\s+/g, ' ')
+        .trim(),
+    });
+  };
+
+  const root =
+    doc.querySelector('#tab-panel-cast .cast-list') ||
+    doc.querySelector('#tab-panel-cast .text-sluglist') ||
+    doc.querySelector('.cast-list');
+
+  if (root) {
+    for (const anchor of root.querySelectorAll('a[href*="/actor/"]')) {
+      const name =
+        anchor.getAttribute('data-lbp-cast-name') ||
+        textOf(anchor.querySelector('strong')) ||
+        textOf(anchor);
+      const role =
+        anchor.getAttribute('data-original-title') ||
+        anchor.getAttribute('title') ||
+        textOf(anchor.querySelector('small')) ||
+        '';
+      push(name, anchor.getAttribute('href') || '', role);
+      if (out.length >= CAST_MAX) return out;
+    }
+  }
+
+  if (out.length) return out;
+
+  const actors = Array.isArray(jsonLd?.actor)
+    ? jsonLd.actor
+    : jsonLd?.actor
+      ? [jsonLd.actor]
+      : [];
+  for (const actor of actors) {
+    push(actor?.name, actor?.sameAs || '', '');
+    if (out.length >= CAST_MAX) break;
+  }
+  return out;
+}
+
 function parseDescription(doc, jsonLd) {
   const truncate = doc.querySelector('.truncate[data-truncate] p, .truncate p');
   const fromDom = truncateText(textOf(truncate));
   if (fromDom) return fromDom;
   return truncateText(jsonLd?.description || '');
+}
+
+function parseStats(doc) {
+  const watchesEl = doc.querySelector(
+    '.production-statistic.-watches[aria-label], .production-statistic.-watches',
+  );
+  const likesEl = doc.querySelector(
+    '.production-statistic.-likes[aria-label], .production-statistic.-likes',
+  );
+  const watches =
+    parseCompactCount(watchesEl?.getAttribute('aria-label')) ||
+    parseCompactCount(textOf(watchesEl?.querySelector('.label'))) ||
+    null;
+  const likes =
+    parseCompactCount(likesEl?.getAttribute('aria-label')) ||
+    parseCompactCount(textOf(likesEl?.querySelector('.label'))) ||
+    null;
+  if (watches == null && likes == null) return null;
+  return { watches, likes };
+}
+
+function parseUserRating(root) {
+  if (!root) return null;
+
+  const selected = root.querySelectorAll(
+    '[data-component-class="InstantRatingInput"] label[data-state="selected"], [data-component-class="InstantRatingInput"] [class*="star-trigger"][data-state="selected"]',
+  );
+  let maxStars = 0;
+  for (const label of selected) {
+    const aria = label.getAttribute('aria-label') || '';
+    const ariaMatch = aria.match(/([\d.]+)\s*Stars?/i);
+    if (ariaMatch) {
+      const stars = Number(ariaMatch[1]);
+      if (Number.isFinite(stars) && stars > maxStars) maxStars = stars;
+      continue;
+    }
+
+    const forId = label.getAttribute('for');
+    let input = null;
+    if (forId) {
+      try {
+        input = root.querySelector(`#${CSS.escape(forId)}`);
+      } catch {
+        input = null;
+      }
+    }
+    if (!input) input = label.previousElementSibling;
+    const half = Number(input?.value);
+    if (Number.isFinite(half) && half > 0) {
+      const stars = half / 2;
+      if (stars > maxStars) maxStars = stars;
+    }
+  }
+  if (maxStars > 0) return maxStars;
+
+  const checked = root.querySelector(
+    '[data-component-class="InstantRatingInput"] input[type="radio"]:checked',
+  );
+  const checkedHalf = Number(checked?.value);
+  if (Number.isFinite(checkedHalf) && checkedHalf > 0) {
+    return checkedHalf / 2;
+  }
+  return null;
+}
+
+function findUserActionsRoot(doc) {
+  return (
+    doc.querySelector(
+      '#userpanel, .js-actions-panel, ul.js-actions-panel, .actions-panel',
+    ) || doc
+  );
+}
+
+function hasUserActionSignals(root) {
+  return Boolean(
+    root.querySelector(
+      '[data-component-class="WatchLink"], [data-component-class="LikeComponent"], [data-component-class="InstantRatingInput"], [data-component-class="Watchlist"], [data-component-class="MemberActivity"]',
+    ),
+  );
+}
+
+export function parseUserStateFromDoc(doc, slugHint = '') {
+  if (!doc) return null;
+  const root = findUserActionsRoot(doc);
+  if (!hasUserActionSignals(root) && root === doc) {
+    // Nothing user-specific in the document.
+    if (!hasUserActionSignals(doc)) return null;
+  }
+
+  const searchRoot = hasUserActionSignals(root) ? root : doc;
+
+  const watchEl =
+    searchRoot.querySelector(
+      '[data-component-class="WatchLink"][data-is-watched]',
+    ) || searchRoot.querySelector('[data-component-class="WatchLink"]');
+  const likeEl =
+    searchRoot.querySelector(
+      '[data-component-class="LikeComponent"][data-is-liked]',
+    ) || searchRoot.querySelector('[data-component-class="LikeComponent"]');
+
+  const watchedAttr = watchEl?.getAttribute('data-is-watched');
+  const likedAttr = likeEl?.getAttribute('data-is-liked');
+  const watched =
+    watchedAttr === 'true' ||
+    Boolean(searchRoot.querySelector('.action.-watch.-on, .watch-link .action.-on'));
+  const liked =
+    likedAttr === 'true' ||
+    Boolean(searchRoot.querySelector('.action.-like.-on, .like-link .action.-on'));
+
+  // If attributes explicitly say false, keep false even without -on class.
+  const watchedState =
+    watchedAttr === 'false' ? false : watchedAttr === 'true' ? true : watched;
+  const likedState =
+    likedAttr === 'false' ? false : likedAttr === 'true' ? true : liked;
+
+  const addWatchlist = searchRoot.querySelector(
+    '.add-to-watchlist, a.action.-watchlist.add-to-watchlist',
+  );
+  const removeWatchlist = searchRoot.querySelector(
+    '.remove-from-watchlist, a.action.-watchlist.remove-from-watchlist, .action.-watchlist.-on',
+  );
+  let inWatchlist = null;
+  if (removeWatchlist) inWatchlist = true;
+  else if (addWatchlist) inWatchlist = false;
+
+  const activityEl = searchRoot.querySelector(
+    '[data-component-class="MemberActivity"]',
+  );
+  const activity =
+    activityEl?.getAttribute('data-members-activity-page-url') || '';
+  const username = activityEl?.getAttribute('data-member-username') || '';
+
+  const rating = parseUserRating(searchRoot);
+  const slug =
+    String(slugHint || '')
+      .trim()
+      .toLowerCase() ||
+    (
+      doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || ''
+    ).match(/\/film\/([^/?#]+)/i)?.[1]?.toLowerCase() ||
+    '';
+
+  if (
+    !watchEl &&
+    !likeEl &&
+    rating == null &&
+    inWatchlist == null &&
+    !activity
+  ) {
+    return null;
+  }
+
+  return {
+    watched: watchedState,
+    liked: likedState,
+    inWatchlist,
+    rating,
+    activityUrl: absUrl(activity) || activity || '',
+    username: String(username || '').trim(),
+    logUrl: slug ? `/film/${encodeURIComponent(slug)}/` : '',
+  };
+}
+
+function normalizeHalfOrStars(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  // Letterboxd forms often use 1–10 (half-stars); API uses 0.5–5.
+  if (n > 5) return Math.max(0.5, Math.min(5, n / 2));
+  return Math.max(0.5, Math.min(5, n));
+}
+
+export function parseUserStateFromFilmJson(data, slugHint = '') {
+  if (!data || typeof data !== 'object') return null;
+
+  const candidates = [
+    data.relationship,
+    data.memberRelationship,
+    data.filmRelationship,
+    data.memberFilmRelationship,
+    data.viewing,
+    data.entry,
+    Array.isArray(data.entries) ? data.entries[0] : null,
+    Array.isArray(data.viewings) ? data.viewings[0] : null,
+    data,
+  ].filter(Boolean);
+
+  let rating = null;
+  let watched = null;
+  let liked = null;
+  let inWatchlist = null;
+
+  for (const item of candidates) {
+    if (rating == null) {
+      rating = normalizeHalfOrStars(
+        item.rating ?? item.memberRating ?? item.rate ?? item.score,
+      );
+    }
+    if (watched == null && typeof item.watched === 'boolean') {
+      watched = item.watched;
+    }
+    if (liked == null && typeof item.liked === 'boolean') {
+      liked = item.liked;
+    }
+    if (inWatchlist == null && typeof item.inWatchlist === 'boolean') {
+      inWatchlist = item.inWatchlist;
+    }
+  }
+
+  if (rating != null && watched == null) watched = true;
+
+  if (rating == null && watched == null && liked == null && inWatchlist == null) {
+    return null;
+  }
+
+  const slug = String(slugHint || '')
+    .trim()
+    .toLowerCase();
+  return {
+    watched: watched === true,
+    liked: liked === true,
+    inWatchlist,
+    rating,
+    activityUrl: '',
+    username: '',
+    logUrl: slug ? `/film/${encodeURIComponent(slug)}/` : '',
+  };
 }
 
 function parseTmdbId(doc) {
@@ -189,9 +597,16 @@ function resolveSlug(doc, slugHint) {
     .trim()
     .toLowerCase();
   if (hint) return hint;
-  const canon = doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
+  const canon =
+    doc.querySelector('link[rel="canonical"]')?.getAttribute('href') || '';
   const match = canon.match(/\/film\/([^/?#]+)/i);
   return match ? match[1].toLowerCase() : '';
+}
+
+function toPublicProfile(profile) {
+  if (!profile) return null;
+  const { user: _user, ...publicProfile } = profile;
+  return publicProfile;
 }
 
 export function parseFilmMiniProfileDoc(doc, slugHint = '') {
@@ -202,17 +617,26 @@ export function parseFilmMiniProfileDoc(doc, slugHint = '') {
   if (!slug && !title) return null;
   if (!slug) return null;
 
+  const user = parseUserStateFromDoc(doc, slug);
+  if (user) rememberUserState(slug, user);
+
   return {
     slug,
     title,
     year: parseYear(doc, jsonLd),
     posterUrl: parsePosterUrl(doc, jsonLd),
-    rating: parseRating(jsonLd),
+    rating: parseRating(doc, jsonLd),
+    ratingCount: parseRatingCount(doc, jsonLd),
+    runtimeMins: parseRuntimeMins(jsonLd),
+    tagline: parseTagline(doc),
     directors: parseDirectors(doc, jsonLd),
+    cast: parseCast(doc, jsonLd),
     genres: parseGenres(doc),
     description: parseDescription(doc, jsonLd),
+    stats: parseStats(doc),
     tmdbId: parseTmdbId(doc),
     filmUrl: `/film/${encodeURIComponent(slug)}/`,
+    user: user || null,
   };
 }
 
@@ -247,6 +671,56 @@ async function requestFilmHtml(slug) {
   }
 }
 
+async function requestFilmJson(slug) {
+  const url = new URL(
+    `/film/${encodeURIComponent(slug)}/json/`,
+    window.location.origin,
+  );
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(
+    () => controller.abort(),
+    REQUEST_TIMEOUT_MS,
+  );
+  try {
+    const response = await fetch(url.href, {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json, text/javascript, */*;q=0.1' },
+      signal: controller.signal,
+    });
+    if (!response.ok) return null;
+    const text = await response.text();
+    if (!text) return null;
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  } catch {
+    return null;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+function mergeUserStates(primary, secondary) {
+  if (!primary && !secondary) return null;
+  if (!primary) return secondary;
+  if (!secondary) return primary;
+  return {
+    watched: Boolean(primary.watched || secondary.watched),
+    liked: Boolean(primary.liked || secondary.liked),
+    inWatchlist:
+      primary.inWatchlist != null
+        ? primary.inWatchlist
+        : secondary.inWatchlist,
+    rating: primary.rating ?? secondary.rating ?? null,
+    activityUrl: primary.activityUrl || secondary.activityUrl || '',
+    username: primary.username || secondary.username || '',
+    logUrl: primary.logUrl || secondary.logUrl || '',
+  };
+}
+
 export async function fetchFilmMiniProfile(slug, cacheHours) {
   const key = String(slug || '')
     .trim()
@@ -261,8 +735,8 @@ export async function fetchFilmMiniProfile(slug, cacheHours) {
     const html = await requestFilmHtml(key);
     const profile = parseFilmMiniProfileHtml(html, key);
     if (!profile) return null;
-    writeCache(filmMiniCacheKey(key), profile);
-    return profile;
+    writeCache(filmMiniCacheKey(key), toPublicProfile(profile));
+    return toPublicProfile(profile);
   })()
     .catch((error) => {
       console.warn('[Letterboxd Plus] Failed to load film mini-profile.', {
@@ -277,4 +751,84 @@ export async function fetchFilmMiniProfile(slug, cacheHours) {
 
   inFlight.set(key, task);
   return task;
+}
+
+export async function fetchFilmUserState(slug) {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase();
+  if (!key) return null;
+
+  const cached = peekCachedUserState(key);
+  if (cached) return cached;
+  if (userStateInFlight.has(key)) return userStateInFlight.get(key);
+
+  const task = (async () => {
+    let fromHtml = null;
+    try {
+      const html = await requestFilmHtml(key);
+      const doc = new DOMParser().parseFromString(
+        String(html || ''),
+        'text/html',
+      );
+      fromHtml = parseUserStateFromDoc(doc, key);
+    } catch (error) {
+      console.warn('[Letterboxd Plus] Failed to parse film user HTML.', {
+        slug: key,
+        error,
+      });
+    }
+
+    let fromJson = null;
+    if (!fromHtml || fromHtml.rating == null) {
+      const json = await requestFilmJson(key);
+      fromJson = parseUserStateFromFilmJson(json, key);
+    }
+
+    const user = mergeUserStates(fromHtml, fromJson);
+    if (user) rememberUserState(key, user);
+    return user;
+  })()
+    .catch((error) => {
+      console.warn('[Letterboxd Plus] Failed to load film user state.', {
+        slug: key,
+        error,
+      });
+      return null;
+    })
+    .finally(() => {
+      userStateInFlight.delete(key);
+    });
+
+  userStateInFlight.set(key, task);
+  return task;
+}
+
+/**
+ * Ensure user state is available. Uses memory cache; on miss fetches HTML.
+ * If cached state has no personal rating yet, also tries /film/{slug}/json/.
+ */
+export async function ensureFilmUserState(slug, { force = false } = {}) {
+  const key = String(slug || '')
+    .trim()
+    .toLowerCase();
+  if (!key) return null;
+
+  if (force) {
+    userStateCache.delete(key);
+    return fetchFilmUserState(key);
+  }
+
+  const cached = peekCachedUserState(key);
+  if (cached?.rating != null) return cached;
+
+  if (cached) {
+    const json = await requestFilmJson(key);
+    const fromJson = parseUserStateFromFilmJson(json, key);
+    const merged = mergeUserStates(cached, fromJson);
+    if (merged) rememberUserState(key, merged);
+    return merged;
+  }
+
+  return fetchFilmUserState(key);
 }

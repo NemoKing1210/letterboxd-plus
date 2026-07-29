@@ -1,5 +1,8 @@
 import './film-mini-profile.css';
-import { peekCachedFilmMiniProfile } from '../../api/film-profile.js';
+import {
+  peekCachedFilmMiniProfile,
+  peekCachedUserState,
+} from '../../api/film-profile.js';
 import {
   FILM_HOVER_CLOSE_MS,
   FILM_HOVER_OPEN_MS,
@@ -10,7 +13,11 @@ import {
   HOVER_ATTR,
   POSTER_SELECTOR,
 } from './constants.js';
-import { ensureProfileFetch, ensureScoreEnrich } from './enrich.js';
+import {
+  ensureProfileFetch,
+  ensureScoreEnrich,
+  ensureUserStateFetch,
+} from './enrich.js';
 import {
   ensurePopover,
   hidePopover,
@@ -42,6 +49,19 @@ function decoratePosters(root = document) {
 
 const decoratePostersSoon = debounce(() => decoratePosters(), 120);
 
+function mergeUser(hint, fetched) {
+  if (!fetched && !hint) return null;
+  return {
+    watched: fetched?.watched ?? hint?.watched ?? null,
+    liked: fetched?.liked ?? hint?.liked ?? null,
+    inWatchlist: fetched?.inWatchlist ?? hint?.inWatchlist ?? null,
+    rating: fetched?.rating ?? hint?.rating ?? null,
+    activityUrl: fetched?.activityUrl || '',
+    username: fetched?.username || '',
+    logUrl: fetched?.logUrl || '',
+  };
+}
+
 async function paintCard(poster, ctx, { soft = false } = {}) {
   const el = ensurePopover();
   el.classList.toggle('is-loading', Boolean(ctx.loadingProfile && !ctx.profile));
@@ -60,16 +80,24 @@ async function paintCard(poster, ctx, { soft = false } = {}) {
   }
 }
 
-async function showForPoster(poster, { slug, title, year, posterHint }) {
+async function showForPoster(
+  poster,
+  { slug, title, year, posterHint, userHint },
+) {
   const el = ensurePopover();
   state.activePoster = poster;
   state.activeSlug = slug;
   const seq = ++state.fetchSeq;
   const settings = currentSettings();
+  const wantsUser = settings.fmpShowUserStatus !== false;
 
   let profile = peekCachedFilmMiniProfile(slug, settings.cacheHours);
+  let user = wantsUser
+    ? mergeUser(userHint, peekCachedUserState(slug))
+    : null;
   let enrichState = { rt: null, mc: null };
   let scoresDone = false;
+  let userDone = !wantsUser || Boolean(peekCachedUserState(slug));
 
   const ctx = (extra = {}) => ({
     slug,
@@ -77,7 +105,9 @@ async function showForPoster(poster, { slug, title, year, posterHint }) {
     yearHint: year,
     posterHint,
     profile,
+    user,
     loadingProfile: !profile,
+    loadingUser: wantsUser && !userDone,
     loadingScores: !scoresDone,
     ...enrichState,
     ...extra,
@@ -86,6 +116,9 @@ async function showForPoster(poster, { slug, title, year, posterHint }) {
   await paintCard(poster, ctx());
 
   const profilePromise = ensureProfileFetch(slug);
+  const userPromise = wantsUser
+    ? profilePromise.then(() => ensureUserStateFetch(slug))
+    : Promise.resolve(null);
   const enrichPromise = profilePromise.then((loaded) =>
     ensureScoreEnrich({
       slug,
@@ -104,6 +137,13 @@ async function showForPoster(poster, { slug, title, year, posterHint }) {
     if (seq !== state.fetchSeq || state.activeSlug !== slug) return;
     enrichState = result;
     scoresDone = true;
+    await maybeRepaint();
+  });
+
+  userPromise.then(async (fetchedUser) => {
+    if (seq !== state.fetchSeq || state.activeSlug !== slug) return;
+    userDone = true;
+    user = mergeUser(userHint, fetchedUser);
     await maybeRepaint();
   });
 
@@ -132,7 +172,9 @@ async function showForPoster(poster, { slug, title, year, posterHint }) {
           yearHint: year,
           posterHint,
           profile: null,
+          user,
           loadingProfile: false,
+          loadingUser: false,
           loadingScores: false,
           ...enrichState,
         },
@@ -140,6 +182,14 @@ async function showForPoster(poster, { slug, title, year, posterHint }) {
       );
     }
     return;
+  }
+
+  // Fresh profile fetch may have populated user memory already.
+  if (wantsUser && !peekCachedUserState(slug)) {
+    /* userPromise still in flight */
+  } else if (wantsUser) {
+    user = mergeUser(userHint, peekCachedUserState(slug));
+    userDone = true;
   }
 
   await maybeRepaint();

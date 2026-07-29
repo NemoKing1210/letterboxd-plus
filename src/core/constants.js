@@ -37,6 +37,18 @@ export const DEFAULT_SETTINGS = Object.freeze({
   enhanceCast: true,
   showFilmMiniProfile: true,
   preloadFilmMiniProfile: false,
+  fmpShowCommunityRating: true,
+  fmpShowUserStatus: true,
+  fmpShowCast: true,
+  fmpShowDirectors: true,
+  fmpShowGenres: true,
+  fmpShowTagline: true,
+  fmpShowRuntime: true,
+  fmpShowDescription: true,
+  fmpShowStats: false,
+  fmpShowExternalScores: true,
+  fmpShowExternalLinks: true,
+  fmpShowQuickLinks: true,
   cacheHours: 24,
 });
 

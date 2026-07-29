@@ -3,6 +3,18 @@ const DEFAULT_SETTINGS_FALLBACK = {
   preloadFilmMiniProfile: false,
   showRottenTomatoes: true,
   showMetacritic: true,
+  fmpShowCommunityRating: true,
+  fmpShowUserStatus: true,
+  fmpShowCast: true,
+  fmpShowDirectors: true,
+  fmpShowGenres: true,
+  fmpShowTagline: true,
+  fmpShowRuntime: true,
+  fmpShowDescription: true,
+  fmpShowStats: false,
+  fmpShowExternalScores: true,
+  fmpShowExternalLinks: true,
+  fmpShowQuickLinks: true,
   cacheHours: 24,
 };
 
@@ -23,6 +35,7 @@ export const state = {
   preloadQueued: new Set(),
   profileFetches: new Map(),
   enrichFetches: new Map(),
+  userStateFetches: new Map(),
 };
 
 export function currentSettings() {
