@@ -521,21 +521,32 @@ export function parseUserStateFromDoc(doc, slugHint = '') {
 
   const watchedAttr = watchEl?.getAttribute('data-is-watched');
   const likedAttr = likeEl?.getAttribute('data-is-liked');
-  const watched =
-    watchedAttr === 'true' ||
-    Boolean(
-      searchRoot.querySelector('.action.-watch.-on, .watch-link .action.-on'),
-    );
-  const liked =
-    likedAttr === 'true' ||
-    Boolean(
-      searchRoot.querySelector('.action.-like.-on, .like-link .action.-on'),
-    );
+  const watchOn = Boolean(
+    searchRoot.querySelector('.action.-watch.-on, .watch-link .action.-on'),
+  );
+  const likeOn = Boolean(
+    searchRoot.querySelector('.action.-like.-on, .like-link .action.-on'),
+  );
 
-  const watchedState =
-    watchedAttr === 'false' ? false : watchedAttr === 'true' ? true : watched;
-  const likedState =
-    likedAttr === 'false' ? false : likedAttr === 'true' ? true : liked;
+  // Empty React shells (WatchLink without data-is-watched) are not definitive.
+  const hasWatchSignal =
+    watchedAttr === 'true' || watchedAttr === 'false' || watchOn;
+  const hasLikeSignal = likedAttr === 'true' || likedAttr === 'false' || likeOn;
+
+  const watchedState = !hasWatchSignal
+    ? null
+    : watchedAttr === 'false'
+      ? false
+      : watchedAttr === 'true'
+        ? true
+        : watchOn;
+  const likedState = !hasLikeSignal
+    ? null
+    : likedAttr === 'false'
+      ? false
+      : likedAttr === 'true'
+        ? true
+        : likeOn;
 
   const addWatchlist = searchRoot.querySelector(
     '.add-to-watchlist, a.action.-watchlist.add-to-watchlist',
@@ -569,8 +580,8 @@ export function parseUserStateFromDoc(doc, slugHint = '') {
     '';
 
   if (
-    !watchEl &&
-    !likeEl &&
+    !hasWatchSignal &&
+    !hasLikeSignal &&
     rating == null &&
     inWatchlist == null &&
     !activity
@@ -587,6 +598,96 @@ export function parseUserStateFromDoc(doc, slugHint = '') {
     username: String(username || '').trim(),
     logUrl: slug ? `/film/${encodeURIComponent(slug)}/` : '',
   };
+}
+
+function normalizeHalfOrStars(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  if (n > 5) return Math.max(0.5, Math.min(5, n / 2));
+  return Math.max(0.5, Math.min(5, n));
+}
+
+export function parseUserStateFromFilmJson(data, slugHint = '') {
+  if (!data || typeof data !== 'object') return null;
+
+  const candidates = [
+    data.relationship,
+    data.memberRelationship,
+    data.filmRelationship,
+    data.memberFilmRelationship,
+    data.viewing,
+    data.entry,
+    Array.isArray(data.entries) ? data.entries[0] : null,
+    Array.isArray(data.viewings) ? data.viewings[0] : null,
+    data,
+  ].filter(Boolean);
+
+  let rating = null;
+  let watched = null;
+  let liked = null;
+  let inWatchlist = null;
+
+  for (const item of candidates) {
+    if (rating == null) {
+      rating = normalizeHalfOrStars(
+        item.rating ?? item.memberRating ?? item.rate ?? item.score,
+      );
+    }
+    if (watched == null && typeof item.watched === 'boolean') {
+      watched = item.watched;
+    }
+    if (liked == null && typeof item.liked === 'boolean') {
+      liked = item.liked;
+    }
+    if (inWatchlist == null && typeof item.inWatchlist === 'boolean') {
+      inWatchlist = item.inWatchlist;
+    }
+  }
+
+  if (rating != null && watched == null) watched = true;
+
+  if (
+    rating == null &&
+    watched == null &&
+    liked == null &&
+    inWatchlist == null
+  ) {
+    return null;
+  }
+
+  const slug = String(slugHint || '')
+    .trim()
+    .toLowerCase();
+  return {
+    watched,
+    liked,
+    inWatchlist,
+    rating,
+    activityUrl: '',
+    username: '',
+    logUrl: slug ? `/film/${encodeURIComponent(slug)}/` : '',
+  };
+}
+
+function mergeUserStates(primary, secondary) {
+  if (!primary && !secondary) return null;
+  if (!primary) return secondary;
+  if (!secondary) return primary;
+  return {
+    watched: primary.watched ?? secondary.watched ?? null,
+    liked: primary.liked ?? secondary.liked ?? null,
+    inWatchlist: primary.inWatchlist ?? secondary.inWatchlist ?? null,
+    rating: primary.rating ?? secondary.rating ?? null,
+    activityUrl: primary.activityUrl || secondary.activityUrl || '',
+    username: primary.username || secondary.username || '',
+    logUrl: primary.logUrl || secondary.logUrl || '',
+  };
+}
+
+function userStateNeedsJsonFallback(user) {
+  if (!user) return true;
+  // SSR HTML often has watch/like shells but no InstantRatingInput selection.
+  return user.rating == null;
 }
 
 function parseTmdbId(doc) {
@@ -684,6 +785,38 @@ async function requestFilmHtml(slug) {
   }
 }
 
+async function requestFilmJson(slug) {
+  const url = new URL(
+    `/film/${encodeURIComponent(slug)}/json/`,
+    window.location.origin,
+  );
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(
+    () => controller.abort(),
+    REQUEST_TIMEOUT_MS,
+  );
+  try {
+    const response = await fetch(url.href, {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json, text/javascript, */*;q=0.1' },
+      signal: controller.signal,
+    });
+    if (!response.ok) return null;
+    const text = await response.text();
+    if (!text) return null;
+    try {
+      return JSON.parse(text);
+    } catch {
+      return null;
+    }
+  } catch {
+    return null;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
 /**
  * Fetch film page HTML once, parse profile + user state.
  * @param {string} slug
@@ -710,6 +843,19 @@ export async function fetchFilmMiniProfile(
     const html = await requestFilmHtml(key);
     const profile = parseFilmMiniProfileHtml(html, key);
     if (!profile) return null;
+
+    // Film HTML often ships unhydrated action shells; fill rating/relationship
+    // from the lightweight JSON endpoint when needed.
+    if (userStateNeedsJsonFallback(profile.user)) {
+      const json = await requestFilmJson(key);
+      const fromJson = parseUserStateFromFilmJson(json, key);
+      const merged = mergeUserStates(profile.user, fromJson);
+      if (merged) {
+        profile.user = merged;
+        rememberUserState(key, merged);
+      }
+    }
+
     const publicProfile = toPublicProfile(profile);
     if (persistCache) writeCache(filmMiniCacheKey(key), publicProfile);
     return publicProfile;
@@ -729,7 +875,7 @@ export async function fetchFilmMiniProfile(
   return task;
 }
 
-/** HTML-only user state fetch (no /film/{slug}/json/). */
+/** Load user relationship from HTML, with JSON fallback for rating/state. */
 export async function fetchFilmUserState(slug) {
   const key = String(slug || '')
     .trim()
@@ -737,23 +883,43 @@ export async function fetchFilmUserState(slug) {
   if (!key) return null;
 
   const cached = peekCachedUserState(key);
-  if (cached) return cached;
+  if (cached && !userStateNeedsJsonFallback(cached)) return cached;
 
   if (inFlight.has(key)) {
     await inFlight.get(key);
     const fromProfile = peekCachedUserState(key);
-    if (fromProfile) return fromProfile;
+    if (fromProfile && !userStateNeedsJsonFallback(fromProfile)) {
+      return fromProfile;
+    }
   }
 
   if (userStateInFlight.has(key)) return userStateInFlight.get(key);
 
   const task = (async () => {
-    const html = await requestFilmHtml(key);
-    const doc = new DOMParser().parseFromString(
-      String(html || ''),
-      'text/html',
-    );
-    const user = parseUserStateFromDoc(doc, key);
+    let fromHtml = cached || null;
+    if (!fromHtml) {
+      try {
+        const html = await requestFilmHtml(key);
+        const doc = new DOMParser().parseFromString(
+          String(html || ''),
+          'text/html',
+        );
+        fromHtml = parseUserStateFromDoc(doc, key);
+      } catch (error) {
+        console.warn('[Letterboxd Plus] Failed to parse film user HTML.', {
+          slug: key,
+          error,
+        });
+      }
+    }
+
+    let fromJson = null;
+    if (userStateNeedsJsonFallback(fromHtml)) {
+      const json = await requestFilmJson(key);
+      fromJson = parseUserStateFromFilmJson(json, key);
+    }
+
+    const user = mergeUserStates(fromHtml, fromJson);
     if (user) rememberUserState(key, user);
     return user;
   })()
@@ -773,7 +939,7 @@ export async function fetchFilmUserState(slug) {
 }
 
 /**
- * Ensure user state is available from memory or a shared / dedicated HTML fetch.
+ * Ensure user state is available from memory or a dedicated fetch.
  */
 export async function ensureFilmUserState(slug, { force = false } = {}) {
   const key = String(slug || '')
@@ -787,11 +953,14 @@ export async function ensureFilmUserState(slug, { force = false } = {}) {
   }
 
   const cached = peekCachedUserState(key);
-  if (cached) return cached;
+  if (cached && !userStateNeedsJsonFallback(cached)) return cached;
 
   if (inFlight.has(key)) {
     await inFlight.get(key);
-    return peekCachedUserState(key);
+    const fromShared = peekCachedUserState(key);
+    if (fromShared && !userStateNeedsJsonFallback(fromShared)) {
+      return fromShared;
+    }
   }
 
   return fetchFilmUserState(key);

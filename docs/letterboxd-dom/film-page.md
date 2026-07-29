@@ -361,8 +361,10 @@ these React islands.
 
 Also: `AddMenu`, `AddToListModalTrigger`, `MenuLogEntry` React components.
 
-Letterboxd Plus reads relationship state from this HTML panel only (no
-`/film/{slug}/json/` fallback).
+Letterboxd Plus prefers `#userpanel` HTML when attributes are definitive
+(`data-is-watched`, selected rating, etc.). Empty React shells are ignored;
+`GET /film/{slug}/json/` fills relationship / personal rating when HTML is
+incomplete.
 
 **Used by:** `parseUserStateFromDoc`, `fetchFilmUserState` in `film-profile.js`.
 
@@ -432,7 +434,8 @@ When fetching `/film/{slug}/` HTML for the mini card (Letterboxd Plus):
 2. **DOM / metas first:** masthead, histogram, cast tab (+ roles), genres tab,
    tagline, synopsis, production stats, `#userpanel`.
 3. **JSON-LD `Movie` as fallback:** runtime (primary), and any field missing from DOM.
-4. **Do not** call `/film/{slug}/json/` for mini-profile or user state.
+4. **User relationship:** definitive `#userpanel` attributes first; if shells are
+   empty or personal rating is missing, use `/film/{slug}/json/`.
 
 ---
 
@@ -456,4 +459,4 @@ When fetching `/film/{slug}/` HTML for the mini card (Letterboxd Plus):
 | Date | Change |
 |------|--------|
 | 2026-07-29 | Initial map from *The Odyssey* (2026) film page HTML |
-| 2026-07-29 | LBP mini-profile: DOM-first parsing; no `/film/{slug}/json/` |
+| 2026-07-29 | LBP mini-profile: DOM-first parsing; JSON only for user relationship |

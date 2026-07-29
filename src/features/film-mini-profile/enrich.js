@@ -41,22 +41,25 @@ export function ensureUserStateFetch(slug) {
   }
 
   const cached = peekCachedUserState(key);
-  if (cached) return Promise.resolve(cached);
+  // Incomplete memory (e.g. HTML shells without rating) still needs a fetch.
+  if (cached?.rating != null) return Promise.resolve(cached);
 
   let pending = state.userStateFetches.get(key);
   if (pending) return pending;
 
   pending = (async () => {
-    // Prefer the shared profile HTML fetch so we do not hit the page twice.
+    // Prefer the shared profile HTML(+JSON) fetch so we do not hit the page twice.
     const profilePending = state.profileFetches.get(key);
     if (profilePending) {
       await profilePending;
       const fromShared = peekCachedUserState(key);
-      if (fromShared) return fromShared;
+      if (fromShared?.rating != null) return fromShared;
+      if (fromShared && fromShared.watched != null) return fromShared;
     } else if (!peekCachedFilmMiniProfile(key, currentSettings().cacheHours)) {
       await ensureProfileFetch(key);
       const fromProfile = peekCachedUserState(key);
-      if (fromProfile) return fromProfile;
+      if (fromProfile?.rating != null) return fromProfile;
+      if (fromProfile && fromProfile.watched != null) return fromProfile;
     }
 
     return enqueueFetch(() => ensureFilmUserState(key));

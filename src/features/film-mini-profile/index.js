@@ -49,17 +49,35 @@ function decoratePosters(root = document) {
 
 const decoratePostersSoon = debounce(() => decoratePosters(), 120);
 
+function mergeBool(fetched, hint) {
+  // Prefer any definitive true; otherwise first non-null (fetched wins ties).
+  if (fetched === true || hint === true) return true;
+  if (fetched != null) return fetched;
+  if (hint != null) return hint;
+  return null;
+}
+
 function mergeUser(hint, fetched) {
   if (!fetched && !hint) return null;
   return {
-    watched: fetched?.watched ?? hint?.watched ?? null,
-    liked: fetched?.liked ?? hint?.liked ?? null,
-    inWatchlist: fetched?.inWatchlist ?? hint?.inWatchlist ?? null,
+    watched: mergeBool(fetched?.watched, hint?.watched),
+    liked: mergeBool(fetched?.liked, hint?.liked),
+    inWatchlist: mergeBool(fetched?.inWatchlist, hint?.inWatchlist),
     rating: fetched?.rating ?? hint?.rating ?? null,
     activityUrl: fetched?.activityUrl || '',
     username: fetched?.username || '',
     logUrl: fetched?.logUrl || '',
   };
+}
+
+function hasUsefulUserHint(hint) {
+  return Boolean(
+    hint &&
+      (hint.watched != null ||
+        hint.liked != null ||
+        hint.inWatchlist != null ||
+        hint.rating != null),
+  );
 }
 
 async function paintCard(poster, ctx, { soft = false } = {}) {
@@ -97,7 +115,11 @@ async function showForPoster(
     : null;
   let enrichState = { rt: null, mc: null };
   let scoresDone = false;
-  let userDone = !wantsUser || Boolean(peekCachedUserState(slug));
+  // Poster metadata can paint status immediately; still refresh in background.
+  let userDone =
+    !wantsUser ||
+    Boolean(peekCachedUserState(slug)) ||
+    hasUsefulUserHint(userHint);
 
   const ctx = (extra = {}) => ({
     slug,

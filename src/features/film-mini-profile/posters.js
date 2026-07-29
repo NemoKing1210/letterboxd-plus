@@ -101,25 +101,116 @@ function readBoolAttr(el, name) {
   return null;
 }
 
-export function parsePosterUserHints(poster) {
-  const roots = [
-    poster,
-    poster.querySelector?.('.poster.film-poster, .film-poster'),
-    poster.closest?.('.poster.film-poster, .film-poster'),
-  ].filter(Boolean);
+function posterRoots(poster) {
+  const lazy = poster.closest?.(
+    '.react-component[data-component-class="LazyPoster"]',
+  );
+  const filmPoster =
+    poster.matches?.('.poster.film-poster, .film-poster')
+      ? poster
+      : poster.querySelector?.('.poster.film-poster, .film-poster') ||
+        poster.closest?.('.poster.film-poster, .film-poster');
+  return [...new Set([poster, lazy, filmPoster].filter(Boolean))];
+}
 
-  let watched = null;
-  let inWatchlist = null;
-  for (const root of roots) {
-    if (watched == null) watched = readBoolAttr(root, 'data-watched');
-    if (inWatchlist == null) {
-      inWatchlist = readBoolAttr(root, 'data-in-watchlist');
-    }
-    if (watched != null && inWatchlist != null) break;
+function parsePosterLiked(root) {
+  const likedAttr =
+    readBoolAttr(root, 'data-liked') ?? readBoolAttr(root, 'data-is-liked');
+  if (likedAttr != null) return likedAttr;
+
+  if (
+    root.querySelector?.(
+      '.icon-liked, .like-link.icon-liked, .like-link.-on, .has-icon.icon-liked',
+    )
+  ) {
+    return true;
   }
 
-  if (watched == null && inWatchlist == null) return null;
-  return { watched, inWatchlist, liked: null, rating: null };
+  // Only treat bare icon-like as "not liked" once member metadata is present.
+  const metadataLoaded = Boolean(
+    root.hasAttribute?.('data-watched') ||
+      root.hasAttribute?.('data-in-watchlist') ||
+      root.querySelector?.('[data-watched], [data-in-watchlist]'),
+  );
+  if (
+    metadataLoaded &&
+    root.querySelector?.(
+      '.like-link.icon-like, .has-icon.icon-like, .like-link-target .like-link',
+    )
+  ) {
+    return false;
+  }
+  return null;
+}
+
+function parsePosterWatched(root) {
+  const watchedAttr = readBoolAttr(root, 'data-watched');
+  if (watchedAttr != null) return watchedAttr;
+
+  if (
+    root.querySelector?.(
+      '.icon-watched, .watch-link .icon-watched, .has-icon.icon-watched',
+    )
+  ) {
+    return true;
+  }
+  return null;
+}
+
+function parsePosterWatchlist(root) {
+  const attr = readBoolAttr(root, 'data-in-watchlist');
+  if (attr != null) return attr;
+  if (
+    root.querySelector?.(
+      '.icon-watchlist.-on, .watchlist-link.-on, .has-icon.icon-watchlist.-on',
+    )
+  ) {
+    return true;
+  }
+  return null;
+}
+
+function parsePosterRating(root) {
+  const rated = root.querySelector?.(
+    '.rating[class*="rated-"], .poster-viewingdata .rating[class*="rated-"], [class*="rated-"]',
+  );
+  const className = rated?.className || '';
+  const match = String(className).match(/\brated-(\d+)\b/);
+  if (!match) return null;
+  const half = Number(match[1]);
+  if (!Number.isFinite(half) || half <= 0) return null;
+  // Letterboxd poster ratings use 1–10 half-star steps → 0.5–5 stars.
+  return Math.max(0.5, Math.min(5, half / 2));
+}
+
+/**
+ * Instant user relationship hints from a list/grid poster card.
+ * Used to paint mini-card status before / without a film-page fetch.
+ */
+export function parsePosterUserHints(poster) {
+  const roots = posterRoots(poster);
+  let watched = null;
+  let liked = null;
+  let inWatchlist = null;
+  let rating = null;
+
+  for (const root of roots) {
+    if (watched == null) watched = parsePosterWatched(root);
+    if (liked == null) liked = parsePosterLiked(root);
+    if (inWatchlist == null) inWatchlist = parsePosterWatchlist(root);
+    if (rating == null) rating = parsePosterRating(root);
+  }
+
+  if (
+    watched == null &&
+    liked == null &&
+    inWatchlist == null &&
+    rating == null
+  ) {
+    return null;
+  }
+
+  return { watched, liked, inWatchlist, rating };
 }
 
 export function clearPosterMark(poster) {
