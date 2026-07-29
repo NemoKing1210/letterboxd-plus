@@ -33,12 +33,29 @@ files; regenerate them with `npm run build`.
   queries.
 - [`DESIGN.md`](DESIGN.md) documents Letterboxd-aligned visual tokens and
   patterns for injected UI.
+- [`docs/letterboxd-dom/`](docs/letterboxd-dom/README.md) documents what data
+  Letterboxd pages expose in the DOM (stable selectors, metas, JSON-LD) for
+  features such as the film mini-profile. Start at the README catalog; film
+  pages are covered in [`film-page.md`](docs/letterboxd-dom/film-page.md).
 - `scripts/` copies and verifies generated install artifacts.
 
 Rotten Tomatoes and Metacritic data is read from their public web endpoints
 without user credentials. Treat both as unreliable external boundaries: use
 timeouts, cache successful results, tolerate missing scores, and never block
 Letterboxd when either source fails.
+
+## Letterboxd DOM reference
+
+When scraping or mounting on Letterboxd pages, read
+[`docs/letterboxd-dom/`](docs/letterboxd-dom/README.md) before inventing
+selectors. Prefer IDs, `data-*` / `data-component-class`, metas, and JSON-LD
+over layout classes. When the user provides a new saved HTML page, extend the
+matching page doc (or add one) and link it from the catalog README.
+
+| Doc | Page |
+|-----|------|
+| [README](docs/letterboxd-dom/README.md) | Catalog and conventions |
+| [film-page.md](docs/letterboxd-dom/film-page.md) | `/film/{slug}/` (+ cast/crew/details/genres/releases tabs) |
 
 ## Conventions
 
