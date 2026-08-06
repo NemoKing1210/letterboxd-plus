@@ -217,6 +217,10 @@ async function showForPoster(
   await maybeRepaint();
 }
 
+function isContextMenuMode() {
+  return currentSettings().fmpOpenMode === 'contextmenu';
+}
+
 function scheduleOpen(poster, hit) {
   window.clearTimeout(state.closeTimer);
   window.clearTimeout(state.openTimer);
@@ -229,6 +233,7 @@ function scheduleOpen(poster, hit) {
 }
 
 function scheduleClose() {
+  if (isContextMenuMode()) return;
   window.clearTimeout(state.openTimer);
   window.clearTimeout(state.closeTimer);
   state.closeTimer = window.setTimeout(() => {
@@ -246,13 +251,18 @@ function resolvePoster(target) {
   return markPoster(poster);
 }
 
+function warmPoster(hit) {
+  if (!peekCachedFilmMiniProfile(hit.slug, currentSettings().cacheHours)) {
+    ensureProfileFetch(hit.slug);
+  }
+}
+
 function onPointerOver(event) {
   if (currentSettings().showFilmMiniProfile === false) return;
   const hit = resolvePoster(event.target);
   if (!hit) return;
-  if (!peekCachedFilmMiniProfile(hit.slug, currentSettings().cacheHours)) {
-    ensureProfileFetch(hit.slug);
-  }
+  warmPoster(hit);
+  if (isContextMenuMode()) return;
   if (
     hit.poster === state.activePoster &&
     state.popoverEl?.classList.contains('is-open')
@@ -265,6 +275,7 @@ function onPointerOver(event) {
 }
 
 function onPointerOut(event) {
+  if (isContextMenuMode()) return;
   const hit = resolvePoster(event.target);
   if (!hit) return;
   const related = event.relatedTarget;
@@ -276,6 +287,49 @@ function onPointerOut(event) {
   }
   hit.poster.removeAttribute(HOVER_ATTR);
   scheduleClose();
+}
+
+function onContextMenu(event) {
+  if (currentSettings().showFilmMiniProfile === false) return;
+  if (!isContextMenuMode()) return;
+  const hit = resolvePoster(event.target);
+  if (!hit) return;
+  event.preventDefault();
+  event.stopPropagation();
+  warmPoster(hit);
+  window.clearTimeout(state.openTimer);
+  window.clearTimeout(state.closeTimer);
+  if (state.popoverEl?.classList.contains('is-leaving')) {
+    state.popoverEl.classList.remove('is-leaving');
+  }
+  if (state.activePoster && state.activePoster !== hit.poster) {
+    state.activePoster.removeAttribute(HOVER_ATTR);
+  }
+  hit.poster.setAttribute(HOVER_ATTR, '1');
+  if (
+    hit.poster === state.activePoster &&
+    state.popoverEl?.classList.contains('is-open')
+  ) {
+    return;
+  }
+  showForPoster(hit.poster, hit);
+}
+
+function onDocumentPointerDown(event) {
+  if (!isContextMenuMode()) return;
+  if (!state.popoverEl?.classList.contains('is-open')) return;
+  if (state.popoverEl.contains(event.target)) return;
+  // Right-click on another eligible poster: let contextmenu swap the card.
+  if (event.button === 2 && resolvePoster(event.target)) return;
+  hidePopover();
+}
+
+function onDocumentKeydown(event) {
+  if (!isContextMenuMode()) return;
+  if (event.key !== 'Escape') return;
+  if (!state.popoverEl?.classList.contains('is-open')) return;
+  event.preventDefault();
+  hidePopover();
 }
 
 function onScrollOrResize() {
@@ -300,6 +354,9 @@ function bindFilmMiniProfiles() {
   state.bound = true;
   document.addEventListener('pointerover', onPointerOver, true);
   document.addEventListener('pointerout', onPointerOut, true);
+  document.addEventListener('contextmenu', onContextMenu, true);
+  document.addEventListener('pointerdown', onDocumentPointerDown, true);
+  document.addEventListener('keydown', onDocumentKeydown, true);
   window.addEventListener('scroll', onScrollOrResize, true);
   window.addEventListener('resize', onScrollOrResize);
 }

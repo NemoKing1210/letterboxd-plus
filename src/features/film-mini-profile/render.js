@@ -47,13 +47,77 @@ function formatStars(value) {
   return `${label}★`;
 }
 
+function wantsExternalScores(settings = currentSettings()) {
+  if (settings.fmpShowExternalScores === false) return false;
+  const wantsRt = settings.showRottenTomatoes !== false;
+  const wantsMc = settings.showMetacritic !== false;
+  return wantsRt || wantsMc;
+}
+
+function extScoreHtml({ href, value, label, modifier }) {
+  return `
+    <a class="lbp-fmp__ext-score lbp-fmp__ext-score--${escapeAttr(modifier)}" href="${escapeAttr(href)}" target="_blank" rel="noopener noreferrer" title="${escapeAttr(label)}">
+      <span class="lbp-fmp__ext-score-value">${escapeHtml(value)}</span>
+      <span class="lbp-fmp__ext-score-label">${escapeHtml(label)}</span>
+    </a>
+  `;
+}
+
+function renderHeaderScores(ctx) {
+  const settings = currentSettings();
+  if (!wantsExternalScores(settings)) return '';
+
+  const wantsRt = settings.showRottenTomatoes !== false;
+  const wantsMc = settings.showMetacritic !== false;
+
+  if (ctx.loadingScores && !ctx.rt && !ctx.mc) {
+    const bones = [];
+    if (wantsRt) {
+      bones.push(
+        `<span class="lbp-fmp__ext-score is-skeleton" aria-hidden="true">${skelBone('lbp-fmp__bone--ext')}</span>`,
+      );
+    }
+    if (wantsMc) {
+      bones.push(
+        `<span class="lbp-fmp__ext-score is-skeleton" aria-hidden="true">${skelBone('lbp-fmp__bone--ext')}</span>`,
+      );
+    }
+    return `<div class="lbp-fmp__ext-scores" aria-busy="true">${bones.join('')}</div>`;
+  }
+
+  const bits = [];
+  if (wantsRt && ctx.rt?.criticsScore != null) {
+    bits.push(
+      extScoreHtml({
+        href: ctx.rt.url || ROTTEN_TOMATOES_ORIGIN,
+        value: `${ctx.rt.criticsScore}%`,
+        label: ctx.rt.isCertifiedFresh ? t('certifiedFresh') : t('tomatometer'),
+        modifier: 'rt',
+      }),
+    );
+  }
+  if (wantsMc && ctx.mc?.criticsScore != null) {
+    const tier = mcScoreTier(ctx.mc.criticsScore);
+    bits.push(
+      extScoreHtml({
+        href: ctx.mc.url || METACRITIC_ORIGIN,
+        value: String(ctx.mc.criticsScore),
+        label: t('metascore'),
+        modifier: tier ? `mc-${tier}` : 'mc',
+      }),
+    );
+  }
+
+  if (!bits.length) return '';
+  return `<div class="lbp-fmp__ext-scores">${bits.join('')}</div>`;
+}
+
 function renderHero(ctx) {
   const settings = currentSettings();
   const profile = ctx.profile;
   const loading = Boolean(ctx.loadingProfile && !profile);
-  const title = profile?.title || ctx.titleHint || '';
-  const year = profile?.year || ctx.yearHint || '';
-  const posterUrl = profile?.posterUrl || ctx.posterHint || '';
+  // Prefer the hovered poster card art when present; fall back to profile.
+  const posterUrl = ctx.posterHint || profile?.posterUrl || '';
   const filmUrl = profile?.filmUrl || filmUrlForSlug(ctx.slug);
   const img = posterUrl
     ? `<img src="${escapeAttr(posterUrl)}" alt="" loading="lazy" decoding="async">`
@@ -61,40 +125,50 @@ function renderHero(ctx) {
       ? skelBone('lbp-fmp__bone--cover')
       : `<span class="lbp-fmp__cover-ph"></span>`;
 
-  const titleHtml = title
-    ? `<a class="lbp-fmp__title" href="${escapeAttr(filmUrl)}">${escapeHtml(title)}</a>`
-    : loading
-      ? `<div class="lbp-fmp__title" aria-hidden="true">${skelBone('lbp-fmp__bone--title')}</div>`
+  const title = profile?.title || (!loading ? ctx.titleHint : '') || '';
+  const titleHtml = loading
+    ? `<div class="lbp-fmp__title lbp-fmp__title--skel" aria-hidden="true">
+        ${skelBone('lbp-fmp__bone--title')}
+        ${skelBone('lbp-fmp__bone--title-2')}
+      </div>`
+    : title
+      ? `<a class="lbp-fmp__title" href="${escapeAttr(filmUrl)}">${escapeHtml(title)}</a>`
       : `<a class="lbp-fmp__title" href="${escapeAttr(filmUrl)}">${escapeHtml(ctx.slug)}</a>`;
 
-  const yearHtml = year
-    ? `<span class="lbp-fmp__year">${escapeHtml(String(year))}</span>`
-    : loading
-      ? skelBone('lbp-fmp__bone--year')
+  const year = profile?.year || (!loading ? ctx.yearHint : '') || '';
+  const yearHtml = loading
+    ? skelBone('lbp-fmp__bone--year')
+    : year
+      ? `<span class="lbp-fmp__year">${escapeHtml(String(year))}</span>`
       : '';
+
   const runtimeLabel =
-    settings.fmpShowRuntime !== false && profile?.runtimeMins
+    !loading &&
+    settings.fmpShowRuntime !== false &&
+    profile?.runtimeMins
       ? formatRuntime(profile.runtimeMins)
       : '';
-  const runtimeHtml = runtimeLabel
-    ? `<span class="lbp-fmp__runtime">${yearHtml ? '<span class="lbp-fmp__sep" aria-hidden="true">·</span>' : ''}${escapeHtml(runtimeLabel)}</span>`
-    : loading && settings.fmpShowRuntime !== false
-      ? `<span class="lbp-fmp__runtime" aria-hidden="true">${yearHtml ? '<span class="lbp-fmp__sep" aria-hidden="true">·</span>' : ''}${skelBone('lbp-fmp__bone--runtime')}</span>`
+  const runtimeHtml = loading && settings.fmpShowRuntime !== false
+    ? `<span class="lbp-fmp__runtime" aria-hidden="true">${yearHtml ? '<span class="lbp-fmp__sep" aria-hidden="true">·</span>' : ''}${skelBone('lbp-fmp__bone--runtime')}</span>`
+    : runtimeLabel
+      ? `<span class="lbp-fmp__runtime">${yearHtml ? '<span class="lbp-fmp__sep" aria-hidden="true">·</span>' : ''}${escapeHtml(runtimeLabel)}</span>`
       : '';
+
   const rating =
-    settings.fmpShowCommunityRating !== false ? profile?.rating : null;
+    !loading && settings.fmpShowCommunityRating !== false
+      ? profile?.rating
+      : null;
   const ratingTitle =
     rating != null && profile?.ratingCount != null
       ? `${t('miniFilmRating')} · ${t('miniFilmRatingCount', {
           count: formatNumber(profile.ratingCount),
         })}`
       : t('miniFilmRating');
-  const ratingHtml =
-    rating != null
+  const ratingHtml = loading && settings.fmpShowCommunityRating !== false
+    ? skelBone('lbp-fmp__bone--rating')
+    : rating != null
       ? `<span class="lbp-fmp__rating" title="${escapeAttr(ratingTitle)}">${escapeHtml(formatStars(rating))}</span>`
-      : loading && settings.fmpShowCommunityRating !== false
-        ? skelBone('lbp-fmp__bone--rating')
-        : '';
+      : '';
 
   const myRating =
     settings.fmpShowUserStatus !== false && ctx.user?.rating != null
@@ -103,6 +177,19 @@ function renderHero(ctx) {
   const myRatingHtml =
     myRating != null && myRating > 0
       ? `<span class="lbp-fmp__user-rating" title="${escapeAttr(t('miniFilmMyRating'))}">${escapeHtml(formatStars(myRating))}</span>`
+      : '';
+
+  const headerScores = renderHeaderScores(ctx);
+  const ratingsBlock =
+    ratingHtml || myRatingHtml || headerScores
+      ? `<div class="lbp-fmp__ratings-block">
+          ${
+            ratingHtml || myRatingHtml
+              ? `<div class="lbp-fmp__ratings">${ratingHtml}${myRatingHtml}</div>`
+              : ''
+          }
+          ${headerScores}
+        </div>`
       : '';
 
   return `
@@ -115,9 +202,8 @@ function renderHero(ctx) {
         <div class="lbp-fmp__sub">
           ${yearHtml}
           ${runtimeHtml}
-          ${ratingHtml}
-          ${myRatingHtml}
         </div>
+        ${ratingsBlock}
       </div>
     </div>
   `;
@@ -301,64 +387,6 @@ function renderStats(ctx) {
   return `<div class="lbp-fmp__section lbp-fmp__stats">${bits.join('')}</div>`;
 }
 
-function scoreRowHtml({ href, value, label, modifier }) {
-  return `
-    <a class="lbp-fmp__score lbp-fmp__score--${escapeAttr(modifier)}" href="${escapeAttr(href)}" target="_blank" rel="noopener noreferrer">
-      <span class="lbp-fmp__score-value">${escapeHtml(value)}</span>
-      <span class="lbp-fmp__score-label">${escapeHtml(label)}</span>
-    </a>
-  `;
-}
-
-function renderScores(ctx) {
-  const settings = currentSettings();
-  if (settings.fmpShowExternalScores === false) return '';
-  const wantsRt = settings.showRottenTomatoes !== false;
-  const wantsMc = settings.showMetacritic !== false;
-  if (!wantsRt && !wantsMc) return '';
-
-  if (ctx.loadingScores && !ctx.rt && !ctx.mc) {
-    return `
-      <div class="lbp-fmp__section lbp-fmp__scores" aria-busy="true">
-        <span class="lbp-fmp__score is-skeleton" aria-hidden="true">
-          ${skelBone('lbp-fmp__bone--score')}
-          ${skelBone('lbp-fmp__bone--label')}
-        </span>
-        <span class="lbp-fmp__score is-skeleton" aria-hidden="true">
-          ${skelBone('lbp-fmp__bone--score')}
-          ${skelBone('lbp-fmp__bone--label')}
-        </span>
-      </div>
-    `;
-  }
-
-  const bits = [];
-  if (wantsRt && ctx.rt?.criticsScore != null) {
-    bits.push(
-      scoreRowHtml({
-        href: ctx.rt.url || ROTTEN_TOMATOES_ORIGIN,
-        value: `${ctx.rt.criticsScore}%`,
-        label: ctx.rt.isCertifiedFresh ? t('certifiedFresh') : t('tomatometer'),
-        modifier: 'rt',
-      }),
-    );
-  }
-  if (wantsMc && ctx.mc?.criticsScore != null) {
-    const tier = mcScoreTier(ctx.mc.criticsScore);
-    bits.push(
-      scoreRowHtml({
-        href: ctx.mc.url || METACRITIC_ORIGIN,
-        value: String(ctx.mc.criticsScore),
-        label: t('metascore'),
-        modifier: tier ? `mc-${tier}` : 'mc',
-      }),
-    );
-  }
-
-  if (!bits.length) return '';
-  return `<div class="lbp-fmp__section lbp-fmp__scores">${bits.join('')}</div>`;
-}
-
 function renderDescription(ctx) {
   const settings = currentSettings();
   if (settings.fmpShowDescription === false) return '';
@@ -441,7 +469,6 @@ const BODY_SECTIONS = [
   { id: 'meta', render: (ctx) => renderMeta(ctx) },
   { id: 'tagline', render: (ctx) => renderTagline(ctx) },
   { id: 'stats', render: (ctx) => renderStats(ctx) },
-  { id: 'scores', render: (ctx) => renderScores(ctx) },
   { id: 'description', render: (ctx) => renderDescription(ctx) },
   { id: 'links', render: (ctx) => renderLinks(ctx) },
   { id: 'quickLinks', render: (ctx) => renderQuickLinks(ctx) },

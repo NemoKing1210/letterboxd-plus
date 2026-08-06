@@ -1,5 +1,5 @@
 import { FILM_LEAVE_MS } from '../../core/constants.js';
-import { POPOVER_ID } from './constants.js';
+import { HOVER_ATTR, POPOVER_ID } from './constants.js';
 import { state } from './state.js';
 
 /** @type {(() => void) | null} */
@@ -38,6 +38,7 @@ function finishHidePopover() {
   state.popoverEl.classList.remove('is-open', 'is-leaving', 'is-loading', 'is-ready');
   state.popoverEl.setAttribute('aria-hidden', 'true');
   state.popoverEl.innerHTML = '';
+  state.activePoster?.removeAttribute?.(HOVER_ATTR);
   state.activePoster = null;
   state.activeSlug = '';
 }

@@ -1,5 +1,6 @@
 const DEFAULT_SETTINGS_FALLBACK = {
   showFilmMiniProfile: true,
+  fmpOpenMode: 'hover',
   preloadFilmMiniProfile: false,
   showRottenTomatoes: true,
   showMetacritic: true,

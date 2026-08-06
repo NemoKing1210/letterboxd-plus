@@ -36,6 +36,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   showMetacriticUserScore: true,
   enhanceCast: true,
   showFilmMiniProfile: true,
+  fmpOpenMode: 'hover',
   preloadFilmMiniProfile: false,
   fmpShowCommunityRating: true,
   fmpShowUserStatus: true,
@@ -63,3 +64,5 @@ export const TOAST_POSITIONS = Object.freeze([
   'bottom-left',
   'bottom-center',
 ]);
+
+export const FMP_OPEN_MODES = Object.freeze(['hover', 'contextmenu']);

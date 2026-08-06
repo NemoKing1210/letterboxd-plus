@@ -1,4 +1,4 @@
-import { CACHE_HOURS_MAX, SCRIPT_VERSION, TOAST_POSITIONS } from '../../core/constants.js';
+import { CACHE_HOURS_MAX, FMP_OPEN_MODES, SCRIPT_VERSION, TOAST_POSITIONS } from '../../core/constants.js';
 import {
   loadSettings,
   resetSettings,
@@ -36,6 +36,11 @@ const TOAST_POSITION_I18N = Object.freeze({
   'bottom-center': 'toastPositionBottomCenter',
 });
 
+const FMP_OPEN_MODE_I18N = Object.freeze({
+  hover: 'fmpOpenModeHover',
+  contextmenu: 'fmpOpenModeContextMenu',
+});
+
 export function openSettings() {
   if (document.querySelector('.lbp-settings-backdrop')) return;
 
@@ -47,6 +52,10 @@ export function openSettings() {
   const toastPositionOptions = TOAST_POSITIONS.map(
     (position) =>
       `<option value="${position}"${draft.toastPosition === position ? ' selected' : ''}>${t(TOAST_POSITION_I18N[position])}</option>`,
+  ).join('');
+  const fmpOpenModeOptions = FMP_OPEN_MODES.map(
+    (mode) =>
+      `<option value="${mode}"${draft.fmpOpenMode === mode ? ' selected' : ''}>${t(FMP_OPEN_MODE_I18N[mode])}</option>`,
   ).join('');
   const cacheTyped = getCacheStatsByType(draft.cacheHours);
   const activeElement = document.activeElement;
@@ -133,6 +142,13 @@ export function openSettings() {
                 t('showFilmMiniProfile'),
                 t('showFilmMiniProfileHint'),
               )}
+              <label class="lbp-field" for="lbp-fmp-open-mode">
+                <span>${t('fmpOpenMode')}</span>
+                <small>${t('fmpOpenModeHint')}</small>
+                <select id="lbp-fmp-open-mode">
+                  ${fmpOpenModeOptions}
+                </select>
+              </label>
               ${switchHtml(
                 'preloadFilmMiniProfile',
                 draft.preloadFilmMiniProfile,
@@ -453,6 +469,7 @@ export function openSettings() {
   dialog.querySelector('[data-save]').addEventListener('click', () => {
     draft.uiLocale = dialog.querySelector('#lbp-ui-locale').value;
     draft.toastPosition = dialog.querySelector('#lbp-toast-position').value;
+    draft.fmpOpenMode = dialog.querySelector('#lbp-fmp-open-mode').value;
     draft.cacheHours = Number(dialog.querySelector('#lbp-cache-hours').value);
     saveSettings(draft);
     queueToast({

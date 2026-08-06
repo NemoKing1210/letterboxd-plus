@@ -2,6 +2,7 @@ import { GM_getValue, GM_setValue } from '$';
 import {
   CACHE_HOURS_MAX,
   DEFAULT_SETTINGS,
+  FMP_OPEN_MODES,
   SETTINGS_KEY,
   TOAST_POSITIONS,
 } from './constants.js';
@@ -17,6 +18,9 @@ function normalizeSettings(value) {
   const toastPosition = TOAST_POSITIONS.includes(raw.toastPosition)
     ? raw.toastPosition
     : DEFAULT_SETTINGS.toastPosition;
+  const fmpOpenMode = FMP_OPEN_MODES.includes(raw.fmpOpenMode)
+    ? raw.fmpOpenMode
+    : DEFAULT_SETTINGS.fmpOpenMode;
 
   return {
     uiLocale,
@@ -27,6 +31,7 @@ function normalizeSettings(value) {
     showMetacriticUserScore: raw.showMetacriticUserScore !== false,
     enhanceCast: raw.enhanceCast !== false,
     showFilmMiniProfile: raw.showFilmMiniProfile !== false,
+    fmpOpenMode,
     preloadFilmMiniProfile: raw.preloadFilmMiniProfile === true,
     fmpShowCommunityRating: raw.fmpShowCommunityRating !== false,
     fmpShowUserStatus: raw.fmpShowUserStatus !== false,

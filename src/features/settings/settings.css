@@ -400,6 +400,14 @@
   margin-top: 12px;
 }
 
+.lbp-settings__card > .lbp-field {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  border-top: 1px solid #3d4854;
+  margin: 0;
+}
+
 .lbp-field__input {
   align-items: center;
   color: var(--lbp-muted);

@@ -80,15 +80,54 @@ export function parsePosterYear(poster) {
   return null;
 }
 
+function pickFromSrcset(srcset) {
+  const raw = String(srcset || '').trim();
+  if (!raw) return '';
+  let best = '';
+  let bestW = -1;
+  for (const part of raw.split(',')) {
+    const bits = part.trim().split(/\s+/);
+    const url = bits[0] || '';
+    if (!url) continue;
+    const descriptor = bits[1] || '';
+    const widthMatch = descriptor.match(/^(\d+)w$/i);
+    const width = widthMatch ? Number(widthMatch[1]) : 0;
+    if (width >= bestW) {
+      bestW = width;
+      best = url;
+    } else if (!best) {
+      best = url;
+    }
+  }
+  return best;
+}
+
+function isUsablePosterSrc(src) {
+  const value = String(src || '').trim();
+  if (!value) return false;
+  if (/empty-poster/i.test(value)) return false;
+  return true;
+}
+
 export function posterImgUrl(poster) {
-  const img = poster?.querySelector?.('img');
-  const src = (
-    img?.getAttribute?.('src') ||
-    img?.getAttribute?.('data-src') ||
-    ''
-  ).trim();
-  if (!src || /empty-poster/i.test(src)) return '';
-  return src;
+  const roots = posterRoots(poster);
+  for (const root of roots) {
+    const img =
+      root.querySelector?.('img.image') || root.querySelector?.('img');
+    if (!img) continue;
+
+    const candidates = [
+      img.currentSrc,
+      img.getAttribute?.('src'),
+      img.getAttribute?.('data-src'),
+      pickFromSrcset(img.getAttribute?.('srcset')),
+      pickFromSrcset(img.getAttribute?.('data-srcset')),
+    ];
+    for (const candidate of candidates) {
+      if (isUsablePosterSrc(candidate)) return String(candidate).trim();
+    }
+  }
+  return '';
 }
 
 function readBoolAttr(el, name) {
