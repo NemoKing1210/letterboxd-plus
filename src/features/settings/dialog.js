@@ -1,4 +1,10 @@
-import { CACHE_HOURS_MAX, FMP_OPEN_MODES, SCRIPT_VERSION, TOAST_POSITIONS } from '../../core/constants.js';
+import {
+  CACHE_HOURS_MAX,
+  FMP_OPEN_MODES,
+  SCRIPT_VERSION,
+  TOAST_POSITIONS,
+  TRANSLATE_DISPLAY_MODES,
+} from '../../core/constants.js';
 import {
   loadSettings,
   resetSettings,
@@ -47,6 +53,11 @@ const FMP_OPEN_MODE_I18N = Object.freeze({
   contextmenu: 'fmpOpenModeContextMenu',
 });
 
+const TRANSLATE_MODE_I18N = Object.freeze({
+  replace: 'translateModeReplace',
+  below: 'translateModeBelow',
+});
+
 const FMP_DEPENDENT_KEYS = Object.freeze([
   'preloadFilmMiniProfile',
   'fmpShowCommunityRating',
@@ -61,6 +72,19 @@ const FMP_DEPENDENT_KEYS = Object.freeze([
   'fmpShowExternalScores',
   'fmpShowQuickLinks',
 ]);
+
+function translateTabBadge(draft) {
+  const pref = draft.translateTargetLocale || 'auto';
+  if (pref === 'auto') return 'AUTO';
+  return String(pref).split('-')[0].toUpperCase();
+}
+
+function setFieldDisabled(field, disabled) {
+  if (!field) return;
+  field.classList.toggle('is-disabled', disabled);
+  const control = field.querySelector('select, input');
+  if (control) control.disabled = disabled;
+}
 
 function syncDependentControls(dialog, draft) {
   setRowDisabled(
@@ -78,11 +102,32 @@ function syncDependentControls(dialog, draft) {
   }
 
   const openModeField = dialog.querySelector('#lbp-fmp-open-mode')?.closest('.lbp-field');
-  if (openModeField) {
-    openModeField.classList.toggle('is-disabled', !filmCardsOn);
-    const select = openModeField.querySelector('select');
-    if (select) select.disabled = !filmCardsOn;
-  }
+  setFieldDisabled(openModeField, !filmCardsOn);
+
+  const translateOn = draft.showTranslate !== false;
+  setFieldDisabled(
+    dialog.querySelector('#lbp-translate-locale')?.closest('.lbp-field'),
+    !translateOn,
+  );
+  setFieldDisabled(
+    dialog.querySelector('#lbp-translate-mode')?.closest('.lbp-field'),
+    !translateOn,
+  );
+  setRowDisabled(
+    dialog.querySelector('[data-setting-row="translateDescription"]'),
+    !translateOn,
+  );
+  setRowDisabled(
+    dialog.querySelector('[data-setting-row="translateReviews"]'),
+    !translateOn,
+  );
+  setRowDisabled(
+    dialog.querySelector('[data-setting-row="translateReviewsAuto"]'),
+    !translateOn || draft.translateReviews === false,
+  );
+
+  const badge = dialog.querySelector('[data-translate-tab-badge]');
+  if (badge) badge.textContent = translateTabBadge(draft);
 }
 
 export function openSettings() {
@@ -101,6 +146,14 @@ export function openSettings() {
     (mode) =>
       `<option value="${mode}"${draft.fmpOpenMode === mode ? ' selected' : ''}>${t(FMP_OPEN_MODE_I18N[mode])}</option>`,
   ).join('');
+  const translateLocaleOptions = SUPPORTED_LOCALES.map(
+    (locale) =>
+      `<option value="${locale}"${draft.translateTargetLocale === locale ? ' selected' : ''}>${LOCALE_FLAGS[locale]} ${LOCALE_NATIVE_NAMES[locale]}</option>`,
+  ).join('');
+  const translateModeOptions = TRANSLATE_DISPLAY_MODES.map(
+    (mode) =>
+      `<option value="${mode}"${draft.translateDisplayMode === mode ? ' selected' : ''}>${t(TRANSLATE_MODE_I18N[mode])}</option>`,
+  ).join('');
   const cacheTyped = getCacheStatsByType(draft.cacheHours);
   const activeElement = document.activeElement;
   const backdrop = document.createElement('div');
@@ -117,6 +170,7 @@ export function openSettings() {
           <button type="button" id="lbp-tab-general" class="is-active" data-tab="general" role="tab" aria-selected="true" aria-controls="lbp-panel-general">${t('tabGeneral')}</button>
           <button type="button" id="lbp-tab-film" data-tab="film" role="tab" aria-selected="false" aria-controls="lbp-panel-film" tabindex="-1">${t('tabFilm')}</button>
           <button type="button" id="lbp-tab-card" data-tab="card" role="tab" aria-selected="false" aria-controls="lbp-panel-card" tabindex="-1">${t('tabCard')}</button>
+          <button type="button" id="lbp-tab-translate" data-tab="translate" role="tab" aria-selected="false" aria-controls="lbp-panel-translate" tabindex="-1">${t('tabTranslate')} <span class="lbp-settings__tab-badge" data-translate-tab-badge>${translateTabBadge(draft)}</span></button>
           <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheTyped.fillPercent}%</span></button>
           <button type="button" id="lbp-tab-about" data-tab="about" role="tab" aria-selected="false" aria-controls="lbp-panel-about" tabindex="-1">${t('tabAbout')}</button>
         </div>
@@ -294,6 +348,59 @@ export function openSettings() {
                   draft.fmpShowQuickLinks,
                   t('fmpShowQuickLinks'),
                   t('fmpShowQuickLinksHint'),
+                ),
+              ),
+            )}
+          </section>
+          <section id="lbp-panel-translate" data-panel="translate" role="tabpanel" aria-labelledby="lbp-tab-translate" hidden>
+            ${groupHtml(
+              'translateGroupMain',
+              'translateGroupMainHint',
+              listHtml(
+                switchHtml(
+                  'showTranslate',
+                  draft.showTranslate,
+                  t('showTranslate'),
+                  t('showTranslateHint'),
+                ),
+                fieldHtml(
+                  'lbp-translate-locale',
+                  t('translateTargetLocale'),
+                  t('translateTargetLocaleHint'),
+                  `<select id="lbp-translate-locale">
+                    <option value="auto"${draft.translateTargetLocale === 'auto' ? ' selected' : ''}>🌐 ${t('translateAsUi')}</option>
+                    ${translateLocaleOptions}
+                  </select>`,
+                ),
+                fieldHtml(
+                  'lbp-translate-mode',
+                  t('translateDisplayMode'),
+                  t('translateDisplayModeHint'),
+                  `<select id="lbp-translate-mode">${translateModeOptions}</select>`,
+                ),
+              ),
+            )}
+            ${groupHtml(
+              'translateGroupTargets',
+              'translateGroupTargetsHint',
+              listHtml(
+                switchHtml(
+                  'translateDescription',
+                  draft.translateDescription,
+                  t('translateDescription'),
+                  t('translateDescriptionHint'),
+                ),
+                switchHtml(
+                  'translateReviews',
+                  draft.translateReviews,
+                  t('translateReviews'),
+                  t('translateReviewsHint'),
+                ),
+                switchHtml(
+                  'translateReviewsAuto',
+                  draft.translateReviewsAuto,
+                  t('translateReviewsAuto'),
+                  t('translateReviewsAutoHint'),
                 ),
               ),
             )}
@@ -534,6 +641,13 @@ export function openSettings() {
     draft.toastPosition = event.target.value;
     configureToastPosition(draft.toastPosition);
   });
+  dialog.querySelector('#lbp-translate-locale').addEventListener('change', (event) => {
+    draft.translateTargetLocale = event.target.value;
+    syncDependentControls(dialog, draft);
+  });
+  dialog.querySelector('#lbp-translate-mode').addEventListener('change', (event) => {
+    draft.translateDisplayMode = event.target.value;
+  });
   dialog.querySelector('#lbp-cache-hours').addEventListener('input', (event) => {
     paintCachePanel(dialog, Number(event.target.value), draft);
   });
@@ -572,6 +686,8 @@ export function openSettings() {
     draft.uiLocale = dialog.querySelector('#lbp-ui-locale').value;
     draft.toastPosition = dialog.querySelector('#lbp-toast-position').value;
     draft.fmpOpenMode = dialog.querySelector('#lbp-fmp-open-mode').value;
+    draft.translateTargetLocale = dialog.querySelector('#lbp-translate-locale').value;
+    draft.translateDisplayMode = dialog.querySelector('#lbp-translate-mode').value;
     draft.cacheHours = Number(dialog.querySelector('#lbp-cache-hours').value);
     const settings = saveSettings(draft);
     forceClose();

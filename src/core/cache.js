@@ -6,7 +6,7 @@ import {
 } from '$';
 import { CACHE_PREFIX, CACHE_SOFT_LIMIT_BYTES } from './constants.js';
 
-export const CACHE_TYPES = Object.freeze(['film', 'rt', 'metacritic']);
+export const CACHE_TYPES = Object.freeze(['film', 'rt', 'metacritic', 'gtx']);
 
 function storageKey(key) {
   return `${CACHE_PREFIX}${key}`;
@@ -40,6 +40,7 @@ export function classifyCacheKey(logicalKey) {
   if (key.startsWith('film:mini:v2:')) return 'film';
   if (key.startsWith('rt:')) return 'rt';
   if (key.startsWith('metacritic:')) return 'metacritic';
+  if (key.startsWith('gtx:')) return 'gtx';
   return null;
 }
 
@@ -88,6 +89,12 @@ function labelForEntry(type, logicalKey, value, titles) {
     const slug = slugMatch[1].toLowerCase();
     return titles.bySlug.get(slug) || slug;
   }
+
+  const gtxMatch = logicalKey.match(/^gtx:([a-z]{2}):(.+)$/i);
+  if (gtxMatch) {
+    return `${gtxMatch[1].toUpperCase()} · ${gtxMatch[2]}`;
+  }
+
   return logicalKey;
 }
 
@@ -167,6 +174,7 @@ export function getCacheStatsByType(cacheHours) {
     film: emptyTypeStats(),
     rt: emptyTypeStats(),
     metacritic: emptyTypeStats(),
+    gtx: emptyTypeStats(),
   };
 
   for (const entry of entries) {
@@ -183,16 +191,14 @@ export function getCacheStatsByType(cacheHours) {
     }
   }
 
-  const usedBytes =
-    byType.film.bytes + byType.rt.bytes + byType.metacritic.bytes;
-  const activeCount =
-    byType.film.activeCount +
-    byType.rt.activeCount +
-    byType.metacritic.activeCount;
-  const expiredCount =
-    byType.film.expiredCount +
-    byType.rt.expiredCount +
-    byType.metacritic.expiredCount;
+  let usedBytes = 0;
+  let activeCount = 0;
+  let expiredCount = 0;
+  for (const type of CACHE_TYPES) {
+    usedBytes += byType[type].bytes;
+    activeCount += byType[type].activeCount;
+    expiredCount += byType[type].expiredCount;
+  }
 
   return {
     byType,

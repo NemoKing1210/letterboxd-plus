@@ -6,6 +6,7 @@ import {
   ensureMetacriticRating,
 } from './ratings/index.js';
 import { ensureSettingsButton } from './settings/index.js';
+import { syncTranslateUi } from './translate/index.js';
 
 export { openSettings } from './settings/index.js';
 export {
@@ -21,4 +22,5 @@ export const pageFeatures = [
   { scan: (settings) => void ensureFilmRating(settings) },
   { scan: (settings) => void ensureMetacriticRating(settings) },
   { scan: () => ensureAverageRating() },
+  { scan: (settings) => syncTranslateUi(settings) },
 ];

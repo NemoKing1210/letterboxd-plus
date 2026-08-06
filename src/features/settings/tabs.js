@@ -1,4 +1,4 @@
-export const TABS = ['general', 'film', 'card', 'cache', 'about'];
+export const TABS = ['general', 'film', 'card', 'translate', 'cache', 'about'];
 
 export function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;

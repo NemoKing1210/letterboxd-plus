@@ -560,6 +560,10 @@
   background: #40bcf4;
 }
 
+.lbp-cache-meter__segment.is-gtx {
+  background: #9ab;
+}
+
 .lbp-cache-meter__legend {
   display: grid;
   gap: 6px;
@@ -600,6 +604,10 @@
   background: #40bcf4;
 }
 
+.lbp-cache-meter__legend i.is-gtx {
+  background: #9ab;
+}
+
 .lbp-cache-meter > p {
   border-top: 1px solid #313b44;
   color: #789;
@@ -633,6 +641,10 @@
 
 .lbp-cache-entity--metacritic {
   border-left-color: #40bcf4;
+}
+
+.lbp-cache-entity--gtx {
+  border-left-color: #9ab;
 }
 
 .lbp-cache-entity__header {

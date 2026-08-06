@@ -47,10 +47,17 @@ export const DEFAULT_SETTINGS = Object.freeze({
   fmpShowStats: false,
   fmpShowExternalScores: true,
   fmpShowQuickLinks: true,
+  showTranslate: true,
+  translateTargetLocale: 'auto',
+  translateDisplayMode: 'replace',
+  translateDescription: true,
+  translateReviews: true,
+  translateReviewsAuto: false,
   cacheHours: 24,
   cacheFilmMiniProfile: true,
   cacheRottenTomatoes: true,
   cacheMetacritic: true,
+  cacheTranslations: true,
 });
 
 export const TOAST_POSITIONS = Object.freeze([
@@ -63,3 +70,9 @@ export const TOAST_POSITIONS = Object.freeze([
 ]);
 
 export const FMP_OPEN_MODES = Object.freeze(['hover', 'contextmenu']);
+
+export const TRANSLATE_DISPLAY_MODES = Object.freeze(['replace', 'below']);
+
+export const TRANSLATE_REQUEST_TIMEOUT_MS = 20_000;
+
+export const GOOGLE_TRANSLATE_ORIGIN = 'https://translate.googleapis.com';

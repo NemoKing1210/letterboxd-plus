@@ -5,6 +5,7 @@ import {
   FMP_OPEN_MODES,
   SETTINGS_KEY,
   TOAST_POSITIONS,
+  TRANSLATE_DISPLAY_MODES,
 } from './constants.js';
 import { SUPPORTED_LOCALES } from '../i18n/meta.js';
 
@@ -21,6 +22,16 @@ function normalizeSettings(value) {
   const fmpOpenMode = FMP_OPEN_MODES.includes(raw.fmpOpenMode)
     ? raw.fmpOpenMode
     : DEFAULT_SETTINGS.fmpOpenMode;
+  const translateTargetLocale =
+    raw.translateTargetLocale === 'auto' ||
+    SUPPORTED_LOCALES.includes(raw.translateTargetLocale)
+      ? raw.translateTargetLocale
+      : DEFAULT_SETTINGS.translateTargetLocale;
+  const translateDisplayMode = TRANSLATE_DISPLAY_MODES.includes(
+    raw.translateDisplayMode,
+  )
+    ? raw.translateDisplayMode
+    : DEFAULT_SETTINGS.translateDisplayMode;
 
   return {
     uiLocale,
@@ -44,12 +55,19 @@ function normalizeSettings(value) {
     fmpShowStats: raw.fmpShowStats === true,
     fmpShowExternalScores: raw.fmpShowExternalScores !== false,
     fmpShowQuickLinks: raw.fmpShowQuickLinks !== false,
+    showTranslate: raw.showTranslate !== false,
+    translateTargetLocale,
+    translateDisplayMode,
+    translateDescription: raw.translateDescription !== false,
+    translateReviews: raw.translateReviews !== false,
+    translateReviewsAuto: raw.translateReviewsAuto === true,
     cacheHours: Number.isFinite(cacheHours)
       ? Math.max(0, Math.min(CACHE_HOURS_MAX, cacheHours))
       : DEFAULT_SETTINGS.cacheHours,
     cacheFilmMiniProfile: raw.cacheFilmMiniProfile !== false,
     cacheRottenTomatoes: raw.cacheRottenTomatoes !== false,
     cacheMetacritic: raw.cacheMetacritic !== false,
+    cacheTranslations: raw.cacheTranslations !== false,
   };
 }
 

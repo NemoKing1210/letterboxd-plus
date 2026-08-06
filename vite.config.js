@@ -61,6 +61,7 @@ export default defineConfig({
           'www.rottentomatoes.com',
           'rottentomatoes.com',
           'backend.metacritic.com',
+          'translate.googleapis.com',
         ],
         'run-at': 'document-idle',
         noframes: true,

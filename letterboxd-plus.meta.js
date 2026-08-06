@@ -7,7 +7,7 @@
 // @name:fr            Letterboxd Plus
 // @name:zh-CN         Letterboxd Plus
 // @namespace          https://github.com/NemoKing1210/letterboxd-plus
-// @version            0.13.1
+// @version            0.14.0
 // @author             NemoKing1210
 // @description        Adds external ratings, film hover mini-cards, and enhanced cast to Letterboxd
 // @description:ru     Добавляет в Letterboxd внешние рейтинги, мини-карточки фильмов и карточки актёров
@@ -32,6 +32,7 @@
 // @connect            www.rottentomatoes.com
 // @connect            rottentomatoes.com
 // @connect            backend.metacritic.com
+// @connect            translate.googleapis.com
 // @grant              GM_addStyle
 // @grant              GM_deleteValue
 // @grant              GM_getValue

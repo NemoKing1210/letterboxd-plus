@@ -171,7 +171,10 @@ Offline “Save page” captures often leave `img.image` pointing at
 
 Example tagline: `Defy the gods.`
 
-**Used by:** `parseTagline`, `parseDescription` in `film-profile.js`.
+Container for both: `section.production-synopsis`.
+
+**Used by:** `parseTagline`, `parseDescription` in `film-profile.js`;
+content translation mounts on the synopsis paragraph (not the tagline).
 
 ---
 
@@ -379,8 +382,21 @@ incomplete.
 | Mentioned by | `#film-hq-mentions` | high |
 | Popular lists | `#production-popular-lists` | high |
 
-Review entries are nested list markup inside those sections (avatars, ratings,
-review text). Detail mapping can be expanded when a feature needs them.
+### Review entry (viewing)
+
+| Field | Preferred selector | Notes | Stability |
+|-------|--------------------|-------|-----------|
+| Card | `article.production-viewing` | Often wrapped in `.listitem.js-listitem` | high |
+| Viewing id | `data-viewing-id` on the article | Numeric | high |
+| Author slug | `data-person` on the article | Profile username | high |
+| Avatar | `a.avatar` / `img` inside card | — | high |
+| Attribution | `.attribution-block` / `.displayname` | “Review by …” | high |
+| Review body | `.js-review-body` or `[data-is-translatable="true"]` | May include `lang` | high |
+| Full text URL | `data-full-text-url` on the body | Same-origin truncated expand | high |
+| Collapsible | `.js-collapsible-text` | Truncation chrome | medium |
+| Actions | `.viewing-actions` / `.review-actions` | Like / etc. | high |
+
+**Used by:** content translation (`src/features/translate/`).
 
 ---
 

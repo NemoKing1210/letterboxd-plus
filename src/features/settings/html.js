@@ -44,6 +44,14 @@ const CACHE_ENTITY_META = Object.freeze({
     enableHintKey: 'cacheMetacriticHint',
     clearKey: 'cacheClearMc',
   },
+  gtx: {
+    settingKey: 'cacheTranslations',
+    titleKey: 'cacheEntityGtxTitle',
+    descKey: 'cacheEntityGtxDesc',
+    enableKey: 'cacheTranslations',
+    enableHintKey: 'cacheTranslationsHint',
+    clearKey: 'cacheClearGtx',
+  },
 });
 
 /**
@@ -136,6 +144,10 @@ export function cacheMeterHtml(typed) {
     typed.byType.metacritic.bytes,
     typed.limitBytes,
   );
+  const gtxPct = typeSegmentPercent(
+    typed.byType.gtx?.bytes || 0,
+    typed.limitBytes,
+  );
 
   return `
     <div class="lbp-cache-meter" data-cache-meter>
@@ -154,11 +166,13 @@ export function cacheMeterHtml(typed) {
         <span class="lbp-cache-meter__segment is-film" style="width:${filmPct}%"></span>
         <span class="lbp-cache-meter__segment is-rt" style="width:${rtPct}%"></span>
         <span class="lbp-cache-meter__segment is-mc" style="width:${mcPct}%"></span>
+        <span class="lbp-cache-meter__segment is-gtx" style="width:${gtxPct}%"></span>
       </div>
       <div class="lbp-cache-meter__legend lbp-cache-meter__legend--types">
         <span><i class="is-film"></i>${t('cacheEntityFilmTitle')} · ${typed.byType.film.count} · ${formatCacheBytes(typed.byType.film.bytes)}</span>
         <span><i class="is-rt"></i>${t('cacheEntityRtTitle')} · ${typed.byType.rt.count} · ${formatCacheBytes(typed.byType.rt.bytes)}</span>
         <span><i class="is-mc"></i>${t('cacheEntityMcTitle')} · ${typed.byType.metacritic.count} · ${formatCacheBytes(typed.byType.metacritic.bytes)}</span>
+        <span><i class="is-gtx"></i>${t('cacheEntityGtxTitle')} · ${typed.byType.gtx?.count || 0} · ${formatCacheBytes(typed.byType.gtx?.bytes || 0)}</span>
       </div>
       <p>${t('cacheSoftLimitHint')}</p>
     </div>

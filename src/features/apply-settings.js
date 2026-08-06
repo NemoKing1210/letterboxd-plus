@@ -9,6 +9,7 @@ import {
   ensureMetacriticRating,
 } from './ratings/index.js';
 import { configureToastPosition } from './toast/index.js';
+import { syncTranslateUi } from './translate/index.js';
 
 function refreshSettingsNav() {
   const link = document.querySelector('#lbp-nav-settings a');
@@ -33,4 +34,5 @@ export function applyRuntimeSettings(settings) {
   void ensureFilmRating(next);
   void ensureMetacriticRating(next);
   ensureAverageRating();
+  syncTranslateUi(next);
 }
