@@ -1,7 +1,6 @@
 export const TABS = [
   'general',
   'film',
-  'card',
   'user-card',
   'translate',
   'cache',

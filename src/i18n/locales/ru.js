@@ -5,8 +5,7 @@ export default {
   closeSettings: 'Закрыть настройки',
   settingsSections: 'Разделы настроек',
   tabGeneral: 'Общие',
-  tabFilm: 'Страница фильма',
-  tabCard: 'Карточка фильма',
+  tabFilm: 'Фильм',
   tabUserCard: 'Карточка пользователя',
   tabTranslate: 'Перевод',
   tabCache: 'Кэш',
@@ -109,6 +108,8 @@ export default {
   translateError: 'Не удалось перевести',
   translateResultLabel: 'Перевод',
 
+  filmSectionPage: 'Страница фильма',
+  filmSectionCard: 'Карточка фильма',
   filmGroupScores: 'Внешние оценки',
   filmGroupScoresHint: 'Показывать Rotten Tomatoes и Metacritic рядом с рейтингами Letterboxd на страницах фильмов.',
   filmGroupCast: 'Актёры и команда',

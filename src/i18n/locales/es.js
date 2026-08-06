@@ -5,8 +5,7 @@ export default {
   closeSettings: 'Cerrar ajustes',
   settingsSections: 'Secciones de ajustes',
   tabGeneral: 'General',
-  tabFilm: 'Página de película',
-  tabCard: 'Tarjeta de película',
+  tabFilm: 'Película',
   tabUserCard: 'Tarjeta de usuario',
   tabTranslate: 'Traducción',
   tabCache: 'Caché',
@@ -109,6 +108,8 @@ export default {
   translateError: 'No se pudo traducir',
   translateResultLabel: 'Traducción',
 
+  filmSectionPage: 'Página de película',
+  filmSectionCard: 'Tarjeta de película',
   filmGroupScores: 'Puntuaciones externas',
   filmGroupScoresHint: 'Muestra Rotten Tomatoes y Metacritic junto a las valoraciones de Letterboxd en páginas de películas.',
   filmGroupCast: 'Reparto y equipo',

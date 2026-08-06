@@ -5,8 +5,7 @@ export default {
   closeSettings: 'Einstellungen schließen',
   settingsSections: 'Einstellungsbereiche',
   tabGeneral: 'Allgemein',
-  tabFilm: 'Filmseite',
-  tabCard: 'Filmkarte',
+  tabFilm: 'Film',
   tabUserCard: 'Benutzerkarte',
   tabTranslate: 'Übersetzung',
   tabCache: 'Cache',
@@ -110,6 +109,8 @@ export default {
   translateError: 'Übersetzung fehlgeschlagen',
   translateResultLabel: 'Übersetzung',
 
+  filmSectionPage: 'Filmseite',
+  filmSectionCard: 'Filmkarte',
   filmGroupScores: 'Externe Wertungen',
   filmGroupScoresHint: 'Rotten Tomatoes und Metacritic neben Letterboxd-Wertungen auf Filmseiten anzeigen.',
   filmGroupCast: 'Besetzung & Stab',

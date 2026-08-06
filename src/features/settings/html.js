@@ -63,6 +63,20 @@ const CACHE_ENTITY_META = Object.freeze({
 });
 
 /**
+ * Top-level settings section within a tab (e.g. Film page vs Film card).
+ */
+export function sectionHtml(titleKey, ...content) {
+  return `
+    <section class="lbp-settings-section">
+      <header class="lbp-settings-section__head">
+        <p class="lbp-settings__kicker">${escapeHtml(t(titleKey))}</p>
+      </header>
+      ${content.filter(Boolean).join('')}
+    </section>
+  `;
+}
+
+/**
  * Settings group: titled block with optional intro and one or more lists.
  */
 export function groupHtml(titleKey, hintKey, ...content) {

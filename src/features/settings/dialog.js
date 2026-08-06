@@ -32,6 +32,7 @@ import {
   groupHtml,
   listHtml,
   paintCachePanel,
+  sectionHtml,
   setRowDisabled,
   setSwitchOn,
   stackListHtml,
@@ -191,7 +192,6 @@ export function openSettings() {
         <div class="lbp-settings__tabs" role="tablist" aria-label="${t('settingsSections')}">
           <button type="button" id="lbp-tab-general" class="is-active" data-tab="general" role="tab" aria-selected="true" aria-controls="lbp-panel-general">${t('tabGeneral')}</button>
           <button type="button" id="lbp-tab-film" data-tab="film" role="tab" aria-selected="false" aria-controls="lbp-panel-film" tabindex="-1">${t('tabFilm')}</button>
-          <button type="button" id="lbp-tab-card" data-tab="card" role="tab" aria-selected="false" aria-controls="lbp-panel-card" tabindex="-1">${t('tabCard')}</button>
           <button type="button" id="lbp-tab-user-card" data-tab="user-card" role="tab" aria-selected="false" aria-controls="lbp-panel-user-card" tabindex="-1">${t('tabUserCard')}</button>
           <button type="button" id="lbp-tab-translate" data-tab="translate" role="tab" aria-selected="false" aria-controls="lbp-panel-translate" tabindex="-1">${t('tabTranslate')} <span class="lbp-settings__tab-badge" data-translate-tab-badge>${translateTabBadge(draft)}</span></button>
           <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheTyped.fillPercent}%</span></button>
@@ -228,155 +228,159 @@ export function openSettings() {
             )}
           </section>
           <section id="lbp-panel-film" data-panel="film" role="tabpanel" aria-labelledby="lbp-tab-film" hidden>
-            ${groupHtml(
-              'filmGroupScores',
-              'filmGroupScoresHint',
-              listHtml(
-                switchHtml(
-                  'showRottenTomatoes',
-                  draft.showRottenTomatoes,
-                  t('rottenTomatoes'),
-                  t('rottenTomatoesHint'),
+            ${sectionHtml(
+              'filmSectionPage',
+              groupHtml(
+                'filmGroupScores',
+                'filmGroupScoresHint',
+                listHtml(
+                  switchHtml(
+                    'showRottenTomatoes',
+                    draft.showRottenTomatoes,
+                    t('rottenTomatoes'),
+                    t('rottenTomatoesHint'),
+                  ),
+                  switchHtml(
+                    'showAudienceScore',
+                    draft.showAudienceScore,
+                    t('popcornmeter'),
+                    t('popcornmeterHint'),
+                  ),
+                  switchHtml(
+                    'showMetacritic',
+                    draft.showMetacritic,
+                    t('metacritic'),
+                    t('metacriticHint'),
+                  ),
+                  switchHtml(
+                    'showMetacriticUserScore',
+                    draft.showMetacriticUserScore,
+                    t('metacriticUserScore'),
+                    t('metacriticUserScoreHint'),
+                  ),
                 ),
-                switchHtml(
-                  'showAudienceScore',
-                  draft.showAudienceScore,
-                  t('popcornmeter'),
-                  t('popcornmeterHint'),
-                ),
-                switchHtml(
-                  'showMetacritic',
-                  draft.showMetacritic,
-                  t('metacritic'),
-                  t('metacriticHint'),
-                ),
-                switchHtml(
-                  'showMetacriticUserScore',
-                  draft.showMetacriticUserScore,
-                  t('metacriticUserScore'),
-                  t('metacriticUserScoreHint'),
+              ),
+              groupHtml(
+                'filmGroupCast',
+                'filmGroupCastHint',
+                listHtml(
+                  switchHtml(
+                    'enhanceCast',
+                    draft.enhanceCast,
+                    t('enhancedCast'),
+                    t('enhancedCastHint'),
+                  ),
+                  switchHtml(
+                    'enhanceCrew',
+                    draft.enhanceCrew,
+                    t('enhancedCrew'),
+                    t('enhancedCrewHint'),
+                  ),
                 ),
               ),
             )}
-            ${groupHtml(
-              'filmGroupCast',
-              'filmGroupCastHint',
-              listHtml(
-                switchHtml(
-                  'enhanceCast',
-                  draft.enhanceCast,
-                  t('enhancedCast'),
-                  t('enhancedCastHint'),
-                ),
-                switchHtml(
-                  'enhanceCrew',
-                  draft.enhanceCrew,
-                  t('enhancedCrew'),
-                  t('enhancedCrewHint'),
-                ),
-              ),
-            )}
-          </section>
-          <section id="lbp-panel-card" data-panel="card" role="tabpanel" aria-labelledby="lbp-tab-card" hidden>
-            ${groupHtml(
-              'cardGroupBehavior',
-              'cardGroupBehaviorHint',
-              listHtml(
-                switchHtml(
-                  'showFilmMiniProfile',
-                  draft.showFilmMiniProfile,
-                  t('showFilmMiniProfile'),
-                  t('showFilmMiniProfileHint'),
-                ),
-                fieldHtml(
-                  'lbp-fmp-open-mode',
-                  t('fmpOpenMode'),
-                  t('fmpOpenModeHint'),
-                  `<select id="lbp-fmp-open-mode" class="lbp-mini-card-open-mode">${fmpOpenModeOptions}</select>`,
-                ),
-                switchHtml(
-                  'preloadFilmMiniProfile',
-                  draft.preloadFilmMiniProfile,
-                  t('preloadFilmMiniProfile'),
-                  t('preloadFilmMiniProfileHint'),
+            ${sectionHtml(
+              'filmSectionCard',
+              groupHtml(
+                'cardGroupBehavior',
+                'cardGroupBehaviorHint',
+                listHtml(
+                  switchHtml(
+                    'showFilmMiniProfile',
+                    draft.showFilmMiniProfile,
+                    t('showFilmMiniProfile'),
+                    t('showFilmMiniProfileHint'),
+                  ),
+                  fieldHtml(
+                    'lbp-fmp-open-mode',
+                    t('fmpOpenMode'),
+                    t('fmpOpenModeHint'),
+                    `<select id="lbp-fmp-open-mode" class="lbp-mini-card-open-mode">${fmpOpenModeOptions}</select>`,
+                  ),
+                  switchHtml(
+                    'preloadFilmMiniProfile',
+                    draft.preloadFilmMiniProfile,
+                    t('preloadFilmMiniProfile'),
+                    t('preloadFilmMiniProfileHint'),
+                  ),
                 ),
               ),
-            )}
-            ${groupHtml(
-              'cardGroupContent',
-              'cardGroupContentHint',
-              listHtml(
-                switchHtml(
-                  'fmpShowCommunityRating',
-                  draft.fmpShowCommunityRating,
-                  t('fmpShowCommunityRating'),
-                  t('fmpShowCommunityRatingHint'),
-                ),
-                switchHtml(
-                  'fmpShowUserStatus',
-                  draft.fmpShowUserStatus,
-                  t('fmpShowUserStatus'),
-                  t('fmpShowUserStatusHint'),
-                ),
-                switchHtml(
-                  'fmpShowCast',
-                  draft.fmpShowCast,
-                  t('fmpShowCast'),
-                  t('fmpShowCastHint'),
-                ),
-                switchHtml(
-                  'fmpShowDirectors',
-                  draft.fmpShowDirectors,
-                  t('fmpShowDirectors'),
-                  t('fmpShowDirectorsHint'),
-                ),
-                switchHtml(
-                  'fmpShowGenres',
-                  draft.fmpShowGenres,
-                  t('fmpShowGenres'),
-                  t('fmpShowGenresHint'),
-                ),
-                switchHtml(
-                  'fmpShowTagline',
-                  draft.fmpShowTagline,
-                  t('fmpShowTagline'),
-                  t('fmpShowTaglineHint'),
-                ),
-                switchHtml(
-                  'fmpShowRuntime',
-                  draft.fmpShowRuntime,
-                  t('fmpShowRuntime'),
-                  t('fmpShowRuntimeHint'),
-                ),
-                switchHtml(
-                  'fmpShowDescription',
-                  draft.fmpShowDescription,
-                  t('fmpShowDescription'),
-                  t('fmpShowDescriptionHint'),
-                ),
-                switchHtml(
-                  'fmpShowStats',
-                  draft.fmpShowStats,
-                  t('fmpShowStats'),
-                  t('fmpShowStatsHint'),
+              groupHtml(
+                'cardGroupContent',
+                'cardGroupContentHint',
+                listHtml(
+                  switchHtml(
+                    'fmpShowCommunityRating',
+                    draft.fmpShowCommunityRating,
+                    t('fmpShowCommunityRating'),
+                    t('fmpShowCommunityRatingHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowUserStatus',
+                    draft.fmpShowUserStatus,
+                    t('fmpShowUserStatus'),
+                    t('fmpShowUserStatusHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowCast',
+                    draft.fmpShowCast,
+                    t('fmpShowCast'),
+                    t('fmpShowCastHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowDirectors',
+                    draft.fmpShowDirectors,
+                    t('fmpShowDirectors'),
+                    t('fmpShowDirectorsHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowGenres',
+                    draft.fmpShowGenres,
+                    t('fmpShowGenres'),
+                    t('fmpShowGenresHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowTagline',
+                    draft.fmpShowTagline,
+                    t('fmpShowTagline'),
+                    t('fmpShowTaglineHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowRuntime',
+                    draft.fmpShowRuntime,
+                    t('fmpShowRuntime'),
+                    t('fmpShowRuntimeHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowDescription',
+                    draft.fmpShowDescription,
+                    t('fmpShowDescription'),
+                    t('fmpShowDescriptionHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowStats',
+                    draft.fmpShowStats,
+                    t('fmpShowStats'),
+                    t('fmpShowStatsHint'),
+                  ),
                 ),
               ),
-            )}
-            ${groupHtml(
-              'cardGroupExtras',
-              'cardGroupExtrasHint',
-              listHtml(
-                switchHtml(
-                  'fmpShowExternalScores',
-                  draft.fmpShowExternalScores,
-                  t('fmpShowExternalScores'),
-                  t('fmpShowExternalScoresHint'),
-                ),
-                switchHtml(
-                  'fmpShowQuickLinks',
-                  draft.fmpShowQuickLinks,
-                  t('fmpShowQuickLinks'),
-                  t('fmpShowQuickLinksHint'),
+              groupHtml(
+                'cardGroupExtras',
+                'cardGroupExtrasHint',
+                listHtml(
+                  switchHtml(
+                    'fmpShowExternalScores',
+                    draft.fmpShowExternalScores,
+                    t('fmpShowExternalScores'),
+                    t('fmpShowExternalScoresHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowQuickLinks',
+                    draft.fmpShowQuickLinks,
+                    t('fmpShowQuickLinks'),
+                    t('fmpShowQuickLinksHint'),
+                  ),
                 ),
               ),
             )}

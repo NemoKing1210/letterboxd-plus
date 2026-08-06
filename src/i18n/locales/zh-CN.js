@@ -5,8 +5,7 @@ export default {
   closeSettings: '关闭设置',
   settingsSections: '设置分区',
   tabGeneral: '常规',
-  tabFilm: '影片页面',
-  tabCard: '影片卡片',
+  tabFilm: '影片',
   tabUserCard: '用户卡片',
   tabTranslate: '翻译',
   tabCache: '缓存',
@@ -108,6 +107,8 @@ export default {
   translateError: '无法翻译',
   translateResultLabel: '译文',
 
+  filmSectionPage: '影片页面',
+  filmSectionCard: '影片卡片',
   filmGroupScores: '外部评分',
   filmGroupScoresHint: '在影片页的 Letterboxd 评分旁显示 Rotten Tomatoes 与 Metacritic。',
   filmGroupCast: '演职员',
