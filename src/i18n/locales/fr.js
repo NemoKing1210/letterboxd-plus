@@ -78,7 +78,7 @@ export default {
   translateGroupTargetsHint: 'Choisissez quels blocs de page affichent le bouton Traduire.',
   showTranslate: 'Activer la traduction',
   showTranslateHint:
-    'Afficher les boutons Traduire sur les synopsis, critiques et commentaires (Google Translate).',
+    'Afficher les boutons Traduire sur les synopsis (pages et mini-cartes), critiques et commentaires (Google Translate).',
   translateTargetLocale: 'Langue cible',
   translateTargetLocaleHint:
     'Langue de traduction. « Comme l\'interface » suit Paramètres → Général → Langue de l\'interface.',
@@ -88,7 +88,7 @@ export default {
   translateModeReplace: 'Remplacer le texte (basculer l\'original)',
   translateModeBelow: 'Afficher la traduction sous l\'original',
   translateDescription: 'Traduire le synopsis',
-  translateDescriptionHint: 'Bouton sous le synopsis sur les pages de films.',
+  translateDescriptionHint: 'Bouton sous le synopsis sur les pages de films et dans les mini-cartes.',
   translateReviews: 'Traduire les critiques',
   translateReviewsHint:
     'Bouton sur les cartes de critique et sur les pages de critique individuelles.',

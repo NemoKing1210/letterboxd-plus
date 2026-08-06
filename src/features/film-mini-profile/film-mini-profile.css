@@ -385,6 +385,12 @@ a.lbp-fmp__cast-name:focus-visible {
   overflow: hidden;
 }
 
+.lbp-fmp__desc--expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+
 .lbp-fmp__links {
   display: flex;
   flex-wrap: wrap;

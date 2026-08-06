@@ -75,7 +75,7 @@ export default {
   translateGroupTargetsHint: 'Choose which page blocks get a Translate button.',
   showTranslate: 'Enable translation',
   showTranslateHint:
-    'Show Translate buttons on film synopses, reviews, and comments (Google Translate).',
+    'Show Translate buttons on film synopses (pages and mini-cards), reviews, and comments (Google Translate).',
   translateTargetLocale: 'Target language',
   translateTargetLocaleHint:
     'Language to translate into. “Same as interface” follows Settings → General → Interface language.',
@@ -85,7 +85,7 @@ export default {
   translateModeReplace: 'Replace text (toggle original)',
   translateModeBelow: 'Show translation below original',
   translateDescription: 'Translate film synopsis',
-  translateDescriptionHint: 'Button under the synopsis on film pages.',
+  translateDescriptionHint: 'Button under the synopsis on film pages and in film mini-cards.',
   translateReviews: 'Translate reviews',
   translateReviewsHint: 'Button on review cards and on standalone review pages.',
   translateReviewsAuto: 'Auto-translate reviews',

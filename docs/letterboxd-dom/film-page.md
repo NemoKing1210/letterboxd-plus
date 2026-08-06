@@ -389,6 +389,7 @@ incomplete.
 | Field | Preferred selector | Notes | Stability |
 |-------|--------------------|-------|-----------|
 | Card | `article.production-viewing` | Often wrapped in `.listitem.js-listitem` | high |
+| Masonry tile | `.review-tile` | Absolute-positioned grid tiles; same body/actions chrome | high |
 | Viewing id | `data-viewing-id` on the article | Numeric | high |
 | Author slug | `data-person` on the article | Profile username | high |
 | Avatar | `a.avatar` / `img` inside card | — | high |
@@ -398,8 +399,9 @@ incomplete.
 | Collapsible | `.js-collapsible-text` | Truncation chrome | medium |
 | Actions | `.viewing-actions` / `.review-actions` | Like / etc. | high |
 
-**Used by:** content translation (`src/features/translate/`) — film-page cards;
-standalone review pages are in [review-page.md](./review-page.md).
+**Used by:** content translation (`src/features/translate/`) — film-page cards
+and `.review-tile` masonry tiles; standalone review pages are in
+[review-page.md](./review-page.md).
 
 ---
 

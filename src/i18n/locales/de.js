@@ -79,7 +79,7 @@ export default {
   translateGroupTargetsHint: 'Wähle, welche Seitenblöcke eine Übersetzen-Schaltfläche erhalten.',
   showTranslate: 'Übersetzung aktivieren',
   showTranslateHint:
-    'Übersetzen-Schaltflächen bei Synopsen, Reviews und Kommentaren anzeigen (Google Translate).',
+    'Übersetzen-Schaltflächen bei Synopsen (Seiten und Mini-Karten), Reviews und Kommentaren anzeigen (Google Translate).',
   translateTargetLocale: 'Zielsprache',
   translateTargetLocaleHint:
     'Sprache der Übersetzung. „Wie Oberfläche“ folgt Einstellungen → Allgemein → Oberflächensprache.',
@@ -89,7 +89,7 @@ export default {
   translateModeReplace: 'Text ersetzen (Original umschalten)',
   translateModeBelow: 'Übersetzung unter dem Original zeigen',
   translateDescription: 'Filmsynopsis übersetzen',
-  translateDescriptionHint: 'Schaltfläche unter der Synopsis auf Filmseiten.',
+  translateDescriptionHint: 'Schaltfläche unter der Synopsis auf Filmseiten und in Mini-Karten.',
   translateReviews: 'Reviews übersetzen',
   translateReviewsHint: 'Schaltfläche auf Review-Karten und einzelnen Review-Seiten.',
   translateReviewsAuto: 'Reviews automatisch übersetzen',

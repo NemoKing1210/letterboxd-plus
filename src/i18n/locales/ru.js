@@ -78,7 +78,7 @@ export default {
   translateGroupTargetsHint: 'Выберите блоки страницы с кнопкой «Перевести».',
   showTranslate: 'Включить перевод',
   showTranslateHint:
-    'Показывать кнопки «Перевести» у синопсиса, обзоров и комментариев (Google Translate).',
+    'Показывать кнопки «Перевести» у синопсиса (страница и мини-карточка), обзоров и комментариев (Google Translate).',
   translateTargetLocale: 'Целевой язык',
   translateTargetLocaleHint:
     'Язык перевода. «Как интерфейс» следует настройке Общие → Язык интерфейса.',
@@ -88,7 +88,7 @@ export default {
   translateModeReplace: 'Заменить текст (переключение с оригиналом)',
   translateModeBelow: 'Показать перевод под оригиналом',
   translateDescription: 'Переводить синопсис фильма',
-  translateDescriptionHint: 'Кнопка под синопсисом на странице фильма.',
+  translateDescriptionHint: 'Кнопка под синопсисом на странице фильма и в мини-карточке.',
   translateReviews: 'Переводить обзоры',
   translateReviewsHint: 'Кнопка на карточках обзоров и на отдельных страницах обзоров.',
   translateReviewsAuto: 'Автоперевод обзоров',

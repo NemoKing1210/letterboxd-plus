@@ -24,6 +24,9 @@ export function ensurePopover() {
   state.popoverEl.addEventListener('pointerleave', () => {
     onPopoverLeave?.();
   });
+  state.popoverEl.addEventListener('lbp:fmp-content', () => {
+    if (state.activePoster) positionPopover(state.activePoster);
+  });
   document.body.appendChild(state.popoverEl);
   return state.popoverEl;
 }

@@ -82,13 +82,26 @@ function findDescriptionTextEl() {
 function findStandaloneReviewHosts() {
   return [...document.querySelectorAll('section.review.js-review')].filter(
     (section) =>
-      !section.closest('article.production-viewing') && findReviewTextEl(section),
+      !section.closest('article.production-viewing') &&
+      !section.closest('.review-tile') &&
+      findReviewTextEl(section),
+  );
+}
+
+/**
+ * Masonry / grid review tiles (absolute-positioned `.review-tile`).
+ * @returns {Element[]}
+ */
+function findReviewTiles() {
+  return [...document.querySelectorAll('.review-tile')].filter((tile) =>
+    findReviewTextEl(tile),
   );
 }
 
 function findReviewCards() {
   return [
     ...document.querySelectorAll('article.production-viewing'),
+    ...findReviewTiles(),
     ...findStandaloneReviewHosts(),
   ];
 }
@@ -101,8 +114,16 @@ function closestReviewHost(el) {
   if (!el?.closest) return null;
   const article = el.closest('article.production-viewing');
   if (article) return article;
+  const tile = el.closest('.review-tile');
+  if (tile) return tile;
   const section = el.closest('section.review.js-review');
-  if (section && !section.closest('article.production-viewing')) return section;
+  if (
+    section &&
+    !section.closest('article.production-viewing') &&
+    !section.closest('.review-tile')
+  ) {
+    return section;
+  }
   return null;
 }
 
@@ -136,11 +157,14 @@ function removeTranslateUi(scope = document) {
   stopAutoTranslate();
   scope
     .querySelectorAll(
-      '.lbp-translate-desc-slot, .lbp-translate-review-slot, .lbp-translate-comment-slot',
+      '.lbp-translate-desc-slot, .lbp-translate-fmp-desc-slot, .lbp-translate-review-slot, .lbp-translate-comment-slot',
     )
     .forEach((el) => el.remove());
   scope.querySelectorAll(`.${BTN_CLASS}`).forEach((el) => el.remove());
   scope.querySelectorAll(`.${RESULT_CLASS}`).forEach((el) => el.remove());
+  scope.querySelectorAll('.lbp-fmp__desc--expanded').forEach((el) => {
+    el.classList.remove('lbp-fmp__desc--expanded');
+  });
   scope.querySelectorAll(`[${MARK_ATTR}]`).forEach((el) => {
     el.removeAttribute(MARK_ATTR);
   });
@@ -178,12 +202,73 @@ function makeButton(kind) {
   const btn = document.createElement('button');
   btn.type = 'button';
   // Reuse Letterboxd’s primary action button (same as “Post”).
-  const sizeClass =
-    kind === 'desc' ? ` ${BTN_CLASS}--desc` : ` ${BTN_CLASS}--review`;
+  let sizeClass = ` ${BTN_CLASS}--review`;
+  if (kind === 'desc') sizeClass = ` ${BTN_CLASS}--desc`;
+  else if (kind === 'fmp-desc') sizeClass = ` ${BTN_CLASS}--fmp`;
   btn.className = `button -action ${BTN_CLASS}${sizeClass}`;
   btn.setAttribute('data-lbp-translate-kind', kind);
   setButtonLabel(btn, 'idle');
   return btn;
+}
+
+function expandFmpDescription(textEl) {
+  textEl?.classList?.add('lbp-fmp__desc--expanded');
+}
+
+function notifyFmpContentChanged(textEl) {
+  textEl
+    ?.closest?.('.lbp-fmp')
+    ?.dispatchEvent(new CustomEvent('lbp:fmp-content', { bubbles: true }));
+}
+
+function clearFmpDescriptionTranslate(scope = document) {
+  scope.querySelectorAll('.lbp-translate-fmp-desc-slot').forEach((el) => el.remove());
+  scope
+    .querySelectorAll(`.${BTN_CLASS}[data-lbp-translate-kind="fmp-desc"]`)
+    .forEach((el) => el.remove());
+  scope.querySelectorAll('.lbp-fmp__desc').forEach((textEl) => {
+    if (textEl.hasAttribute(ORIG_ATTR)) {
+      textEl.innerHTML = textEl.getAttribute(ORIG_ATTR);
+      textEl.removeAttribute(ORIG_ATTR);
+      textEl.removeAttribute(STATE_ATTR);
+    }
+    textEl.classList.remove('lbp-fmp__desc--expanded');
+    textEl.removeAttribute(MARK_ATTR);
+    const wrap = textEl.parentElement;
+    wrap?.querySelectorAll?.(`.${RESULT_CLASS}`).forEach((el) => el.remove());
+  });
+}
+
+/**
+ * @param {Element} textEl
+ */
+function ensureFmpDescriptionButton(textEl) {
+  if (!textEl || !htmlToPlain(textEl.innerHTML)) return;
+  const root = textEl.closest('.lbp-fmp') || textEl.parentElement;
+  if (!root) return;
+
+  const existing = root.querySelector(
+    `.${BTN_CLASS}[data-lbp-translate-kind="fmp-desc"]`,
+  );
+  if (existing) return;
+
+  textEl.setAttribute(MARK_ATTR, 'fmp-desc');
+  const btn = makeButton('fmp-desc');
+  const slot = document.createElement('div');
+  slot.className = 'lbp-translate-fmp-desc-slot';
+  slot.appendChild(btn);
+  textEl.insertAdjacentElement('afterend', slot);
+}
+
+function syncFmpDescriptionButtons(scope = document) {
+  if (settings().translateDescription === false) {
+    clearFmpDescriptionTranslate(scope);
+    return;
+  }
+  const root = scope.querySelectorAll ? scope : document;
+  root.querySelectorAll('.lbp-fmp__desc').forEach((textEl) => {
+    ensureFmpDescriptionButton(textEl);
+  });
 }
 
 function ensureDescriptionButton() {
@@ -304,6 +389,13 @@ function getTargetForButton(btn) {
     const textEl = findDescriptionTextEl();
     return textEl ? { textEl, host: textEl.parentElement || textEl } : null;
   }
+  if (kind === 'fmp-desc') {
+    const root = btn.closest('.lbp-fmp');
+    const textEl = root?.querySelector('.lbp-fmp__desc');
+    return textEl
+      ? { textEl, host: textEl.parentElement || textEl, isFmpDesc: true }
+      : null;
+  }
   if (kind === 'comment') {
     const item = btn.closest('li.comment');
     if (!item) return null;
@@ -380,6 +472,11 @@ function expandReviewBody(textEl) {
 }
 
 function clearBelowResult(host, textEl) {
+  const fmp = textEl?.closest?.('.lbp-fmp') || host?.closest?.('.lbp-fmp');
+  if (fmp) {
+    fmp.querySelectorAll(`.${RESULT_CLASS}`).forEach((el) => el.remove());
+    return;
+  }
   const reviewHost = closestReviewHost(textEl) || closestReviewHost(host);
   if (reviewHost) {
     reviewHost.querySelectorAll(`.${RESULT_CLASS}`).forEach((el) => el.remove());
@@ -416,8 +513,21 @@ function placeBelowResult(textEl, box, isComment) {
     return;
   }
 
-  // Film-page review cards: keep previous placement after the review text wrap.
-  if (textEl.closest('article.production-viewing')) {
+  if (textEl.classList?.contains('lbp-fmp__desc') || textEl.closest('.lbp-fmp')) {
+    const slot = textEl.parentElement?.querySelector('.lbp-translate-fmp-desc-slot');
+    if (slot) {
+      slot.insertAdjacentElement('beforebegin', box);
+      return;
+    }
+    textEl.insertAdjacentElement('afterend', box);
+    return;
+  }
+
+  // Film-page cards and masonry tiles: place after the review text wrap.
+  if (
+    textEl.closest('article.production-viewing') ||
+    textEl.closest('.review-tile')
+  ) {
     const wrap = textEl.closest('.js-review') || textEl;
     wrap.insertAdjacentElement('afterend', box);
     return;
@@ -464,14 +574,16 @@ async function applyTranslation({
   btn,
   isReview,
   isComment = false,
+  isFmpDesc = false,
   expand = true,
 }) {
   if (!textEl) return 'skip';
   if (btn?.getAttribute(STATE_ATTR) === 'translated') return 'skip';
   if (textEl.hasAttribute(ORIG_ATTR) && displayMode() === 'replace') return 'skip';
 
-  const resultHost = card || textEl.closest('li.comment');
-  if ((isReview || isComment) && resultHost?.querySelector?.(`.${RESULT_CLASS}`)) {
+  const resultHost =
+    card || textEl.closest('li.comment') || (isFmpDesc ? textEl.closest('.lbp-fmp') : null);
+  if ((isReview || isComment || isFmpDesc) && resultHost?.querySelector?.(`.${RESULT_CLASS}`)) {
     return 'skip';
   }
 
@@ -520,12 +632,15 @@ async function applyTranslation({
   const translatedHtml = plainToHtml(result.text);
   const mode = displayMode();
 
+  if (isFmpDesc) expandFmpDescription(textEl);
+
   if (mode === 'below') {
     mountBelowResult(textEl, host, translatedHtml, isComment);
     if (btn) {
       btn.setAttribute(STATE_ATTR, 'translated');
       setButtonLabel(btn, 'hide');
     }
+    if (isFmpDesc) notifyFmpContentChanged(textEl);
     return 'ok';
   }
 
@@ -538,6 +653,7 @@ async function applyTranslation({
     btn.setAttribute(STATE_ATTR, 'translated');
     setButtonLabel(btn, 'original');
   }
+  if (isFmpDesc) notifyFmpContentChanged(textEl);
   return 'ok';
 }
 
@@ -549,7 +665,7 @@ async function onTranslateClick(e) {
 
   const target = getTargetForButton(btn);
   if (!target) return;
-  const { textEl, host, card, isComment = false } = target;
+  const { textEl, host, card, isComment = false, isFmpDesc = false } = target;
   const mode = displayMode();
   const state = btn.getAttribute(STATE_ATTR) || 'idle';
   const kind = btn.getAttribute('data-lbp-translate-kind');
@@ -561,6 +677,10 @@ async function onTranslateClick(e) {
     textEl.removeAttribute(ORIG_ATTR);
     btn.removeAttribute(STATE_ATTR);
     setButtonLabel(btn, 'idle');
+    if (isFmpDesc) {
+      textEl.classList.remove('lbp-fmp__desc--expanded');
+      notifyFmpContentChanged(textEl);
+    }
     return;
   }
 
@@ -568,10 +688,22 @@ async function onTranslateClick(e) {
     clearBelowResult(host, textEl);
     btn.removeAttribute(STATE_ATTR);
     setButtonLabel(btn, 'idle');
+    if (isFmpDesc) {
+      textEl.classList.remove('lbp-fmp__desc--expanded');
+      notifyFmpContentChanged(textEl);
+    }
     return;
   }
 
-  await applyTranslation({ textEl, host, card, btn, isReview, isComment });
+  await applyTranslation({
+    textEl,
+    host,
+    card,
+    btn,
+    isReview,
+    isComment,
+    isFmpDesc,
+  });
 }
 
 function ensureTranslateClicks() {
@@ -697,7 +829,20 @@ export function syncTranslateUi(nextSettings) {
   }
 
   ensureDescriptionButton();
+  syncFmpDescriptionButtons();
   syncReviewButtons();
   syncCommentButtons();
   syncAutoTranslate();
+}
+
+/**
+ * Mount Translate on a film mini-profile card after it paints.
+ * @param {ParentNode | null | undefined} root
+ * @param {Record<string, unknown>} [nextSettings]
+ */
+export function syncFilmMiniProfileTranslate(root, nextSettings) {
+  if (nextSettings) runtimeSettings = nextSettings;
+  ensureTranslateClicks();
+  if (!root || settings().showTranslate === false) return;
+  syncFmpDescriptionButtons(root);
 }

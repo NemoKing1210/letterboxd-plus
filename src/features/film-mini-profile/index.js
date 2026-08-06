@@ -33,6 +33,7 @@ import {
 import { scheduleFilmPreload, stopFilmPreload } from './preload.js';
 import { renderCard, renderError } from './render.js';
 import { currentSettings, setSettingsRef, state } from './state.js';
+import { syncFilmMiniProfileTranslate } from '../translate/index.js';
 
 function decoratePosters(root = document) {
   if (currentSettings().showFilmMiniProfile === false) {
@@ -85,6 +86,7 @@ async function paintCard(poster, ctx, { soft = false } = {}) {
   el.classList.toggle('is-loading', Boolean(ctx.loadingProfile && !ctx.profile));
   if (soft) el.classList.remove('is-ready');
   el.innerHTML = renderCard(ctx);
+  syncFilmMiniProfileTranslate(el, currentSettings());
   openPopover(el);
   if (soft) {
     void el.offsetWidth;

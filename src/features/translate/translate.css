@@ -47,10 +47,54 @@
   margin: 0.55rem 0 0;
 }
 
+.lbp-translate-fmp-desc-slot {
+  align-items: center;
+  display: flex;
+  margin: 0.45rem 0 0;
+}
+
+.lbp-translate-btn--fmp {
+  font-size: 10px;
+  line-height: 1.2;
+  padding-block: 0.22em;
+  padding-inline: 0.7em;
+}
+
+.lbp-translate-btn--fmp .lbp-translate-btn__spin {
+  height: 9px;
+  width: 9px;
+}
+
+.lbp-fmp .lbp-translate-result--card {
+  margin: 0.45rem 0 0.35rem;
+  padding: 0.5rem 0.6rem 0.55rem;
+}
+
+.lbp-fmp .lbp-translate-result__head {
+  font-size: 9px;
+  margin: 0 0 0.3rem;
+}
+
+.lbp-fmp .lbp-translate-result__body {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .lbp-translate-review-slot {
   display: inline-flex;
   align-items: center;
   margin-inline-start: 0.65rem;
+}
+
+.review-tile .lbp-translate-review-slot {
+  flex: 0 0 auto;
+  margin-block: 0.15rem;
+  vertical-align: middle;
+}
+
+.review-tile .lbp-translate-result--card {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .lbp-translate-comment-slot {
@@ -83,6 +127,7 @@
     transform 0.22s ease;
   width: 100%;
   white-space: normal;
+  z-index: 1;
 }
 
 .lbp-translate-result--card.is-in {

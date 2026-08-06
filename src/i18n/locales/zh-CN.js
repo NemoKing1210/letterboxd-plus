@@ -77,7 +77,7 @@ export default {
   translateGroupTargets: '翻译范围',
   translateGroupTargetsHint: '选择哪些页面区块显示“翻译”按钮。',
   showTranslate: '启用翻译',
-  showTranslateHint: '在影片简介、影评与评论上显示“翻译”按钮（Google 翻译）。',
+  showTranslateHint: '在影片简介（页面与迷你卡片）、影评与评论上显示“翻译”按钮（Google 翻译）。',
   translateTargetLocale: '目标语言',
   translateTargetLocaleHint:
     '要翻译成的语言。“与界面相同”跟随 设置 → 常规 → 界面语言。',
@@ -87,7 +87,7 @@ export default {
   translateModeReplace: '替换原文（可切换回原文）',
   translateModeBelow: '在原文下方显示译文',
   translateDescription: '翻译影片简介',
-  translateDescriptionHint: '影片页简介下方的按钮。',
+  translateDescriptionHint: '影片页与迷你卡片简介下方的按钮。',
   translateReviews: '翻译影评',
   translateReviewsHint: '影评卡片与独立影评页上的按钮。',
   translateReviewsAuto: '自动翻译影评',
