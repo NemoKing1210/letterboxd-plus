@@ -46,23 +46,80 @@ const CACHE_ENTITY_META = Object.freeze({
   },
 });
 
-export function switchHtml(key, isOn, label, hint) {
+/**
+ * Settings group: titled block with optional intro and one or more lists.
+ */
+export function groupHtml(titleKey, hintKey, ...content) {
+  const hint = hintKey
+    ? `<p class="lbp-settings__intro">${escapeHtml(t(hintKey))}</p>`
+    : '';
   return `
-    <div class="lbp-setting-row">
+    <section class="lbp-settings-group">
+      <header class="lbp-settings-group__head">
+        <h3>${escapeHtml(t(titleKey))}</h3>
+        ${hint}
+      </header>
+      ${content.filter(Boolean).join('')}
+    </section>
+  `;
+}
+
+export function listHtml(...rows) {
+  return `<div class="lbp-settings-list">${rows.filter(Boolean).join('')}</div>`;
+}
+
+export function stackListHtml(...content) {
+  return `<div class="lbp-settings-list lbp-settings-list--stack">${content.filter(Boolean).join('')}</div>`;
+}
+
+export function fieldHtml(id, label, hint, controlHtml) {
+  return `
+    <label class="lbp-field" for="${escapeAttr(id)}">
+      <span>${escapeHtml(label)}</span>
+      <small>${escapeHtml(hint)}</small>
+      ${controlHtml}
+    </label>
+  `;
+}
+
+export function switchHtml(key, isOn, label, hint, { disabled = false } = {}) {
+  const safeLabel = escapeHtml(label);
+  const safeHint = escapeHtml(hint);
+  return `
+    <div class="lbp-setting-row${disabled ? ' is-disabled' : ''}" data-setting-row="${escapeAttr(key)}">
       <span class="lbp-setting-row__copy">
-        <strong>${label}</strong>
-        <small>${hint}</small>
+        <strong>${safeLabel}</strong>
+        <small>${safeHint}</small>
       </span>
       <button
         type="button"
         class="lbp-switch${isOn ? ' is-on' : ''}"
         role="switch"
         aria-checked="${isOn}"
-        data-setting="${key}"
-        aria-label="${label}"
+        data-setting="${escapeAttr(key)}"
+        aria-label="${escapeAttr(label)}"
+        ${disabled ? 'disabled aria-disabled="true"' : ''}
       ><span aria-hidden="true"></span></button>
     </div>
   `;
+}
+
+export function setSwitchOn(btn, on) {
+  btn.classList.toggle('is-on', on);
+  btn.setAttribute('aria-checked', String(on));
+}
+
+export function setRowDisabled(row, disabled) {
+  if (!row) return;
+  row.classList.toggle('is-disabled', disabled);
+  const btn = row.querySelector('[data-setting]');
+  if (btn) {
+    btn.disabled = disabled;
+    btn.setAttribute('aria-disabled', String(disabled));
+  }
+  const field = row.matches?.('.lbp-field') ? row : row.querySelector?.('.lbp-field');
+  const control = (field || row).querySelector?.('select, input');
+  if (control) control.disabled = disabled;
 }
 
 function typeSegmentPercent(bytes, limitBytes) {
@@ -238,8 +295,10 @@ export function paintCachePanel(root, cacheHours, draft) {
 
 export function aboutHtml() {
   return `
-    <div class="lbp-about">
-      <div class="lbp-about__card">
+    ${groupHtml(
+      'aboutGroupScript',
+      null,
+      stackListHtml(`
         <div class="lbp-about__brand">
           <span class="lbp-about__mark" aria-hidden="true"><i></i><i></i><i></i></span>
           <strong>Letterboxd Plus</strong>
@@ -257,9 +316,12 @@ export function aboutHtml() {
           </span>
           <b aria-hidden="true">↗</b>
         </a>
-      </div>
-      <div class="lbp-about__card">
-        <p class="lbp-about__label">${t('aboutAuthor')}</p>
+      `),
+    )}
+    ${groupHtml(
+      'aboutAuthor',
+      null,
+      stackListHtml(`
         <div class="lbp-about__author">
           <a href="${AUTHOR_URL}" target="_blank" rel="noopener noreferrer" aria-label="${AUTHOR_NAME}">
             <img src="${AUTHOR_AVATAR_URL}" alt="" width="56" height="56" loading="lazy" decoding="async">
@@ -270,8 +332,8 @@ export function aboutHtml() {
             <a class="lbp-about__email" href="mailto:${AUTHOR_EMAIL}">${AUTHOR_EMAIL}</a>
           </span>
         </div>
-      </div>
-    </div>
+      `),
+    )}
   `;
 }
 

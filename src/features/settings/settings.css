@@ -124,10 +124,7 @@
 }
 
 .lbp-settings h3 {
-  color: #fff;
-  font-size: 18px;
-  letter-spacing: -0.015em;
-  margin-bottom: 18px;
+  margin-top: 0;
 }
 
 .lbp-settings__close {
@@ -248,38 +245,24 @@
   animation: lbp-settings-panel-in 0.22s ease both;
 }
 
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings__kicker,
-.lbp-settings__content [role='tabpanel'].is-entering > h3,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings__intro,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings__card,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-field,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-cache-meter,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-cache-actions,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-cache-status,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-about {
+.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings-group {
   animation: lbp-settings-item-in 0.28s ease both;
 }
 
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings__kicker {
-  animation-delay: 0.02s;
-}
-
-.lbp-settings__content [role='tabpanel'].is-entering > h3 {
+.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings-group:nth-child(1) {
   animation-delay: 0.04s;
 }
 
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings__intro,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-field:first-of-type,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings__card,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-cache-meter,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-about {
+.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings-group:nth-child(2) {
   animation-delay: 0.07s;
 }
 
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-field + .lbp-field,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-cache-actions,
-.lbp-settings__content [role='tabpanel'].is-entering > .lbp-cache-status {
+.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings-group:nth-child(3) {
   animation-delay: 0.1s;
+}
+
+.lbp-settings__content [role='tabpanel'].is-entering > .lbp-settings-group:nth-child(4) {
+  animation-delay: 0.13s;
 }
 
 @keyframes lbp-settings-panel-in {
@@ -304,14 +287,37 @@
   }
 }
 
+.lbp-settings-group {
+  margin: 0 0 22px;
+}
+
+.lbp-settings-group:last-child {
+  margin-bottom: 0;
+}
+
+.lbp-settings-group__head {
+  margin: 0 0 10px;
+}
+
+.lbp-settings-group__head h3 {
+  color: var(--lbp-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.lbp-settings-group__head .lbp-settings__intro,
 .lbp-settings__intro {
   color: var(--lbp-muted);
   font-size: 12px;
   line-height: 1.5;
-  margin: -8px 0 16px;
+  margin: 5px 0 0;
   max-width: 540px;
 }
 
+.lbp-settings-list,
 .lbp-settings__card,
 .lbp-field,
 .lbp-settings__about {
@@ -320,17 +326,44 @@
   border-radius: 3px;
 }
 
+.lbp-settings-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.lbp-settings-list--stack {
+  padding: 14px 16px;
+}
+
+.lbp-settings-list > .lbp-setting-row + .lbp-setting-row,
+.lbp-settings-list > .lbp-field + .lbp-setting-row,
+.lbp-settings-list > .lbp-setting-row + .lbp-field,
+.lbp-settings-list > .lbp-field + .lbp-field {
+  border-top: 1px solid #3d4854;
+}
+
 .lbp-setting-row {
   align-items: center;
+  cursor: pointer;
   display: flex;
   gap: 20px;
   justify-content: space-between;
-  padding: 15px 16px;
-  transition: background-color 0.15s ease;
+  padding: 14px 16px;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
 }
 
 .lbp-setting-row:hover {
   background: rgba(255, 255, 255, 0.025);
+}
+
+.lbp-setting-row.is-disabled,
+.lbp-field.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+  pointer-events: none;
 }
 
 .lbp-setting-row + .lbp-setting-row {
@@ -341,18 +374,22 @@
 .lbp-field {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .lbp-setting-row strong,
 .lbp-field > span:first-child {
   color: #f3f6f8;
   font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .lbp-setting-row small,
 .lbp-field small {
   color: var(--lbp-muted);
   font-size: 11px;
+  line-height: 1.4;
   margin-top: 3px;
 }
 
@@ -393,19 +430,24 @@
 }
 
 .lbp-field {
-  padding: 16px;
+  margin: 0;
+  padding: 14px 16px;
 }
 
 .lbp-field + .lbp-field {
   margin-top: 12px;
 }
 
+.lbp-settings-list > .lbp-field,
 .lbp-settings__card > .lbp-field {
   background: transparent;
   border: 0;
   border-radius: 0;
-  border-top: 1px solid #3d4854;
   margin: 0;
+}
+
+.lbp-settings-list--stack > .lbp-field {
+  padding: 0;
 }
 
 .lbp-field__input {
@@ -413,7 +455,7 @@
   color: var(--lbp-muted);
   display: flex;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .lbp-field input,
@@ -424,6 +466,9 @@
   color: #fff;
   font: inherit;
   padding: 8px 10px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .lbp-field input {
@@ -431,8 +476,13 @@
 }
 
 .lbp-field select {
-  margin-top: 14px;
+  margin-top: 12px;
   width: 100%;
+}
+
+.lbp-field input:hover,
+.lbp-field select:hover {
+  border-color: #607080;
 }
 
 .lbp-field input:focus,
@@ -440,6 +490,17 @@
   border-color: var(--lbp-blue);
   box-shadow: 0 0 0 3px rgba(64, 188, 244, 0.12);
   outline: none;
+}
+
+.lbp-field select:disabled,
+.lbp-field input:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.lbp-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .lbp-cache-meter {
@@ -551,7 +612,7 @@
 .lbp-cache-entities {
   display: grid;
   gap: 10px;
-  margin: 14px 0 12px;
+  margin: 0;
 }
 
 .lbp-cache-entity {
@@ -749,7 +810,14 @@
   align-items: center;
   display: flex;
   gap: 12px;
-  margin-top: 12px;
+  margin: 0;
+}
+
+.lbp-settings-list--stack .lbp-cache-meter {
+  background: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .lbp-cache-actions__clear {
@@ -792,18 +860,6 @@
   font-size: 11px;
   min-height: 1.4em;
   margin: 8px 0 0 !important;
-}
-
-.lbp-about {
-  display: grid;
-  gap: 12px;
-}
-
-.lbp-about__card {
-  background: #242b33;
-  border: 1px solid #3d4854;
-  border-radius: 3px;
-  padding: 18px;
 }
 
 .lbp-about__brand {

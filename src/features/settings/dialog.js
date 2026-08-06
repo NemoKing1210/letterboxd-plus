@@ -21,8 +21,14 @@ import {
   cacheMeterHtml,
   clearCache,
   clearCacheByType,
+  fieldHtml,
   getCacheStatsByType,
+  groupHtml,
+  listHtml,
   paintCachePanel,
+  setRowDisabled,
+  setSwitchOn,
+  stackListHtml,
   switchHtml,
 } from './html.js';
 import { activateTab, prefersReducedMotion } from './tabs.js';
@@ -40,6 +46,44 @@ const FMP_OPEN_MODE_I18N = Object.freeze({
   hover: 'fmpOpenModeHover',
   contextmenu: 'fmpOpenModeContextMenu',
 });
+
+const FMP_DEPENDENT_KEYS = Object.freeze([
+  'preloadFilmMiniProfile',
+  'fmpShowCommunityRating',
+  'fmpShowUserStatus',
+  'fmpShowCast',
+  'fmpShowDirectors',
+  'fmpShowGenres',
+  'fmpShowTagline',
+  'fmpShowRuntime',
+  'fmpShowDescription',
+  'fmpShowStats',
+  'fmpShowExternalScores',
+  'fmpShowQuickLinks',
+]);
+
+function syncDependentControls(dialog, draft) {
+  setRowDisabled(
+    dialog.querySelector('[data-setting-row="showAudienceScore"]'),
+    !draft.showRottenTomatoes,
+  );
+  setRowDisabled(
+    dialog.querySelector('[data-setting-row="showMetacriticUserScore"]'),
+    !draft.showMetacritic,
+  );
+
+  const filmCardsOn = draft.showFilmMiniProfile !== false;
+  for (const key of FMP_DEPENDENT_KEYS) {
+    setRowDisabled(dialog.querySelector(`[data-setting-row="${key}"]`), !filmCardsOn);
+  }
+
+  const openModeField = dialog.querySelector('#lbp-fmp-open-mode')?.closest('.lbp-field');
+  if (openModeField) {
+    openModeField.classList.toggle('is-disabled', !filmCardsOn);
+    const select = openModeField.querySelector('select');
+    if (select) select.disabled = !filmCardsOn;
+  }
+}
 
 export function openSettings() {
   if (document.querySelector('.lbp-settings-backdrop')) return;
@@ -78,174 +122,221 @@ export function openSettings() {
         </div>
         <div class="lbp-settings__content">
           <section id="lbp-panel-general" data-panel="general" role="tabpanel" aria-labelledby="lbp-tab-general">
-            <p class="lbp-settings__kicker">${t('tabGeneral')}</p>
-            <h3>${t('generalTitle')}</h3>
-            <label class="lbp-field" for="lbp-ui-locale">
-              <span>${t('uiLanguage')}</span>
-              <small>${t('uiLanguageHint')}</small>
-              <select id="lbp-ui-locale">
-                <option value="auto"${draft.uiLocale === 'auto' ? ' selected' : ''}>🌐 ${t('uiLanguageAuto')}</option>
-                ${localeOptions}
-              </select>
-            </label>
-            <label class="lbp-field" for="lbp-toast-position">
-              <span>${t('toastPosition')}</span>
-              <small>${t('toastPositionHint')}</small>
-              <select id="lbp-toast-position">
-                ${toastPositionOptions}
-              </select>
-            </label>
+            ${groupHtml(
+              'generalGroupLanguage',
+              'generalGroupLanguageHint',
+              listHtml(
+                fieldHtml(
+                  'lbp-ui-locale',
+                  t('uiLanguage'),
+                  t('uiLanguageHint'),
+                  `<select id="lbp-ui-locale">
+                    <option value="auto"${draft.uiLocale === 'auto' ? ' selected' : ''}>🌐 ${t('uiLanguageAuto')}</option>
+                    ${localeOptions}
+                  </select>`,
+                ),
+              ),
+            )}
+            ${groupHtml(
+              'generalGroupNotifications',
+              'generalGroupNotificationsHint',
+              listHtml(
+                fieldHtml(
+                  'lbp-toast-position',
+                  t('toastPosition'),
+                  t('toastPositionHint'),
+                  `<select id="lbp-toast-position">${toastPositionOptions}</select>`,
+                ),
+              ),
+            )}
           </section>
           <section id="lbp-panel-film" data-panel="film" role="tabpanel" aria-labelledby="lbp-tab-film" hidden>
-            <p class="lbp-settings__kicker">${t('tabFilm')}</p>
-            <h3>${t('filmTitle')}</h3>
-            <div class="lbp-settings__card">
-              ${switchHtml(
-                'showRottenTomatoes',
-                draft.showRottenTomatoes,
-                t('rottenTomatoes'),
-                t('rottenTomatoesHint'),
-              )}
-              ${switchHtml(
-                'showAudienceScore',
-                draft.showAudienceScore,
-                t('popcornmeter'),
-                t('popcornmeterHint'),
-              )}
-              ${switchHtml(
-                'showMetacritic',
-                draft.showMetacritic,
-                t('metacritic'),
-                t('metacriticHint'),
-              )}
-              ${switchHtml(
-                'showMetacriticUserScore',
-                draft.showMetacriticUserScore,
-                t('metacriticUserScore'),
-                t('metacriticUserScoreHint'),
-              )}
-              ${switchHtml(
-                'enhanceCast',
-                draft.enhanceCast,
-                t('enhancedCast'),
-                t('enhancedCastHint'),
-              )}
-            </div>
+            ${groupHtml(
+              'filmGroupScores',
+              'filmGroupScoresHint',
+              listHtml(
+                switchHtml(
+                  'showRottenTomatoes',
+                  draft.showRottenTomatoes,
+                  t('rottenTomatoes'),
+                  t('rottenTomatoesHint'),
+                ),
+                switchHtml(
+                  'showAudienceScore',
+                  draft.showAudienceScore,
+                  t('popcornmeter'),
+                  t('popcornmeterHint'),
+                ),
+                switchHtml(
+                  'showMetacritic',
+                  draft.showMetacritic,
+                  t('metacritic'),
+                  t('metacriticHint'),
+                ),
+                switchHtml(
+                  'showMetacriticUserScore',
+                  draft.showMetacriticUserScore,
+                  t('metacriticUserScore'),
+                  t('metacriticUserScoreHint'),
+                ),
+              ),
+            )}
+            ${groupHtml(
+              'filmGroupCast',
+              'filmGroupCastHint',
+              listHtml(
+                switchHtml(
+                  'enhanceCast',
+                  draft.enhanceCast,
+                  t('enhancedCast'),
+                  t('enhancedCastHint'),
+                ),
+              ),
+            )}
           </section>
           <section id="lbp-panel-card" data-panel="card" role="tabpanel" aria-labelledby="lbp-tab-card" hidden>
-            <p class="lbp-settings__kicker">${t('tabCard')}</p>
-            <h3>${t('cardTitle')}</h3>
-            <div class="lbp-settings__card">
-              ${switchHtml(
-                'showFilmMiniProfile',
-                draft.showFilmMiniProfile,
-                t('showFilmMiniProfile'),
-                t('showFilmMiniProfileHint'),
-              )}
-              <label class="lbp-field" for="lbp-fmp-open-mode">
-                <span>${t('fmpOpenMode')}</span>
-                <small>${t('fmpOpenModeHint')}</small>
-                <select id="lbp-fmp-open-mode">
-                  ${fmpOpenModeOptions}
-                </select>
-              </label>
-              ${switchHtml(
-                'preloadFilmMiniProfile',
-                draft.preloadFilmMiniProfile,
-                t('preloadFilmMiniProfile'),
-                t('preloadFilmMiniProfileHint'),
-              )}
-              ${switchHtml(
-                'fmpShowCommunityRating',
-                draft.fmpShowCommunityRating,
-                t('fmpShowCommunityRating'),
-                t('fmpShowCommunityRatingHint'),
-              )}
-              ${switchHtml(
-                'fmpShowUserStatus',
-                draft.fmpShowUserStatus,
-                t('fmpShowUserStatus'),
-                t('fmpShowUserStatusHint'),
-              )}
-              ${switchHtml(
-                'fmpShowCast',
-                draft.fmpShowCast,
-                t('fmpShowCast'),
-                t('fmpShowCastHint'),
-              )}
-              ${switchHtml(
-                'fmpShowDirectors',
-                draft.fmpShowDirectors,
-                t('fmpShowDirectors'),
-                t('fmpShowDirectorsHint'),
-              )}
-              ${switchHtml(
-                'fmpShowGenres',
-                draft.fmpShowGenres,
-                t('fmpShowGenres'),
-                t('fmpShowGenresHint'),
-              )}
-              ${switchHtml(
-                'fmpShowTagline',
-                draft.fmpShowTagline,
-                t('fmpShowTagline'),
-                t('fmpShowTaglineHint'),
-              )}
-              ${switchHtml(
-                'fmpShowRuntime',
-                draft.fmpShowRuntime,
-                t('fmpShowRuntime'),
-                t('fmpShowRuntimeHint'),
-              )}
-              ${switchHtml(
-                'fmpShowDescription',
-                draft.fmpShowDescription,
-                t('fmpShowDescription'),
-                t('fmpShowDescriptionHint'),
-              )}
-              ${switchHtml(
-                'fmpShowStats',
-                draft.fmpShowStats,
-                t('fmpShowStats'),
-                t('fmpShowStatsHint'),
-              )}
-              ${switchHtml(
-                'fmpShowExternalScores',
-                draft.fmpShowExternalScores,
-                t('fmpShowExternalScores'),
-                t('fmpShowExternalScoresHint'),
-              )}
-              ${switchHtml(
-                'fmpShowQuickLinks',
-                draft.fmpShowQuickLinks,
-                t('fmpShowQuickLinks'),
-                t('fmpShowQuickLinksHint'),
-              )}
-            </div>
+            ${groupHtml(
+              'cardGroupBehavior',
+              'cardGroupBehaviorHint',
+              listHtml(
+                switchHtml(
+                  'showFilmMiniProfile',
+                  draft.showFilmMiniProfile,
+                  t('showFilmMiniProfile'),
+                  t('showFilmMiniProfileHint'),
+                ),
+                fieldHtml(
+                  'lbp-fmp-open-mode',
+                  t('fmpOpenMode'),
+                  t('fmpOpenModeHint'),
+                  `<select id="lbp-fmp-open-mode">${fmpOpenModeOptions}</select>`,
+                ),
+                switchHtml(
+                  'preloadFilmMiniProfile',
+                  draft.preloadFilmMiniProfile,
+                  t('preloadFilmMiniProfile'),
+                  t('preloadFilmMiniProfileHint'),
+                ),
+              ),
+            )}
+            ${groupHtml(
+              'cardGroupContent',
+              'cardGroupContentHint',
+              listHtml(
+                switchHtml(
+                  'fmpShowCommunityRating',
+                  draft.fmpShowCommunityRating,
+                  t('fmpShowCommunityRating'),
+                  t('fmpShowCommunityRatingHint'),
+                ),
+                switchHtml(
+                  'fmpShowUserStatus',
+                  draft.fmpShowUserStatus,
+                  t('fmpShowUserStatus'),
+                  t('fmpShowUserStatusHint'),
+                ),
+                switchHtml(
+                  'fmpShowCast',
+                  draft.fmpShowCast,
+                  t('fmpShowCast'),
+                  t('fmpShowCastHint'),
+                ),
+                switchHtml(
+                  'fmpShowDirectors',
+                  draft.fmpShowDirectors,
+                  t('fmpShowDirectors'),
+                  t('fmpShowDirectorsHint'),
+                ),
+                switchHtml(
+                  'fmpShowGenres',
+                  draft.fmpShowGenres,
+                  t('fmpShowGenres'),
+                  t('fmpShowGenresHint'),
+                ),
+                switchHtml(
+                  'fmpShowTagline',
+                  draft.fmpShowTagline,
+                  t('fmpShowTagline'),
+                  t('fmpShowTaglineHint'),
+                ),
+                switchHtml(
+                  'fmpShowRuntime',
+                  draft.fmpShowRuntime,
+                  t('fmpShowRuntime'),
+                  t('fmpShowRuntimeHint'),
+                ),
+                switchHtml(
+                  'fmpShowDescription',
+                  draft.fmpShowDescription,
+                  t('fmpShowDescription'),
+                  t('fmpShowDescriptionHint'),
+                ),
+                switchHtml(
+                  'fmpShowStats',
+                  draft.fmpShowStats,
+                  t('fmpShowStats'),
+                  t('fmpShowStatsHint'),
+                ),
+              ),
+            )}
+            ${groupHtml(
+              'cardGroupExtras',
+              'cardGroupExtrasHint',
+              listHtml(
+                switchHtml(
+                  'fmpShowExternalScores',
+                  draft.fmpShowExternalScores,
+                  t('fmpShowExternalScores'),
+                  t('fmpShowExternalScoresHint'),
+                ),
+                switchHtml(
+                  'fmpShowQuickLinks',
+                  draft.fmpShowQuickLinks,
+                  t('fmpShowQuickLinks'),
+                  t('fmpShowQuickLinksHint'),
+                ),
+              ),
+            )}
           </section>
           <section id="lbp-panel-cache" data-panel="cache" role="tabpanel" aria-labelledby="lbp-tab-cache" hidden>
-            <p class="lbp-settings__kicker">${t('tabCache')}</p>
-            <h3>${t('cacheTitle')}</h3>
-            <p class="lbp-settings__intro">${t('cacheDescription')}</p>
-            ${cacheMeterHtml(cacheTyped)}
-            <label class="lbp-field" for="lbp-cache-hours">
-              <span>${t('cacheDuration')}</span>
-              <small>${t('cacheHint')}</small>
-              <span class="lbp-field__input">
-                <input id="lbp-cache-hours" type="number" min="0" max="${CACHE_HOURS_MAX}" value="${draft.cacheHours}">
-                <span>${t('hours')}</span>
-              </span>
-            </label>
-            ${cacheEntitiesHtml(draft, cacheTyped)}
-            <div class="lbp-cache-actions">
-              <button type="button" class="lbp-cache-actions__clear" data-clear-cache>${t('clearCache')}</button>
-              <span>${t('cacheClearHint')}</span>
-            </div>
-            <p class="lbp-cache-status" data-cache-status aria-live="polite"></p>
+            ${groupHtml(
+              'cacheGroupUsage',
+              'cacheDescription',
+              stackListHtml(cacheMeterHtml(cacheTyped)),
+            )}
+            ${groupHtml(
+              'cacheGroupDuration',
+              null,
+              listHtml(
+                fieldHtml(
+                  'lbp-cache-hours',
+                  t('cacheDuration'),
+                  t('cacheHint'),
+                  `<span class="lbp-field__input">
+                    <input id="lbp-cache-hours" type="number" min="0" max="${CACHE_HOURS_MAX}" value="${draft.cacheHours}">
+                    <span>${t('hours')}</span>
+                  </span>`,
+                ),
+              ),
+            )}
+            ${groupHtml(
+              'cacheGroupSources',
+              'cacheGroupSourcesHint',
+              cacheEntitiesHtml(draft, cacheTyped),
+            )}
+            ${groupHtml(
+              'cacheGroupClear',
+              null,
+              stackListHtml(`
+                <div class="lbp-cache-actions">
+                  <button type="button" class="lbp-cache-actions__clear" data-clear-cache>${t('clearCache')}</button>
+                  <span>${t('cacheClearHint')}</span>
+                </div>
+                <p class="lbp-cache-status" data-cache-status aria-live="polite"></p>
+              `),
+            )}
           </section>
           <section id="lbp-panel-about" data-panel="about" role="tabpanel" aria-labelledby="lbp-tab-about" hidden>
-            <p class="lbp-settings__kicker">${t('tabAbout')}</p>
-            <h3>${t('aboutTitle')}</h3>
             ${aboutHtml()}
           </section>
         </div>
@@ -354,6 +445,8 @@ export function openSettings() {
     }
   };
 
+  syncDependentControls(dialog, draft);
+
   backdrop.addEventListener('click', (event) => {
     if (event.target.closest('[data-close]')) {
       forceClose();
@@ -379,12 +472,26 @@ export function openSettings() {
     activateTab(dialog, next.dataset.tab, true);
   });
   dialog.addEventListener('click', (event) => {
+    const row = event.target.closest('[data-setting-row]');
+    if (
+      row &&
+      dialog.contains(row) &&
+      !row.classList.contains('is-disabled') &&
+      !event.target.closest('.lbp-switch, select, input, a, button')
+    ) {
+      const switchBtn = row.querySelector('[data-setting]');
+      if (switchBtn && !switchBtn.disabled) {
+        switchBtn.click();
+        return;
+      }
+    }
+
     const switchBtn = event.target.closest('[data-setting]');
-    if (switchBtn && dialog.contains(switchBtn)) {
+    if (switchBtn && dialog.contains(switchBtn) && !switchBtn.disabled) {
       const key = switchBtn.dataset.setting;
       draft[key] = !draft[key];
-      switchBtn.classList.toggle('is-on', draft[key]);
-      switchBtn.setAttribute('aria-checked', String(draft[key]));
+      setSwitchOn(switchBtn, draft[key]);
+      syncDependentControls(dialog, draft);
       return;
     }
 
