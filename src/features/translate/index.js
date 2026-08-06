@@ -136,7 +136,8 @@ function setButtonLabel(btn, kind) {
 function makeButton(kind) {
   const btn = document.createElement('button');
   btn.type = 'button';
-  btn.className = `${BTN_CLASS} ${BTN_CLASS}--chip${
+  // Reuse Letterboxd’s primary action button (same as “Post”).
+  btn.className = `button -action ${BTN_CLASS}${
     kind === 'desc' ? ` ${BTN_CLASS}--desc` : ` ${BTN_CLASS}--review`
   }`;
   btn.setAttribute('data-lbp-translate-kind', kind);

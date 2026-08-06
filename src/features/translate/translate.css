@@ -1,32 +1,21 @@
+/* Translate controls reuse Letterboxd `.button.-action`; only Plus-specific chrome here. */
+
 .lbp-translate-btn {
-  appearance: none;
-  background: none;
-  border: 0;
-  color: inherit;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font: inherit;
   gap: 0.4em;
-  line-height: 1.2;
-  margin: 0;
-  padding: 0;
-  text-decoration: none;
-  transition:
-    color 0.15s ease,
-    background 0.15s ease,
-    border-color 0.15s ease,
-    opacity 0.15s ease;
+  vertical-align: middle;
 }
 
 .lbp-translate-btn__spin {
-  border: 2px solid color-mix(in srgb, var(--lbp-green) 35%, transparent);
+  border: 2px solid color-mix(in srgb, #fff 35%, transparent);
   border-radius: 50%;
-  border-top-color: var(--lbp-green);
+  border-top-color: #fff;
   flex: 0 0 auto;
-  height: 12px;
-  width: 12px;
+  height: 11px;
+  width: 11px;
   animation: lbp-translate-spin 0.65s linear infinite;
 }
 
@@ -34,60 +23,22 @@
   white-space: nowrap;
 }
 
-.lbp-translate-btn:hover,
-.lbp-translate-btn:focus-visible {
-  outline: none;
-}
-
-.lbp-translate-btn:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--lbp-blue) 55%, transparent);
-}
-
 .lbp-translate-btn.is-loading {
   cursor: wait;
+  opacity: 0.85;
   pointer-events: none;
-}
-
-.lbp-translate-btn--chip {
-  background: color-mix(in srgb, var(--lbp-green) 12%, #1a2229);
-  border: 1px solid color-mix(in srgb, var(--lbp-green) 45%, transparent);
-  border-radius: 3px;
-  color: var(--lbp-green);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  opacity: 1;
-  padding: 0.28rem 0.7rem;
-}
-
-.lbp-translate-btn--chip:hover,
-.lbp-translate-btn--chip:focus-visible {
-  background: var(--lbp-green);
-  border-color: var(--lbp-green);
-  color: #14181c;
-}
-
-.lbp-translate-btn--chip:hover .lbp-translate-btn__spin,
-.lbp-translate-btn--chip:focus-visible .lbp-translate-btn__spin {
-  border-color: color-mix(in srgb, #14181c 35%, transparent);
-  border-top-color: #14181c;
-}
-
-.lbp-translate-btn--chip.is-loading {
-  background: color-mix(in srgb, var(--lbp-green) 12%, #1a2229);
-  border-color: color-mix(in srgb, var(--lbp-green) 45%, transparent);
-  color: var(--lbp-green);
-  opacity: 0.9;
 }
 
 .lbp-translate-btn--review {
   font-size: 11px;
-  padding: 0.2rem 0.55rem;
+  line-height: 1.2;
+  padding-block: 0.28em;
+  padding-inline: 0.85em;
 }
 
 .lbp-translate-btn--review .lbp-translate-btn__spin {
-  height: 11px;
-  width: 11px;
+  height: 10px;
+  width: 10px;
 }
 
 .lbp-translate-desc-slot {
@@ -159,7 +110,7 @@
 @media (prefers-reduced-motion: reduce) {
   .lbp-translate-btn__spin {
     animation: none;
-    border-color: var(--lbp-green);
+    border-color: #fff;
     opacity: 0.55;
   }
 
