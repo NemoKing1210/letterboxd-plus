@@ -150,7 +150,7 @@ export default {
   resetConfirmTitle: '¿Restablecer todos los ajustes?',
   resetConfirmMessage: 'Todas las opciones de Letterboxd Plus volverán a sus valores predeterminados. Se conserva la caché de valoraciones.',
   resetConfirmAction: 'Restablecer ajustes',
-  saveReload: 'Guardar y recargar',
+  saveReload: 'Guardar',
   settingsSavedTitle: 'Ajustes guardados',
   settingsSavedMessage: 'Tus preferencias se aplicaron.',
   settingsResetTitle: 'Ajustes restablecidos',

@@ -51,8 +51,10 @@
   display: flex;
   gap: 8px;
   opacity: 0;
+  overflow: hidden;
   padding: 12px 12px 12px 14px;
   pointer-events: auto;
+  position: relative;
   transform: translateY(8px);
   transition:
     opacity 0.2s ease,
@@ -158,4 +160,39 @@
 .lbp-toast__close:focus-visible {
   color: #fff;
   outline: none;
+}
+
+.lbp-toast__progress {
+  background: var(--lbp-green);
+  bottom: 0;
+  height: 2px;
+  left: 0;
+  opacity: 0.85;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.lbp-toast.is-open .lbp-toast__progress {
+  animation: lbp-toast-progress var(--lbp-toast-ms, 4500ms) linear forwards;
+}
+
+@keyframes lbp-toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lbp-toast__progress {
+    animation: none !important;
+    opacity: 0.35;
+    transform: scaleX(1);
+  }
 }

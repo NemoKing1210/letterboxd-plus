@@ -10,9 +10,9 @@ import {
   SUPPORTED_LOCALES,
   t,
 } from '../../i18n/index.js';
+import { applyRuntimeSettings } from '../apply-settings.js';
 import {
   configureToastPosition,
-  queueToast,
   showToast,
 } from '../toast/index.js';
 import {
@@ -560,24 +560,26 @@ export function openSettings() {
     closeConfirm();
   });
   confirm.querySelector('[data-confirm-ok]').addEventListener('click', () => {
-    resetSettings();
-    queueToast({
+    const settings = resetSettings();
+    forceClose();
+    applyRuntimeSettings(settings);
+    showToast({
       title: t('settingsResetTitle'),
       message: t('settingsResetMessage'),
     });
-    location.reload();
   });
   dialog.querySelector('[data-save]').addEventListener('click', () => {
     draft.uiLocale = dialog.querySelector('#lbp-ui-locale').value;
     draft.toastPosition = dialog.querySelector('#lbp-toast-position').value;
     draft.fmpOpenMode = dialog.querySelector('#lbp-fmp-open-mode').value;
     draft.cacheHours = Number(dialog.querySelector('#lbp-cache-hours').value);
-    saveSettings(draft);
-    queueToast({
+    const settings = saveSettings(draft);
+    forceClose();
+    applyRuntimeSettings(settings);
+    showToast({
       title: t('settingsSavedTitle'),
       message: t('settingsSavedMessage'),
     });
-    location.reload();
   });
 
   document.documentElement.classList.add('lbp-modal-open');

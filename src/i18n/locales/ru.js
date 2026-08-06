@@ -150,7 +150,7 @@ export default {
   resetConfirmTitle: 'Сбросить все настройки?',
   resetConfirmMessage: 'Все параметры Letterboxd Plus вернутся к значениям по умолчанию. Кэш рейтингов сохранится.',
   resetConfirmAction: 'Сбросить настройки',
-  saveReload: 'Сохранить и перезагрузить',
+  saveReload: 'Сохранить',
   settingsSavedTitle: 'Настройки сохранены',
   settingsSavedMessage: 'Ваши предпочтения применены.',
   settingsResetTitle: 'Настройки сброшены',

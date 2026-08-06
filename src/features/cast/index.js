@@ -142,7 +142,11 @@ function setupCastTrigger(list, cards) {
   } else {
     trigger.classList.add('lbp-cast-show-all');
   }
-  if (castTriggers.has(trigger)) return;
+  if (castTriggers.has(trigger)) {
+    const state = castTriggers.get(trigger);
+    if (state?.isCreated) trigger.textContent = t('showAllCast');
+    return;
+  }
 
   const original = {
     ariaExpanded: trigger.getAttribute('aria-expanded'),

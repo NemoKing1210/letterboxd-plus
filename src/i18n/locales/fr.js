@@ -150,7 +150,7 @@ export default {
   resetConfirmTitle: 'Réinitialiser tous les paramètres ?',
   resetConfirmMessage: 'Toutes les options de Letterboxd Plus seront restaurées par défaut. Le cache des notes est conservé.',
   resetConfirmAction: 'Réinitialiser les paramètres',
-  saveReload: 'Enregistrer et recharger',
+  saveReload: 'Enregistrer',
   settingsSavedTitle: 'Paramètres enregistrés',
   settingsSavedMessage: 'Vos préférences ont été appliquées.',
   settingsResetTitle: 'Paramètres réinitialisés',

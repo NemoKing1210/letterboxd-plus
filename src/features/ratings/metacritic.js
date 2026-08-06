@@ -1,6 +1,6 @@
 import { getMetacriticRating } from '../../api/metacritic.js';
 import { METACRITIC_ORIGIN } from '../../core/constants.js';
-import { formatNumber, t } from '../../i18n/index.js';
+import { formatNumber, getActiveLocale, t } from '../../i18n/index.js';
 import { getFilmContext } from './film-context.js';
 import {
   createRatingSection,
@@ -10,6 +10,15 @@ import {
 } from './section.js';
 
 const RATING_ID = 'lbp-metacritic';
+
+function ratingSignature(settings) {
+  return [
+    getActiveLocale(),
+    settings.showMetacriticUserScore !== false ? '1' : '0',
+    Number(settings.cacheHours) || 0,
+    settings.cacheMetacritic !== false ? '1' : '0',
+  ].join('|');
+}
 
 function scoreTone(score, maxScore) {
   if (score == null) return '';
@@ -83,7 +92,12 @@ export async function ensureMetacriticRating(settings) {
     existing?.remove();
     return;
   }
-  if (existing) return;
+
+  const signature = ratingSignature(settings);
+  if (existing) {
+    if (existing.dataset.lbpSettings === signature) return;
+    existing.remove();
+  }
 
   const context = getFilmContext();
   const sidebar = document.querySelector('#film-page-wrapper aside.sidebar');
@@ -97,6 +111,7 @@ export async function ensureMetacriticRating(settings) {
       ? ['metascore', 'user-score']
       : ['metascore'],
   });
+  section.dataset.lbpSettings = signature;
   mountRatingSection(section, sidebar);
 
   try {

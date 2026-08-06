@@ -150,7 +150,7 @@ export default {
   resetConfirmTitle: '重置所有设置？',
   resetConfirmMessage: '所有 Letterboxd Plus 选项将恢复为默认值。评分缓存会保留。',
   resetConfirmAction: '重置设置',
-  saveReload: '保存并重新加载',
+  saveReload: '保存',
   settingsSavedTitle: '设置已保存',
   settingsSavedMessage: '你的偏好设置已生效。',
   settingsResetTitle: '设置已重置',

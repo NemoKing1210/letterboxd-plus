@@ -150,7 +150,7 @@ export default {
   resetConfirmTitle: 'Redefinir todas as configurações?',
   resetConfirmMessage: 'Todas as opções do Letterboxd Plus voltarão aos valores padrão. O cache de avaliações será mantido.',
   resetConfirmAction: 'Redefinir configurações',
-  saveReload: 'Salvar e recarregar',
+  saveReload: 'Salvar',
   settingsSavedTitle: 'Configurações salvas',
   settingsSavedMessage: 'Suas preferências foram aplicadas.',
   settingsResetTitle: 'Configurações redefinidas',

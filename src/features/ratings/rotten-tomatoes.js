@@ -1,6 +1,6 @@
 import { getRottenTomatoesRating } from '../../api/rotten-tomatoes.js';
 import { ROTTEN_TOMATOES_ORIGIN } from '../../core/constants.js';
-import { formatNumber, t } from '../../i18n/index.js';
+import { formatNumber, getActiveLocale, t } from '../../i18n/index.js';
 import { getFilmContext } from './film-context.js';
 import {
   createRatingSection as createRatingSectionBase,
@@ -10,6 +10,15 @@ import {
 } from './section.js';
 
 const RATING_ID = 'lbp-rotten-tomatoes';
+
+function ratingSignature(settings) {
+  return [
+    getActiveLocale(),
+    settings.showAudienceScore !== false ? '1' : '0',
+    Number(settings.cacheHours) || 0,
+    settings.cacheRottenTomatoes !== false ? '1' : '0',
+  ].join('|');
+}
 
 function createRatingSection(showAudienceScore) {
   return createRatingSectionBase({
@@ -71,13 +80,19 @@ export async function ensureFilmRating(settings) {
     existing?.remove();
     return;
   }
-  if (existing) return;
+
+  const signature = ratingSignature(settings);
+  if (existing) {
+    if (existing.dataset.lbpSettings === signature) return;
+    existing.remove();
+  }
 
   const context = getFilmContext();
   const sidebar = document.querySelector('#film-page-wrapper aside.sidebar');
   if (!context || !sidebar) return;
 
   const section = createRatingSection(settings.showAudienceScore);
+  section.dataset.lbpSettings = signature;
   mountRatingSection(section, sidebar);
 
   try {

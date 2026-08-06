@@ -146,7 +146,7 @@ export default {
   resetConfirmTitle: 'Reset all settings?',
   resetConfirmMessage: 'This restores every Letterboxd Plus option to its default value. Your rating cache is kept.',
   resetConfirmAction: 'Reset settings',
-  saveReload: 'Save and reload',
+  saveReload: 'Save',
   settingsSavedTitle: 'Settings saved',
   settingsSavedMessage: 'Your preferences were applied.',
   settingsResetTitle: 'Settings reset',

@@ -86,6 +86,12 @@ function clearTimer(entry) {
   }
 }
 
+function setProgressPaused(entry, paused) {
+  const progress = entry.progressEl;
+  if (!progress) return;
+  progress.style.animationPlayState = paused ? 'paused' : 'running';
+}
+
 function scheduleHide(entry) {
   clearTimer(entry);
   if (!entry.duration || entry.paused) return;
@@ -93,6 +99,7 @@ function scheduleHide(entry) {
     dismissToast(entry.id);
   }, entry.remaining);
   entry.startedAt = Date.now();
+  setProgressPaused(entry, false);
 }
 
 function pauseTimer(entry) {
@@ -102,6 +109,7 @@ function pauseTimer(entry) {
     entry.remaining = Math.max(0, entry.remaining - (Date.now() - entry.startedAt));
     clearTimer(entry);
   }
+  setProgressPaused(entry, true);
 }
 
 function resumeTimer(entry) {
@@ -232,6 +240,15 @@ export function showToast(options = {}) {
   });
   el.appendChild(closeBtn);
 
+  let progressEl = null;
+  if (duration > 0) {
+    progressEl = document.createElement('span');
+    progressEl.className = 'lbp-toast__progress';
+    progressEl.setAttribute('aria-hidden', 'true');
+    progressEl.style.setProperty('--lbp-toast-ms', `${duration}ms`);
+    el.appendChild(progressEl);
+  }
+
   if (onClick) {
     el.classList.add('is-clickable');
     el.tabIndex = 0;
@@ -254,6 +271,7 @@ export function showToast(options = {}) {
   const entry = {
     id,
     el,
+    progressEl,
     duration,
     remaining: duration,
     startedAt: 0,

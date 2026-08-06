@@ -1,4 +1,4 @@
-import { t } from '../../i18n/index.js';
+import { getActiveLocale, t } from '../../i18n/index.js';
 import {
   createRatingSection,
   mountRatingSection,
@@ -118,13 +118,21 @@ export function ensureAverageRating() {
     return;
   }
 
-  if (!existing) {
+  const locale = getActiveLocale();
+  if (existing) {
+    if (existing.dataset.lbpLocale !== locale) {
+      const heading = existing.querySelector('.section-heading');
+      if (heading) heading.textContent = t('averageRating');
+      existing.dataset.lbpLocale = locale;
+    }
+  } else {
     const section = createRatingSection({
       id: RATING_ID,
       title: t('averageRating'),
       skeletonModifiers: ['average'],
       variant: 'average',
     });
+    section.dataset.lbpLocale = locale;
     mountRatingSection(section, sidebar);
   }
 
