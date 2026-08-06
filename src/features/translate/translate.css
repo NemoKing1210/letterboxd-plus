@@ -90,18 +90,16 @@
   width: 11px;
 }
 
-.lbp-translate-desc-slot,
-.lbp-translate-review-slot {
+.lbp-translate-desc-slot {
   align-items: center;
   display: flex;
-}
-
-.lbp-translate-desc-slot {
   margin: 0.55rem 0 0;
 }
 
 .lbp-translate-review-slot {
-  margin: 0 0.65rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  margin-inline-start: 0.65rem;
 }
 
 .lbp-translate-result {

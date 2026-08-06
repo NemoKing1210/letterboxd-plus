@@ -38,11 +38,26 @@ function htmlToPlain(html) {
   const div = document.createElement('div');
   div.innerHTML = String(html || '');
   div.querySelectorAll('br').forEach((br) => br.replaceWith('\n'));
-  return (div.textContent || '').replace(/\u00a0/g, ' ').trim();
+  div
+    .querySelectorAll('p, li, blockquote, h1, h2, h3, h4, h5, h6')
+    .forEach((el) => {
+      el.insertAdjacentText('afterend', '\n\n');
+    });
+  return (div.textContent || '')
+    .replace(/\u00a0/g, ' ')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function plainToHtml(text) {
-  return escapeHtml(String(text || '')).replace(/\r\n|\r|\n/g, '<br>');
+  const blocks = String(text || '')
+    .split(/\n{2,}/)
+    .map((block) => escapeHtml(block.trim()).replace(/\r\n|\r|\n/g, '<br>'))
+    .filter(Boolean);
+  if (!blocks.length) return '';
+  if (blocks.length === 1 && !blocks[0].includes('<br>')) return blocks[0];
+  return blocks.map((block) => `<p>${block}</p>`).join('');
 }
 
 function findDescriptionHost() {
@@ -166,18 +181,27 @@ function ensureDescriptionButton() {
 }
 
 function ensureReviewButton(card) {
-  if (card.querySelector(`.${BTN_CLASS}[data-lbp-translate-kind="review"]`)) return;
+  const actions =
+    card.querySelector('.review-actions') || card.querySelector('.viewing-actions');
+  const existing = card.querySelector(`.${BTN_CLASS}[data-lbp-translate-kind="review"]`);
+  if (existing) {
+    const slot = existing.closest('.lbp-translate-review-slot') || existing;
+    if (actions && slot.parentElement === actions && actions.lastElementChild !== slot) {
+      actions.append(slot);
+    }
+    return;
+  }
+
   const textEl = findReviewTextEl(card);
   if (!textEl || !htmlToPlain(textEl.innerHTML)) return;
 
   card.setAttribute(MARK_ATTR, 'review');
   const btn = makeButton('review');
-  const actions = card.querySelector('.review-actions') || card.querySelector('.viewing-actions');
   if (actions) {
     const slot = document.createElement('div');
     slot.className = 'lbp-translate-review-slot';
     slot.appendChild(btn);
-    actions.prepend(slot);
+    actions.append(slot);
     return;
   }
   textEl.insertAdjacentElement('afterend', btn);
@@ -212,6 +236,32 @@ function getTargetForButton(btn) {
 }
 
 /**
+ * Normalize Letterboxd full-text payloads into review-body HTML.
+ * @returns {string | null}
+ */
+function extractReviewHtml(raw) {
+  const trimmed = String(raw || '').trim();
+  if (!trimmed) return null;
+  if (/<!DOCTYPE|<html[\s>]/i.test(trimmed)) return null;
+
+  if (trimmed.startsWith('{')) {
+    try {
+      const data = JSON.parse(trimmed);
+      const fromJson =
+        (typeof data.html === 'string' && data.html) ||
+        (typeof data.content === 'string' && data.content) ||
+        (typeof data.body === 'string' && data.body) ||
+        '';
+      return extractReviewHtml(fromJson);
+    } catch {
+      return null;
+    }
+  }
+
+  return trimmed;
+}
+
+/**
  * Fetch full review HTML from Letterboxd when the body is truncated.
  * @returns {Promise<string | null>}
  */
@@ -222,11 +272,10 @@ async function loadFullReviewHtml(textEl) {
     const url = new URL(path, location.origin).href;
     const response = await fetch(url, {
       credentials: 'same-origin',
-      headers: { Accept: 'text/html' },
+      headers: { Accept: 'text/html, application/json' },
     });
     if (!response.ok) return null;
-    const html = await response.text();
-    return html?.trim() ? html : null;
+    return extractReviewHtml(await response.text());
   } catch {
     return null;
   }
@@ -300,12 +349,15 @@ async function applyTranslation({ textEl, host, card, btn, isReview, expand = tr
   if (isReview && expand) {
     const fullHtml = await loadFullReviewHtml(textEl);
     if (fullHtml) {
-      sourceHtml = fullHtml;
-      textEl.innerHTML = fullHtml;
-      expandReviewBody(textEl);
-    } else {
-      expandReviewBody(textEl);
+      const fullPlain = htmlToPlain(fullHtml);
+      const currentPlain = htmlToPlain(sourceHtml);
+      // Prefer the longer payload — full-text must not clobber a complete DOM body.
+      if (fullPlain.length > currentPlain.length) {
+        sourceHtml = fullHtml;
+        textEl.innerHTML = fullHtml;
+      }
     }
+    expandReviewBody(textEl);
   }
 
   const plain = htmlToPlain(sourceHtml);

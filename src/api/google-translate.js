@@ -33,13 +33,20 @@ function detectedLang(data) {
   return '';
 }
 
-function requestJson(url) {
+function requestTranslate(tl, plain) {
   return new Promise((resolve, reject) => {
+    // POST keeps multiline bodies intact; GET often truncates at the first newline.
     GM_xmlhttpRequest({
-      method: 'GET',
-      url,
+      method: 'POST',
+      url: GTX_URL,
       timeout: TRANSLATE_REQUEST_TIMEOUT_MS,
-      headers: { Accept: 'application/json' },
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      data:
+        `client=gtx&sl=auto&tl=${encodeURIComponent(tl)}` +
+        `&dt=t&q=${encodeURIComponent(plain)}`,
       onload: (response) => {
         if (response.status < 200 || response.status >= 300) {
           reject(new Error(`Google Translate returned HTTP ${response.status}.`));
@@ -83,10 +90,7 @@ export async function translateText(text, targetLang) {
   if (inflight.has(cacheKey)) return inflight.get(cacheKey);
 
   const task = (async () => {
-    const url =
-      `${GTX_URL}?client=gtx&sl=auto&tl=${encodeURIComponent(tl)}` +
-      `&dt=t&q=${encodeURIComponent(plain)}`;
-    const data = await requestJson(url);
+    const data = await requestTranslate(tl, plain);
     const translated = joinSegments(data).trim();
     if (!translated) return null;
     const payload = {
