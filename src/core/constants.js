@@ -45,7 +45,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   fmpShowTagline: true,
   fmpShowRuntime: true,
   fmpShowDescription: true,
-  fmpShowStats: false,
+  fmpShowStats: true,
   fmpShowExternalScores: true,
   fmpShowQuickLinks: true,
   showTranslate: true,

@@ -180,19 +180,35 @@ content translation mounts on the synopsis paragraph (not the tagline).
 
 ## 8. Production statistics (under poster)
 
-Container: elements with class `production-statistic` inside `#js-poster-col`.
+**Root:** `.production-statistic-list` inside `#js-poster-col` (under the poster).
+
+```html
+<div class="production-statistic-list"
+     aria-label="Statistics for {Title} ({Year})">
+  <div class="production-statistic -watches" aria-label="Watched by N members">…</div>
+  <div class="production-statistic -lists" aria-label="Appears in N lists">…</div>
+  <div class="production-statistic -likes" aria-label="Liked by N members">…</div>
+  <div class="production-statistic -topFilms" aria-label="№ N in the Letterboxd Top 500">…</div>
+</div>
+```
+
+Each item is `.production-statistic.{variant}` wrapping `a.tooltip` → SVG `.glyph` + `span.label`.
+`-topFilms` is omitted when the film is outside the official Top 500.
 
 | Variant class | Meaning | Count source | Link pattern |
 |---------------|---------|--------------|--------------|
-| `-watches` | Watches | `aria-label` (“Watched by N members”) or `.label` (`2.6M`) | `/film/{slug}/members/` |
-| `-lists` | List appearances | `aria-label` / `.label` | `/film/{slug}/lists/by/popular/` |
-| `-likes` | Likes | `aria-label` / `.label` | `/film/{slug}/likes/` |
-| `-topFilms` | Official Top 500 rank | `aria-label` / `.label` | official list URL |
+| `-watches` | Watches | `aria-label` (“Watched by N members”) or `.label` (`2.3M`) | `/film/{slug}/members/` |
+| `-lists` | List appearances | `aria-label` (“Appears in N lists”) / `.label` (`373K`) | `/film/{slug}/lists/by/popular/` |
+| `-likes` | Likes | `aria-label` (“Liked by N members”) / `.label` (`1.1M`) | `/film/{slug}/likes/` |
+| `-topFilms` | Official Top 500 rank | `aria-label` / `.label` (`459`) | official list URL (e.g. `/official/list/letterboxds-top-500-films/page/N/`) |
 | `imdb-ranking` / `extras-ranking` | Extra ranking (e.g. IMDb Top 250) | `.label` | member list URL |
 
-Compact labels use `K` / `M` suffixes; full integers live in `aria-label`.
+Compact labels use `K` / `M` suffixes; full integers live in `aria-label` (and
+`data-original-title` on the tooltip link). Prefer `aria-label` on the
+`.production-statistic` item for parsing.
 
-**Used by:** `parseStats` (watches + likes only today).
+**Used by:** `parseStats` in `film-profile.js` (watches, lists, likes, topRank);
+rendered in the film mini-profile when `fmpShowStats` is on.
 
 ---
 
@@ -433,10 +449,9 @@ What `parseFilmMiniProfileDoc` already pulls vs what the page still offers:
 | `cast` (+ roles) | yes | `#tab-panel-cast` (roles from tooltip) |
 | `genres` | yes | `#tab-panel-genres` |
 | `description` | yes | `.truncate p` / JSON-LD |
-| `stats.watches/likes` | yes | `.production-statistic.-watches/-likes` |
+| `stats.watches/lists/likes/topRank` | yes | `.production-statistic-list` → `-watches/-lists/-likes/-topFilms` |
 | `tmdbId` | yes | `body[data-tmdb-id]` |
 | `user.*` | yes (logged-in) | `#userpanel` components |
-| Lists count / Top 500 rank | available, unused | `.production-statistic.-lists/-topFilms` |
 | Studios / countries / languages | available, unused | details tab / JSON-LD |
 | Trailer URL | available, unused | `.watch-panel` trailer link |
 | CinemaScore / extras | available, unused | sidebar extras sections |
@@ -481,3 +496,4 @@ When fetching `/film/{slug}/` HTML for the mini card (Letterboxd Plus):
 |------|--------|
 | 2026-07-29 | Initial map from *The Odyssey* (2026) film page HTML |
 | 2026-07-29 | LBP mini-profile: DOM-first parsing; JSON only for user relationship |
+| 2026-08-07 | Documented `.production-statistic-list` wrapper; mini-profile uses lists + Top 500 |

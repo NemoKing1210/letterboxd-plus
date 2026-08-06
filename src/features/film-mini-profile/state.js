@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS_FALLBACK = {
   fmpShowTagline: true,
   fmpShowRuntime: true,
   fmpShowDescription: true,
-  fmpShowStats: false,
+  fmpShowStats: true,
   fmpShowExternalScores: true,
   fmpShowQuickLinks: true,
   cacheHours: 24,

@@ -53,7 +53,7 @@ function normalizeSettings(value) {
     fmpShowTagline: raw.fmpShowTagline !== false,
     fmpShowRuntime: raw.fmpShowRuntime !== false,
     fmpShowDescription: raw.fmpShowDescription !== false,
-    fmpShowStats: raw.fmpShowStats === true,
+    fmpShowStats: raw.fmpShowStats !== false,
     fmpShowExternalScores: raw.fmpShowExternalScores !== false,
     fmpShowQuickLinks: raw.fmpShowQuickLinks !== false,
     showTranslate: raw.showTranslate !== false,

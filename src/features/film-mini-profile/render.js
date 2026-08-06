@@ -381,9 +381,41 @@ function renderTagline(ctx) {
   return `<p class="lbp-fmp__tagline">${escapeHtml(tagline)}</p>`;
 }
 
+function formatCompactCount(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0) return '';
+  if (n >= 1e6) {
+    const scaled = n / 1e6;
+    const rounded = scaled >= 10 ? Math.round(scaled) : Math.round(scaled * 10) / 10;
+    return `${rounded}M`;
+  }
+  if (n >= 1e3) {
+    const scaled = n / 1e3;
+    const rounded = scaled >= 10 ? Math.round(scaled) : Math.round(scaled * 10) / 10;
+    return `${rounded}K`;
+  }
+  return formatNumber(n);
+}
+
+const STAT_ICONS = {
+  watches: `<svg xmlns="http://www.w3.org/2000/svg" role="presentation" class="lbp-fmp__stat-icon" width="16" height="11" viewBox="0 0 16 11" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M8.009 1c4.046 0 7.51 3.873 7.945 4.378l.04.048L16 5.6S12.324 10 7.991 10C3.945 10 .481 6.127.046 5.622L0 5.568V5.4S3.676 1 8.009 1ZM8 2.625a2.875 2.875 0 1 0 0 5.75 2.875 2.875 0 0 0 0-5.75ZM8 4.25a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5Z"></path></svg>`,
+  lists: `<svg xmlns="http://www.w3.org/2000/svg" role="presentation" class="lbp-fmp__stat-icon" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M10 .75v2.5a.75.75 0 0 1-.75.75h-2.5A.75.75 0 0 1 6 3.25V.75A.75.75 0 0 1 6.75 0h2.5a.75.75 0 0 1 .75.75ZM6.75 6h2.5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-.75.75h-2.5A.75.75 0 0 1 6 9.25v-2.5A.75.75 0 0 1 6.75 6ZM4 .75v2.5a.75.75 0 0 1-.75.75H.75A.75.75 0 0 1 0 3.25V.75A.75.75 0 0 1 .75 0h2.5A.75.75 0 0 1 4 .75ZM.75 6h2.5a.75.75 0 0 1 .75.75v2.5a.75.75 0 0 1-.75.75H.75A.75.75 0 0 1 0 9.25v-2.5A.75.75 0 0 1 .75 6Z"></path></svg>`,
+  likes: `<svg xmlns="http://www.w3.org/2000/svg" role="presentation" class="lbp-fmp__stat-icon" width="12" height="11" viewBox="0 0 12 11" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M6 2.25S4.51.5 2.99.5C1.46.5 0 1.23 0 3.37c0 1.52 1.5 2.86 1.5 2.86l3.812 3.617a1 1 0 0 0 1.376 0L10.5 6.23S12 4.89 12 3.37C12 1.23 10.54.5 9.01.5 7.49.5 6 2.25 6 2.25Z"></path></svg>`,
+  topFilms: `<svg xmlns="http://www.w3.org/2000/svg" role="presentation" class="lbp-fmp__stat-icon" width="14" height="11" viewBox="0 0 14 11" aria-hidden="true"><path fill="currentColor" d="M0 2.169c0-.252.126-.48.32-.576.194-.097.417-.043.566.135l2.546 3.056c.05.062.12.095.192.091a.248.248 0 0 0 .188-.108l2.535-3.55A.488.488 0 0 1 6.74 1c.151 0 .295.08.394.218l2.547 3.565c.045.064.109.103.178.108a.236.236 0 0 0 .189-.077l3.091-3.248a.452.452 0 0 1 .556-.098c.185.102.304.323.304.567V10H0V2.169Z"></path></svg>`,
+};
+
+function renderStatItem({ kind, label, title, href }) {
+  const icon = STAT_ICONS[kind] || '';
+  const inner = `${icon}<span class="lbp-fmp__stat-label">${escapeHtml(label)}</span>`;
+  if (href) {
+    return `<a class="lbp-fmp__stat" href="${escapeAttr(href)}" title="${escapeAttr(title)}">${inner}</a>`;
+  }
+  return `<span class="lbp-fmp__stat" title="${escapeAttr(title)}">${inner}</span>`;
+}
+
 function renderStats(ctx) {
   const settings = currentSettings();
-  if (settings.fmpShowStats !== true) return '';
+  if (settings.fmpShowStats === false) return '';
 
   const stats = ctx.profile?.stats;
   if (!stats && ctx.loadingProfile) {
@@ -391,28 +423,61 @@ function renderStats(ctx) {
       <div class="lbp-fmp__section lbp-fmp__stats" aria-hidden="true">
         ${skelBone('lbp-fmp__bone--chip')}
         ${skelBone('lbp-fmp__bone--chip')}
+        ${skelBone('lbp-fmp__bone--chip')}
       </div>
     `;
   }
   if (!stats) return '';
 
+  const slug = ctx.profile?.slug || ctx.slug;
+  const filmBase = filmUrlForSlug(slug);
   const bits = [];
+
   if (stats.watches != null) {
     bits.push(
-      `<span class="lbp-fmp__stat" title="${escapeAttr(t('miniFilmWatches'))}">${escapeHtml(
-        t('miniFilmWatchesCount', { count: formatNumber(stats.watches) }),
-      )}</span>`,
+      renderStatItem({
+        kind: 'watches',
+        label: formatCompactCount(stats.watches),
+        title: t('miniFilmWatchesCount', {
+          count: formatNumber(stats.watches),
+        }),
+        href: stats.watchesUrl || `${filmBase}members/`,
+      }),
+    );
+  }
+  if (stats.lists != null) {
+    bits.push(
+      renderStatItem({
+        kind: 'lists',
+        label: formatCompactCount(stats.lists),
+        title: t('miniFilmListsCount', { count: formatNumber(stats.lists) }),
+        href: stats.listsUrl || `${filmBase}lists/by/popular/`,
+      }),
     );
   }
   if (stats.likes != null) {
     bits.push(
-      `<span class="lbp-fmp__stat" title="${escapeAttr(t('miniFilmLikes'))}">${escapeHtml(
-        t('miniFilmLikesCount', { count: formatNumber(stats.likes) }),
-      )}</span>`,
+      renderStatItem({
+        kind: 'likes',
+        label: formatCompactCount(stats.likes),
+        title: t('miniFilmLikesCount', { count: formatNumber(stats.likes) }),
+        href: stats.likesUrl || `${filmBase}likes/`,
+      }),
     );
   }
+  if (stats.topRank != null) {
+    bits.push(
+      renderStatItem({
+        kind: 'topFilms',
+        label: formatNumber(stats.topRank),
+        title: t('miniFilmTopRankTitle', { rank: formatNumber(stats.topRank) }),
+        href: stats.topFilmsUrl || '',
+      }),
+    );
+  }
+
   if (!bits.length) return '';
-  return `<div class="lbp-fmp__section lbp-fmp__stats">${bits.join('')}</div>`;
+  return `<div class="lbp-fmp__section lbp-fmp__stats" aria-label="${escapeAttr(t('miniFilmStats'))}">${bits.join('')}</div>`;
 }
 
 function renderDescription(ctx) {
@@ -450,7 +515,7 @@ function renderFooter(ctx) {
   const filmUrl = ctx.profile?.filmUrl || filmUrlForSlug(ctx.slug);
   return `
     <footer class="lbp-fmp__footer">
-      <a class="lbp-fmp__cta" href="${escapeAttr(filmUrl)}">${escapeHtml(t('miniFilmOpen'))}</a>
+      <a class="button -action lbp-fmp__cta" href="${escapeAttr(filmUrl)}">${escapeHtml(t('miniFilmOpen'))}</a>
     </footer>
   `;
 }
@@ -496,7 +561,7 @@ export function renderError(slug, titleHint) {
         <div class="lbp-fmp__status">${escapeHtml(t('miniFilmError'))}</div>
       </div>
       <footer class="lbp-fmp__footer">
-        <a class="lbp-fmp__cta" href="${escapeAttr(filmUrl)}">${escapeHtml(t('miniFilmOpen'))}</a>
+        <a class="button -action lbp-fmp__cta" href="${escapeAttr(filmUrl)}">${escapeHtml(t('miniFilmOpen'))}</a>
       </footer>
     </div>
   `;

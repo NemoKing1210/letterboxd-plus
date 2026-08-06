@@ -422,23 +422,60 @@ function parseDescription(doc, jsonLd) {
   return truncateText(jsonLd?.description || '');
 }
 
+function parseStatValue(el) {
+  if (!el) return null;
+  return (
+    parseCompactCount(el.getAttribute('aria-label')) ||
+    parseCompactCount(
+      el.querySelector('a.tooltip')?.getAttribute('data-original-title'),
+    ) ||
+    parseCompactCount(textOf(el.querySelector('.label'))) ||
+    null
+  );
+}
+
+function parseStatHref(el) {
+  const href = el?.querySelector('a[href]')?.getAttribute('href') || '';
+  return href ? absUrl(href) : '';
+}
+
 function parseStats(doc) {
-  const watchesEl = doc.querySelector(
-    '#js-poster-col .production-statistic.-watches, .production-statistic.-watches',
-  );
-  const likesEl = doc.querySelector(
-    '#js-poster-col .production-statistic.-likes, .production-statistic.-likes',
-  );
-  const watches =
-    parseCompactCount(watchesEl?.getAttribute('aria-label')) ||
-    parseCompactCount(textOf(watchesEl?.querySelector('.label'))) ||
-    null;
-  const likes =
-    parseCompactCount(likesEl?.getAttribute('aria-label')) ||
-    parseCompactCount(textOf(likesEl?.querySelector('.label'))) ||
-    null;
-  if (watches == null && likes == null) return null;
-  return { watches, likes };
+  const list =
+    doc.querySelector('#js-poster-col .production-statistic-list') ||
+    doc.querySelector('.production-statistic-list');
+  const scope = list || doc;
+  const watchesEl = scope.querySelector('.production-statistic.-watches');
+  const listsEl = scope.querySelector('.production-statistic.-lists');
+  const likesEl = scope.querySelector('.production-statistic.-likes');
+  const topFilmsEl = scope.querySelector('.production-statistic.-topFilms');
+
+  const watches = parseStatValue(watchesEl);
+  const lists = parseStatValue(listsEl);
+  const likes = parseStatValue(likesEl);
+  // Rank is usually the bare `.label` (e.g. "459"); aria-label is "№ 459…".
+  const topRank =
+    parseCompactCount(textOf(topFilmsEl?.querySelector('.label'))) ||
+    parseStatValue(topFilmsEl);
+
+  if (
+    watches == null &&
+    lists == null &&
+    likes == null &&
+    topRank == null
+  ) {
+    return null;
+  }
+
+  return {
+    watches,
+    lists,
+    likes,
+    topRank,
+    watchesUrl: parseStatHref(watchesEl),
+    listsUrl: parseStatHref(listsEl),
+    likesUrl: parseStatHref(likesEl),
+    topFilmsUrl: parseStatHref(topFilmsEl),
+  };
 }
 
 function parseUserRating(root) {
