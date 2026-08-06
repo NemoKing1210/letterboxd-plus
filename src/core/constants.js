@@ -33,6 +33,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   showMetacritic: true,
   showMetacriticUserScore: true,
   enhanceCast: true,
+  enhanceCrew: true,
   showFilmMiniProfile: true,
   fmpOpenMode: 'hover',
   preloadFilmMiniProfile: false,

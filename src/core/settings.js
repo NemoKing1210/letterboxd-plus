@@ -41,6 +41,7 @@ function normalizeSettings(value) {
     showMetacritic: raw.showMetacritic !== false,
     showMetacriticUserScore: raw.showMetacriticUserScore !== false,
     enhanceCast: raw.enhanceCast !== false,
+    enhanceCrew: raw.enhanceCrew !== false,
     showFilmMiniProfile: raw.showFilmMiniProfile !== false,
     fmpOpenMode,
     preloadFilmMiniProfile: raw.preloadFilmMiniProfile === true,

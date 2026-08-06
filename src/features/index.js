@@ -1,4 +1,5 @@
 import { ensureEnhancedCast } from './cast/index.js';
+import { ensureEnhancedCrew } from './crew/index.js';
 import { scheduleFilmMiniProfiles } from './film-mini-profile/index.js';
 import {
   ensureAverageRating,
@@ -18,6 +19,7 @@ export {
 export const pageFeatures = [
   { scan: () => ensureSettingsButton() },
   { scan: (settings) => ensureEnhancedCast(settings) },
+  { scan: (settings) => ensureEnhancedCrew(settings) },
   { scan: (settings) => scheduleFilmMiniProfiles(settings) },
   { scan: (settings) => void ensureFilmRating(settings) },
   { scan: (settings) => void ensureMetacriticRating(settings) },

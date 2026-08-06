@@ -249,6 +249,12 @@ export function openSettings() {
                   t('enhancedCast'),
                   t('enhancedCastHint'),
                 ),
+                switchHtml(
+                  'enhanceCrew',
+                  draft.enhanceCrew,
+                  t('enhancedCrew'),
+                  t('enhancedCrewHint'),
+                ),
               ),
             )}
           </section>

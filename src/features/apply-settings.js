@@ -1,6 +1,7 @@
 import { loadSettings } from '../core/settings.js';
 import { configureLocale, t } from '../i18n/index.js';
 import { ensureEnhancedCast } from './cast/index.js';
+import { ensureEnhancedCrew } from './crew/index.js';
 import { scheduleFilmMiniProfiles } from './film-mini-profile/index.js';
 import { hidePopover } from './film-mini-profile/popover.js';
 import {
@@ -30,6 +31,7 @@ export function applyRuntimeSettings(settings) {
   }
 
   ensureEnhancedCast(next);
+  ensureEnhancedCrew(next);
   scheduleFilmMiniProfiles(next);
   void ensureFilmRating(next);
   void ensureMetacriticRating(next);

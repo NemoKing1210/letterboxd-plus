@@ -3,6 +3,38 @@ import { REQUEST_TIMEOUT_MS } from '../core/constants.js';
 const MAX_CONCURRENT_REQUESTS = 3;
 const ALLOWED_IMAGE_HOSTS = new Set(['a.ltrbxd.com', 'image.tmdb.org']);
 
+/** First path segments that are never Letterboxd person credit pages. */
+const NON_PERSON_ROOTS = new Set([
+  'about',
+  'activity',
+  'api',
+  'apps',
+  'film',
+  'films',
+  'genre',
+  'genres',
+  'invite',
+  'journal',
+  'list',
+  'lists',
+  'members',
+  'news',
+  'pro',
+  'reviews',
+  'search',
+  'settings',
+  'stories',
+  'studio',
+  'studios',
+  'tag',
+  'tags',
+  'theme',
+  'themes',
+  'welcome',
+  'year',
+  'years',
+]);
+
 const portraitCache = new Map();
 const inFlightRequests = new Map();
 const requestQueue = [];
@@ -32,13 +64,18 @@ function enqueue(task) {
   });
 }
 
-function validatedActorUrl(value) {
+function validatedPersonUrl(value) {
   const url = new URL(value, window.location.origin);
+  const parts = url.pathname.split('/').filter(Boolean);
+  const root = parts[0]?.toLowerCase() || '';
   if (
     url.origin !== window.location.origin ||
-    !url.pathname.startsWith('/actor/')
+    parts.length !== 2 ||
+    NON_PERSON_ROOTS.has(root) ||
+    !/^[a-z0-9-]+$/i.test(parts[0]) ||
+    !/^[a-z0-9-]+$/i.test(parts[1])
   ) {
-    throw new Error('Invalid Letterboxd actor URL.');
+    throw new Error('Invalid Letterboxd person URL.');
   }
   return url;
 }
@@ -56,14 +93,14 @@ function parsePortraitUrl(html) {
   return url.href;
 }
 
-async function requestPortrait(actorUrl) {
+async function requestPortrait(personUrl) {
   const controller = new AbortController();
   const timeoutId = window.setTimeout(
     () => controller.abort(),
     REQUEST_TIMEOUT_MS,
   );
   try {
-    const response = await fetch(actorUrl.href, {
+    const response = await fetch(personUrl.href, {
       cache: 'default',
       credentials: 'same-origin',
       headers: { Accept: 'text/html,application/xhtml+xml' },
@@ -79,26 +116,26 @@ async function requestPortrait(actorUrl) {
 }
 
 export function getLetterboxdPersonPortrait(value) {
-  let actorUrl;
+  let personUrl;
   try {
-    actorUrl = validatedActorUrl(value);
+    personUrl = validatedPersonUrl(value);
   } catch (error) {
-    console.warn('[Letterboxd Plus] Invalid actor portrait request.', error);
+    console.warn('[Letterboxd Plus] Invalid person portrait request.', error);
     return Promise.resolve(null);
   }
 
-  const key = actorUrl.pathname;
+  const key = personUrl.pathname;
   if (portraitCache.has(key)) return Promise.resolve(portraitCache.get(key));
   if (inFlightRequests.has(key)) return inFlightRequests.get(key);
 
-  const request = enqueue(() => requestPortrait(actorUrl))
+  const request = enqueue(() => requestPortrait(personUrl))
     .then((portraitUrl) => {
       if (portraitUrl) portraitCache.set(key, portraitUrl);
       return portraitUrl;
     })
     .catch((error) => {
-      console.warn('[Letterboxd Plus] Failed to load actor portrait.', {
-        actor: key,
+      console.warn('[Letterboxd Plus] Failed to load person portrait.', {
+        person: key,
         error,
       });
       return null;

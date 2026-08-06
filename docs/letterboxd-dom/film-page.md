@@ -8,7 +8,7 @@ Reference for Letterboxd **film** pages (`/film/{slug}/`).
 | **`body` markers** | `data-type="film"`, often `data-tmdb-type="movie"`, `data-tmdb-id="{id}"` |
 | **Sample** | *The Odyssey* (2026), slug `the-odyssey-2026` |
 | **Captured** | 2026-07-29 (saved HTML; some assets local/empty) |
-| **Consumers** | `src/api/film-profile.js`, `src/features/film-mini-profile/`, `src/features/ratings/`, `src/features/cast/` |
+| **Consumers** | `src/api/film-profile.js`, `src/features/film-mini-profile/`, `src/features/ratings/`, `src/features/cast/`, `src/features/crew/` |
 
 Tab deep-links (`/cast/`, `/crew/`, `/details/`, `/genres/`, `/releases/`) render the
 same panels on the film page (`#tab-panel-*`). Prefer panel IDs over relying on
@@ -258,6 +258,8 @@ Structure: repeated blocks of:
 | People | following `.text-sluglist a.text-slug` | high |
 | Role from URL | `/director/`, `/producer/`, `/writer/`, … | high |
 
+**Used by:** role headings remain native; people links enhanced by `src/features/crew/`.
+
 Observed roles on sample: Director, Producers, Writer, Original Writer,
 Casting, Editor, Cinematography, Assistant Directors, Executive Producer,
 Lighting, Camera Operator, Production Design, Art Direction, Set Decoration,
@@ -437,7 +439,7 @@ What `parseFilmMiniProfileDoc` already pulls vs what the page still offers:
 | Trailer URL | available, unused | `.watch-panel` trailer link |
 | CinemaScore / extras | available, unused | sidebar extras sections |
 | Releases / certifications | available, unused | `#tab-panel-releases-*` |
-| Full crew by role | available, unused | `#tab-panel-crew` |
+| Full crew by role | yes (enhanced UI) | `#tab-panel-crew` |
 | Themes | sometimes | `#tab-panel-genres a[href*="/films/theme/"]` |
 | Budget / alt titles | sometimes | `#tab-panel-details` |
 

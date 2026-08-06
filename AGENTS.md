@@ -28,7 +28,7 @@ files; regenerate them with `npm run build`.
 - `src/api/` contains external integrations. Cross-origin requests use
   `GM_xmlhttpRequest`.
 - `src/features/` contains DOM integrations grouped by concern (`ratings/`,
-  `cast/`, `film-mini-profile/`, `settings/`, `toast/`), with co-located CSS.
+  `cast/`, `crew/`, `film-mini-profile/`, `settings/`, `toast/`), with co-located CSS.
 - `src/styles/tokens.css` holds shared design tokens and cross-feature media
   queries.
 - [`DESIGN.md`](DESIGN.md) documents Letterboxd-aligned visual tokens and

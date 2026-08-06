@@ -97,6 +97,9 @@ html.lbp-modal-open {
   .lbp-cast-card,
   .lbp-cast-card__portrait::after,
   .lbp-cast-card__portrait img,
+  .lbp-crew-card,
+  .lbp-crew-card__portrait::after,
+  .lbp-crew-card__portrait img,
   .lbp-toast {
     animation: none !important;
     filter: none !important;
