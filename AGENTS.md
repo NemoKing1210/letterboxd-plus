@@ -57,6 +57,7 @@ matching page doc (or add one) and link it from the catalog README.
 | [README](docs/letterboxd-dom/README.md) | Catalog and conventions |
 | [film-page.md](docs/letterboxd-dom/film-page.md) | `/film/{slug}/` (+ cast/crew/details/genres/releases tabs) |
 | [review-page.md](docs/letterboxd-dom/review-page.md) | `/{username}/film/{slug}/` (standalone review + comments) |
+| [profile-page.md](docs/letterboxd-dom/profile-page.md) | `/{username}/` (member profile overview) |
 
 ## Conventions
 

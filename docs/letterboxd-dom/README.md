@@ -21,6 +21,7 @@ ratings sidebar, etc.) so agents and humans know **what can be read** and
 |------|-------------|-----|--------|
 | Film | `/film/{slug}/` | [film-page.md](./film-page.md) | Documented |
 | Review / viewing | `/{username}/film/{slug}/` | [review-page.md](./review-page.md) | Documented |
+| Member profile | `/{username}/` | [profile-page.md](./profile-page.md) | Documented |
 | Film poster card | lists / grids / similar | [poster-card.md](./poster-card.md) | Documented |
 | Film cast (tab / deep link) | `/film/{slug}/cast/` | Same tabs as film page | Covered in film-page |
 | Film crew | `/film/{slug}/crew/` | Same | Covered in film-page |
@@ -28,7 +29,7 @@ ratings sidebar, etc.) so agents and humans know **what can be read** and
 | Film genres | `/film/{slug}/genres/` | Same | Covered in film-page |
 | Film releases | `/film/{slug}/releases/` | Same | Covered in film-page |
 | Film JSON | `/film/{slug}/json/` | Mentioned in film-page / poster-card | Endpoint only |
-| List / diary / person / search | — | — | TODO (send HTML) |
+| List / diary / search | — | — | TODO (send HTML) |
 
 ## Conventions in these docs
 
