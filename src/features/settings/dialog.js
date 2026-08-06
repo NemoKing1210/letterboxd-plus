@@ -216,12 +216,6 @@ export function openSettings() {
                 t('fmpShowExternalScoresHint'),
               )}
               ${switchHtml(
-                'fmpShowExternalLinks',
-                draft.fmpShowExternalLinks,
-                t('fmpShowExternalLinks'),
-                t('fmpShowExternalLinksHint'),
-              )}
-              ${switchHtml(
                 'fmpShowQuickLinks',
                 draft.fmpShowQuickLinks,
                 t('fmpShowQuickLinks'),

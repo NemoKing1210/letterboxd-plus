@@ -10,8 +10,6 @@ export const METACRITIC_API_ORIGIN = 'https://backend.metacritic.com';
 export const REQUEST_TIMEOUT_MS = 12_000;
 export const CACHE_HOURS_MAX = 168;
 export const CACHE_SOFT_LIMIT_BYTES = 5 * 1024 * 1024;
-export const FAVICON_URL =
-  'https://www.google.com/s2/favicons?domain={domain}&sz=32';
 export const FILM_HOVER_OPEN_MS = 280;
 export const FILM_HOVER_CLOSE_MS = 180;
 export const FILM_LEAVE_MS = 300;
@@ -48,7 +46,6 @@ export const DEFAULT_SETTINGS = Object.freeze({
   fmpShowDescription: true,
   fmpShowStats: false,
   fmpShowExternalScores: true,
-  fmpShowExternalLinks: true,
   fmpShowQuickLinks: true,
   cacheHours: 24,
   cacheFilmMiniProfile: true,

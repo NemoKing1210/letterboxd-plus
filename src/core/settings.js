@@ -43,7 +43,6 @@ function normalizeSettings(value) {
     fmpShowDescription: raw.fmpShowDescription !== false,
     fmpShowStats: raw.fmpShowStats === true,
     fmpShowExternalScores: raw.fmpShowExternalScores !== false,
-    fmpShowExternalLinks: raw.fmpShowExternalLinks !== false,
     fmpShowQuickLinks: raw.fmpShowQuickLinks !== false,
     cacheHours: Number.isFinite(cacheHours)
       ? Math.max(0, Math.min(CACHE_HOURS_MAX, cacheHours))
