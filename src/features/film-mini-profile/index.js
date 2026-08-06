@@ -34,6 +34,7 @@ import { scheduleFilmPreload, stopFilmPreload } from './preload.js';
 import { renderCard, renderError } from './render.js';
 import { currentSettings, setSettingsRef, state } from './state.js';
 import { syncFilmMiniProfileTranslate } from '../translate/index.js';
+import { hidePopover as hideUserPopover } from '../user-mini-profile/popover.js';
 
 function decoratePosters(root = document) {
   if (currentSettings().showFilmMiniProfile === false) {
@@ -104,6 +105,7 @@ async function showForPoster(
   poster,
   { slug, title, year, posterHint, userHint },
 ) {
+  hideUserPopover({ immediate: true });
   const el = ensurePopover();
   state.activePoster = poster;
   state.activeSlug = slug;

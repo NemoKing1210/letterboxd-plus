@@ -11,7 +11,7 @@ import {
 import { configureLocale, t } from './i18n/index.js';
 
 const IGNORE_MUTATION_SELECTOR =
-  '#lbp-film-mini-profile, .lbp-fmp, .lbp-settings-backdrop, .lbp-toast-host, .lbp-translate-btn, .lbp-translate-result, .lbp-translate-desc-slot, .lbp-translate-review-slot';
+  '#lbp-film-mini-profile, .lbp-fmp, #lbp-user-mini-profile, .lbp-ump, .lbp-settings-backdrop, .lbp-toast-host, .lbp-translate-btn, .lbp-translate-result, .lbp-translate-desc-slot, .lbp-translate-review-slot';
 
 let scanTimer = 0;
 
@@ -28,7 +28,9 @@ function shouldIgnoreMutation(mutation) {
     return Boolean(
       node.closest?.(IGNORE_MUTATION_SELECTOR) ||
         node.id === 'lbp-film-mini-profile' ||
+        node.id === 'lbp-user-mini-profile' ||
         node.classList?.contains('lbp-fmp') ||
+        node.classList?.contains('lbp-ump') ||
         node.classList?.contains('lbp-settings-backdrop') ||
         node.classList?.contains('lbp-toast-host') ||
         node.classList?.contains('lbp-toast') ||

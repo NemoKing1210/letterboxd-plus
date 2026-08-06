@@ -89,8 +89,8 @@ matching page doc (or add one) and link it from the catalog README.
 Settings are stored under `lbp_settings`. The settings entry belongs in the
 account dropdown immediately after the profile/avatar item (highlighted in brand
 green) and is also available through `GM_registerMenuCommand`. Cache persistence
-for film mini-profiles, Rotten Tomatoes, Metacritic, and translations can be
-toggled per type on the Cache settings tab.
+for film mini-profiles, user mini-profiles, Rotten Tomatoes, Metacritic, and
+translations can be toggled per type on the Cache settings tab.
 
 Add defaults to `DEFAULT_SETTINGS`, normalize persisted values in
 `src/core/settings.js`, and expose user-facing controls in

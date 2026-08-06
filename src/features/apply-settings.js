@@ -3,7 +3,7 @@ import { configureLocale, t } from '../i18n/index.js';
 import { ensureEnhancedCast } from './cast/index.js';
 import { ensureEnhancedCrew } from './crew/index.js';
 import { scheduleFilmMiniProfiles } from './film-mini-profile/index.js';
-import { hidePopover } from './film-mini-profile/popover.js';
+import { hidePopover as hideFilmPopover } from './film-mini-profile/popover.js';
 import {
   ensureAverageRating,
   ensureFilmRating,
@@ -11,6 +11,8 @@ import {
 } from './ratings/index.js';
 import { configureToastPosition } from './toast/index.js';
 import { syncTranslateUi } from './translate/index.js';
+import { scheduleUserMiniProfiles } from './user-mini-profile/index.js';
+import { hidePopover as hideUserPopover } from './user-mini-profile/popover.js';
 
 function refreshSettingsNav() {
   const link = document.querySelector('#lbp-nav-settings a');
@@ -27,12 +29,16 @@ export function applyRuntimeSettings(settings) {
   refreshSettingsNav();
 
   if (next.showFilmMiniProfile === false) {
-    hidePopover({ immediate: true });
+    hideFilmPopover({ immediate: true });
+  }
+  if (next.showUserMiniProfile === false) {
+    hideUserPopover({ immediate: true });
   }
 
   ensureEnhancedCast(next);
   ensureEnhancedCrew(next);
   scheduleFilmMiniProfiles(next);
+  scheduleUserMiniProfiles(next);
   void ensureFilmRating(next);
   void ensureMetacriticRating(next);
   ensureAverageRating();

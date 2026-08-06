@@ -8,6 +8,7 @@ import {
 } from './ratings/index.js';
 import { ensureSettingsButton } from './settings/index.js';
 import { syncTranslateUi } from './translate/index.js';
+import { scheduleUserMiniProfiles } from './user-mini-profile/index.js';
 
 export { openSettings } from './settings/index.js';
 export {
@@ -21,6 +22,7 @@ export const pageFeatures = [
   { scan: (settings) => ensureEnhancedCast(settings) },
   { scan: (settings) => ensureEnhancedCrew(settings) },
   { scan: (settings) => scheduleFilmMiniProfiles(settings) },
+  { scan: (settings) => scheduleUserMiniProfiles(settings) },
   { scan: (settings) => void ensureFilmRating(settings) },
   { scan: (settings) => void ensureMetacriticRating(settings) },
   { scan: () => ensureAverageRating() },

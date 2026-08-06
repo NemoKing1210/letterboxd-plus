@@ -17,6 +17,10 @@ export const FILM_FETCH_CONCURRENCY = 2;
 export const FILM_PRELOAD_ROOT_MARGIN = '160px 0px';
 export const FILM_POSTER_SKIP_ANCESTOR =
   '#js-poster-col, .modal-dialog, .lbp-settings-backdrop';
+export const USER_MINI_SKIP_ANCESTOR =
+  '#header, .main-nav, .modal-dialog, .lbp-settings-backdrop, #lbp-film-mini-profile, .lbp-fmp';
+export const USER_FETCH_CONCURRENCY = 2;
+export const USER_PRELOAD_ROOT_MARGIN = '160px 0px';
 export const REPO_URL = 'https://github.com/NemoKing1210/letterboxd-plus';
 export const AUTHOR_NAME = 'NemoKing';
 export const AUTHOR_HANDLE = 'NemoKing1210';
@@ -48,6 +52,11 @@ export const DEFAULT_SETTINGS = Object.freeze({
   fmpShowStats: true,
   fmpShowExternalScores: true,
   fmpShowQuickLinks: true,
+  showUserMiniProfile: true,
+  preloadUserMiniProfile: false,
+  umpShowBio: true,
+  umpShowStats: true,
+  umpShowLocation: true,
   showTranslate: true,
   translateTargetLocale: 'auto',
   translateDisplayMode: 'replace',
@@ -57,6 +66,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   translateComments: true,
   cacheHours: 24,
   cacheFilmMiniProfile: true,
+  cacheUserMiniProfile: true,
   cacheRottenTomatoes: true,
   cacheMetacritic: true,
   cacheTranslations: true,

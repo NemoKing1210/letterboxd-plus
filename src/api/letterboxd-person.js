@@ -1,39 +1,8 @@
 import { REQUEST_TIMEOUT_MS } from '../core/constants.js';
+import { RESERVED_ROOT_SEGMENTS } from '../utils/letterboxd-username.js';
 
 const MAX_CONCURRENT_REQUESTS = 3;
 const ALLOWED_IMAGE_HOSTS = new Set(['a.ltrbxd.com', 'image.tmdb.org']);
-
-/** First path segments that are never Letterboxd person credit pages. */
-const NON_PERSON_ROOTS = new Set([
-  'about',
-  'activity',
-  'api',
-  'apps',
-  'film',
-  'films',
-  'genre',
-  'genres',
-  'invite',
-  'journal',
-  'list',
-  'lists',
-  'members',
-  'news',
-  'pro',
-  'reviews',
-  'search',
-  'settings',
-  'stories',
-  'studio',
-  'studios',
-  'tag',
-  'tags',
-  'theme',
-  'themes',
-  'welcome',
-  'year',
-  'years',
-]);
 
 const portraitCache = new Map();
 const inFlightRequests = new Map();
@@ -71,7 +40,7 @@ function validatedPersonUrl(value) {
   if (
     url.origin !== window.location.origin ||
     parts.length !== 2 ||
-    NON_PERSON_ROOTS.has(root) ||
+    RESERVED_ROOT_SEGMENTS.has(root) ||
     !/^[a-z0-9-]+$/i.test(parts[0]) ||
     !/^[a-z0-9-]+$/i.test(parts[1])
   ) {

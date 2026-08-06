@@ -52,7 +52,9 @@ ratings sidebar, etc.) so agents and humans know **what can be read** and
 - [`AGENTS.md`](../../AGENTS.md) — architecture and agent rules
 - [`DESIGN.md`](../../DESIGN.md) — visual tokens for injected UI
 - `src/api/film-profile.js` — current film HTML/JSON parsers
-- `src/features/film-mini-profile/` — mini card consumers
+- `src/api/user-profile.js` — member profile HTML parsers for user mini-cards
+- `src/features/film-mini-profile/` — film mini-card consumers
+- `src/features/user-mini-profile/` — user mini-card consumers
 - `src/features/film-mini-profile/posters.js` — poster card identity + user hints
 - `src/features/ratings/` — film sidebar rating mounts
 - `src/features/cast/` — cast list enhancement

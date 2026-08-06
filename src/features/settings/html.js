@@ -28,6 +28,14 @@ const CACHE_ENTITY_META = Object.freeze({
     enableHintKey: 'cacheFilmMiniProfileHint',
     clearKey: 'cacheClearFilm',
   },
+  user: {
+    settingKey: 'cacheUserMiniProfile',
+    titleKey: 'cacheEntityUserTitle',
+    descKey: 'cacheEntityUserDesc',
+    enableKey: 'cacheUserMiniProfile',
+    enableHintKey: 'cacheUserMiniProfileHint',
+    clearKey: 'cacheClearUser',
+  },
   rt: {
     settingKey: 'cacheRottenTomatoes',
     titleKey: 'cacheEntityRtTitle',

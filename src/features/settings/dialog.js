@@ -73,6 +73,13 @@ const FMP_DEPENDENT_KEYS = Object.freeze([
   'fmpShowQuickLinks',
 ]);
 
+const UMP_DEPENDENT_KEYS = Object.freeze([
+  'preloadUserMiniProfile',
+  'umpShowBio',
+  'umpShowStats',
+  'umpShowLocation',
+]);
+
 function translateTabBadge(draft) {
   const pref = draft.translateTargetLocale || 'auto';
   if (pref === 'auto') return 'AUTO';
@@ -101,8 +108,19 @@ function syncDependentControls(dialog, draft) {
     setRowDisabled(dialog.querySelector(`[data-setting-row="${key}"]`), !filmCardsOn);
   }
 
-  const openModeField = dialog.querySelector('#lbp-fmp-open-mode')?.closest('.lbp-field');
-  setFieldDisabled(openModeField, !filmCardsOn);
+  const userCardsOn = draft.showUserMiniProfile !== false;
+  for (const key of UMP_DEPENDENT_KEYS) {
+    setRowDisabled(dialog.querySelector(`[data-setting-row="${key}"]`), !userCardsOn);
+  }
+
+  setFieldDisabled(
+    dialog.querySelector('#lbp-fmp-open-mode')?.closest('.lbp-field'),
+    !filmCardsOn,
+  );
+  setFieldDisabled(
+    dialog.querySelector('#lbp-ump-open-mode')?.closest('.lbp-field'),
+    !userCardsOn,
+  );
 
   const translateOn = draft.showTranslate !== false;
   setFieldDisabled(
@@ -174,6 +192,7 @@ export function openSettings() {
           <button type="button" id="lbp-tab-general" class="is-active" data-tab="general" role="tab" aria-selected="true" aria-controls="lbp-panel-general">${t('tabGeneral')}</button>
           <button type="button" id="lbp-tab-film" data-tab="film" role="tab" aria-selected="false" aria-controls="lbp-panel-film" tabindex="-1">${t('tabFilm')}</button>
           <button type="button" id="lbp-tab-card" data-tab="card" role="tab" aria-selected="false" aria-controls="lbp-panel-card" tabindex="-1">${t('tabCard')}</button>
+          <button type="button" id="lbp-tab-user-card" data-tab="user-card" role="tab" aria-selected="false" aria-controls="lbp-panel-user-card" tabindex="-1">${t('tabUserCard')}</button>
           <button type="button" id="lbp-tab-translate" data-tab="translate" role="tab" aria-selected="false" aria-controls="lbp-panel-translate" tabindex="-1">${t('tabTranslate')} <span class="lbp-settings__tab-badge" data-translate-tab-badge>${translateTabBadge(draft)}</span></button>
           <button type="button" id="lbp-tab-cache" data-tab="cache" role="tab" aria-selected="false" aria-controls="lbp-panel-cache" tabindex="-1">${t('tabCache')} <span class="lbp-settings__tab-badge" data-cache-tab-badge>${cacheTyped.fillPercent}%</span></button>
           <button type="button" id="lbp-tab-about" data-tab="about" role="tab" aria-selected="false" aria-controls="lbp-panel-about" tabindex="-1">${t('tabAbout')}</button>
@@ -273,7 +292,7 @@ export function openSettings() {
                   'lbp-fmp-open-mode',
                   t('fmpOpenMode'),
                   t('fmpOpenModeHint'),
-                  `<select id="lbp-fmp-open-mode">${fmpOpenModeOptions}</select>`,
+                  `<select id="lbp-fmp-open-mode" class="lbp-mini-card-open-mode">${fmpOpenModeOptions}</select>`,
                 ),
                 switchHtml(
                   'preloadFilmMiniProfile',
@@ -358,6 +377,56 @@ export function openSettings() {
                   draft.fmpShowQuickLinks,
                   t('fmpShowQuickLinks'),
                   t('fmpShowQuickLinksHint'),
+                ),
+              ),
+            )}
+          </section>
+          <section id="lbp-panel-user-card" data-panel="user-card" role="tabpanel" aria-labelledby="lbp-tab-user-card" hidden>
+            ${groupHtml(
+              'userCardGroupBehavior',
+              'userCardGroupBehaviorHint',
+              listHtml(
+                switchHtml(
+                  'showUserMiniProfile',
+                  draft.showUserMiniProfile,
+                  t('showUserMiniProfile'),
+                  t('showUserMiniProfileHint'),
+                ),
+                fieldHtml(
+                  'lbp-ump-open-mode',
+                  t('fmpOpenMode'),
+                  t('fmpOpenModeHint'),
+                  `<select id="lbp-ump-open-mode" class="lbp-mini-card-open-mode">${fmpOpenModeOptions}</select>`,
+                ),
+                switchHtml(
+                  'preloadUserMiniProfile',
+                  draft.preloadUserMiniProfile,
+                  t('preloadUserMiniProfile'),
+                  t('preloadUserMiniProfileHint'),
+                ),
+              ),
+            )}
+            ${groupHtml(
+              'userCardGroupContent',
+              'userCardGroupContentHint',
+              listHtml(
+                switchHtml(
+                  'umpShowBio',
+                  draft.umpShowBio,
+                  t('umpShowBio'),
+                  t('umpShowBioHint'),
+                ),
+                switchHtml(
+                  'umpShowStats',
+                  draft.umpShowStats,
+                  t('umpShowStats'),
+                  t('umpShowStatsHint'),
+                ),
+                switchHtml(
+                  'umpShowLocation',
+                  draft.umpShowLocation,
+                  t('umpShowLocation'),
+                  t('umpShowLocationHint'),
                 ),
               ),
             )}
@@ -657,6 +726,15 @@ export function openSettings() {
     draft.toastPosition = event.target.value;
     configureToastPosition(draft.toastPosition);
   });
+  dialog.querySelectorAll('.lbp-mini-card-open-mode').forEach((select) => {
+    select.addEventListener('change', (event) => {
+      const value = event.target.value;
+      draft.fmpOpenMode = value;
+      dialog.querySelectorAll('.lbp-mini-card-open-mode').forEach((other) => {
+        if (other !== event.target) other.value = value;
+      });
+    });
+  });
   dialog.querySelector('#lbp-translate-locale').addEventListener('change', (event) => {
     draft.translateTargetLocale = event.target.value;
     syncDependentControls(dialog, draft);
@@ -701,7 +779,10 @@ export function openSettings() {
   dialog.querySelector('[data-save]').addEventListener('click', () => {
     draft.uiLocale = dialog.querySelector('#lbp-ui-locale').value;
     draft.toastPosition = dialog.querySelector('#lbp-toast-position').value;
-    draft.fmpOpenMode = dialog.querySelector('#lbp-fmp-open-mode').value;
+    draft.fmpOpenMode =
+      dialog.querySelector('#lbp-fmp-open-mode')?.value ||
+      dialog.querySelector('#lbp-ump-open-mode')?.value ||
+      draft.fmpOpenMode;
     draft.translateTargetLocale = dialog.querySelector('#lbp-translate-locale').value;
     draft.translateDisplayMode = dialog.querySelector('#lbp-translate-mode').value;
     draft.cacheHours = Number(dialog.querySelector('#lbp-cache-hours').value);

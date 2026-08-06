@@ -8,7 +8,7 @@ Reference for Letterboxd **member profile** pages (`/{username}/`).
 | **`body` markers** | Live-verify `body[data-type]` (not in `#content`-only captures) |
 | **Sample** | `swjerr` (display name “jer ☘️”), person `12132330` |
 | **Captured** | 2026-08-07 (main `#content` fragment) |
-| **Consumers** | — (none yet); poster islands share [poster-card.md](./poster-card.md) |
+| **Consumers** | [`src/features/user-mini-profile/`](../../src/features/user-mini-profile/); poster islands share [poster-card.md](./poster-card.md) |
 
 Subpages linked from the profile nav (films, diary, reviews, watchlist, lists,
 likes, tags, network, stats, activity) are **separate URLs**. This doc covers

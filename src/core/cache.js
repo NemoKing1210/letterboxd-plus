@@ -6,7 +6,13 @@ import {
 } from '$';
 import { CACHE_PREFIX, CACHE_SOFT_LIMIT_BYTES } from './constants.js';
 
-export const CACHE_TYPES = Object.freeze(['film', 'rt', 'metacritic', 'gtx']);
+export const CACHE_TYPES = Object.freeze([
+  'film',
+  'user',
+  'rt',
+  'metacritic',
+  'gtx',
+]);
 
 function storageKey(key) {
   return `${CACHE_PREFIX}${key}`;
@@ -38,6 +44,7 @@ function logicalKeyFromStorage(storageKeyValue) {
 export function classifyCacheKey(logicalKey) {
   const key = String(logicalKey || '');
   if (key.startsWith('film:mini:v2:')) return 'film';
+  if (key.startsWith('user:mini:v1:')) return 'user';
   if (key.startsWith('rt:')) return 'rt';
   if (key.startsWith('metacritic:')) return 'metacritic';
   if (key.startsWith('gtx:')) return 'gtx';
@@ -78,6 +85,17 @@ function labelForEntry(type, logicalKey, value, titles) {
     }
     const slug = logicalKey.replace(/^film:mini:v2:/, '');
     return slug || logicalKey;
+  }
+
+  if (type === 'user') {
+    const displayName = String(value?.displayName || '').trim();
+    const username =
+      String(value?.username || '').trim() ||
+      logicalKey.replace(/^user:mini:v1:/, '');
+    if (displayName && username && displayName.toLowerCase() !== username) {
+      return `${displayName} (@${username})`;
+    }
+    return displayName || username || logicalKey;
   }
 
   const idMatch = logicalKey.match(/^(?:rt|metacritic):tmdb:(\d+)$/i);
@@ -172,6 +190,7 @@ export function getCacheStatsByType(cacheHours) {
   const entries = listCacheEntries(cacheHours);
   const byType = {
     film: emptyTypeStats(),
+    user: emptyTypeStats(),
     rt: emptyTypeStats(),
     metacritic: emptyTypeStats(),
     gtx: emptyTypeStats(),
