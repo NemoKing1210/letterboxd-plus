@@ -53,14 +53,14 @@
   margin-inline-start: 0.65rem;
 }
 
-.lbp-translate-result {
-  border-top: 1px solid color-mix(in srgb, var(--lbp-green) 22%, transparent);
-  font-size: inherit;
-  line-height: inherit;
-  margin-top: 0.65rem;
-  opacity: 0.92;
-  padding-top: 0.55rem;
-  white-space: pre-wrap;
+.lbp-translate-comment-slot {
+  clear: both;
+  display: flex;
+  float: none;
+  justify-content: flex-end;
+  margin: 0.5rem 0 0.35rem;
+  position: relative;
+  width: 100%;
 }
 
 .lbp-translate-result--card {
@@ -68,13 +68,20 @@
   border: 1px solid color-mix(in srgb, var(--lbp-green) 24%, transparent);
   border-radius: 3px;
   box-shadow: none;
+  box-sizing: border-box;
+  clear: both;
+  display: block;
+  float: none;
   margin: 0.55rem 0 0.65rem;
   opacity: 0;
+  overflow: visible;
   padding: 0.65rem 0.75rem 0.7rem;
+  position: relative;
   transform: translateY(4px);
   transition:
     opacity 0.22s ease,
     transform 0.22s ease;
+  width: 100%;
   white-space: normal;
 }
 
@@ -98,7 +105,9 @@
   font-size: inherit;
   line-height: 1.45;
   opacity: 0.95;
+  overflow-wrap: anywhere;
   white-space: pre-wrap;
+  word-break: break-word;
 }
 
 @keyframes lbp-translate-spin {

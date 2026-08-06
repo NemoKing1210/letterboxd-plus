@@ -7,7 +7,7 @@
 // @name:fr            Letterboxd Plus
 // @name:zh-CN         Letterboxd Plus
 // @namespace          https://github.com/NemoKing1210/letterboxd-plus
-// @version            0.14.2
+// @version            0.15.4
 // @author             NemoKing1210
 // @description        Adds external ratings, film hover mini-cards, and enhanced cast to Letterboxd
 // @description:ru     Добавляет в Letterboxd внешние рейтинги, мини-карточки фильмов и карточки актёров

@@ -125,6 +125,10 @@ function syncDependentControls(dialog, draft) {
     dialog.querySelector('[data-setting-row="translateReviewsAuto"]'),
     !translateOn || draft.translateReviews === false,
   );
+  setRowDisabled(
+    dialog.querySelector('[data-setting-row="translateComments"]'),
+    !translateOn,
+  );
 
   const badge = dialog.querySelector('[data-translate-tab-badge]');
   if (badge) badge.textContent = translateTabBadge(draft);
@@ -401,6 +405,12 @@ export function openSettings() {
                   draft.translateReviewsAuto,
                   t('translateReviewsAuto'),
                   t('translateReviewsAutoHint'),
+                ),
+                switchHtml(
+                  'translateComments',
+                  draft.translateComments,
+                  t('translateComments'),
+                  t('translateCommentsHint'),
                 ),
               ),
             )}

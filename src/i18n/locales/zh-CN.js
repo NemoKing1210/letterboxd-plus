@@ -73,11 +73,11 @@ export default {
   cacheClearGtx: '清除翻译',
 
   translateGroupMain: '翻译',
-  translateGroupMainHint: '使用 Google 翻译翻译影片简介与影评。',
+  translateGroupMainHint: '使用 Google 翻译翻译影片简介、影评与评论。',
   translateGroupTargets: '翻译范围',
   translateGroupTargetsHint: '选择哪些页面区块显示“翻译”按钮。',
   showTranslate: '启用翻译',
-  showTranslateHint: '在影片简介与影评上显示“翻译”按钮（Google 翻译）。',
+  showTranslateHint: '在影片简介、影评与评论上显示“翻译”按钮（Google 翻译）。',
   translateTargetLocale: '目标语言',
   translateTargetLocaleHint:
     '要翻译成的语言。“与界面相同”跟随 设置 → 常规 → 界面语言。',
@@ -89,10 +89,12 @@ export default {
   translateDescription: '翻译影片简介',
   translateDescriptionHint: '影片页简介下方的按钮。',
   translateReviews: '翻译影评',
-  translateReviewsHint: '每条影评卡片上的按钮。',
+  translateReviewsHint: '影评卡片与独立影评页上的按钮。',
   translateReviewsAuto: '自动翻译影评',
   translateReviewsAutoHint:
     '影评滚入可视区域时自动翻译。默认关闭。',
+  translateComments: '翻译评论',
+  translateCommentsHint: '影评页每条评论下方的按钮。',
   translateButton: '翻译',
   translateShowOriginal: '显示原文',
   translateHide: '隐藏译文',

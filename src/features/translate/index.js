@@ -75,8 +75,35 @@ function findDescriptionTextEl() {
   );
 }
 
+/**
+ * Standalone review page host (`/{user}/film/{slug}/`), not a film-page card.
+ * @returns {Element[]}
+ */
+function findStandaloneReviewHosts() {
+  return [...document.querySelectorAll('section.review.js-review')].filter(
+    (section) =>
+      !section.closest('article.production-viewing') && findReviewTextEl(section),
+  );
+}
+
 function findReviewCards() {
-  return document.querySelectorAll('article.production-viewing');
+  return [
+    ...document.querySelectorAll('article.production-viewing'),
+    ...findStandaloneReviewHosts(),
+  ];
+}
+
+/**
+ * @param {Element | null | undefined} el
+ * @returns {Element | null}
+ */
+function closestReviewHost(el) {
+  if (!el?.closest) return null;
+  const article = el.closest('article.production-viewing');
+  if (article) return article;
+  const section = el.closest('section.review.js-review');
+  if (section && !section.closest('article.production-viewing')) return section;
+  return null;
 }
 
 function findReviewTextEl(card) {
@@ -93,10 +120,24 @@ function reviewButton(card) {
   );
 }
 
+function findCommentItems() {
+  return document.querySelectorAll('#comments ul.comment-list li.comment');
+}
+
+function findCommentTextEl(item) {
+  return (
+    item.querySelector('.comment-body') ||
+    item.querySelector('.js-collapsible-text.body-text') ||
+    item.querySelector('.js-collapsible-text')
+  );
+}
+
 function removeTranslateUi(scope = document) {
   stopAutoTranslate();
   scope
-    .querySelectorAll('.lbp-translate-desc-slot, .lbp-translate-review-slot')
+    .querySelectorAll(
+      '.lbp-translate-desc-slot, .lbp-translate-review-slot, .lbp-translate-comment-slot',
+    )
     .forEach((el) => el.remove());
   scope.querySelectorAll(`.${BTN_CLASS}`).forEach((el) => el.remove());
   scope.querySelectorAll(`.${RESULT_CLASS}`).forEach((el) => el.remove());
@@ -137,9 +178,9 @@ function makeButton(kind) {
   const btn = document.createElement('button');
   btn.type = 'button';
   // Reuse Letterboxd’s primary action button (same as “Post”).
-  btn.className = `button -action ${BTN_CLASS}${
-    kind === 'desc' ? ` ${BTN_CLASS}--desc` : ` ${BTN_CLASS}--review`
-  }`;
+  const sizeClass =
+    kind === 'desc' ? ` ${BTN_CLASS}--desc` : ` ${BTN_CLASS}--review`;
+  btn.className = `button -action ${BTN_CLASS}${sizeClass}`;
   btn.setAttribute('data-lbp-translate-kind', kind);
   setButtonLabel(btn, 'idle');
   return btn;
@@ -216,12 +257,45 @@ function syncReviewButtons() {
         el.closest('.lbp-translate-review-slot')?.remove();
         el.remove();
       });
-    document.querySelectorAll(`article.production-viewing[${MARK_ATTR}="review"]`).forEach((el) => {
+    document.querySelectorAll(`[${MARK_ATTR}="review"]`).forEach((el) => {
       el.removeAttribute(MARK_ATTR);
     });
     return;
   }
   findReviewCards().forEach((card) => ensureReviewButton(card));
+}
+
+function ensureCommentButton(item) {
+  const existing = item.querySelector(`.${BTN_CLASS}[data-lbp-translate-kind="comment"]`);
+  if (existing) return;
+
+  const textEl = findCommentTextEl(item);
+  if (!textEl || !htmlToPlain(textEl.innerHTML)) return;
+
+  item.setAttribute(MARK_ATTR, 'comment');
+  const btn = makeButton('comment');
+  const slot = document.createElement('div');
+  slot.className = 'lbp-translate-comment-slot';
+  slot.appendChild(btn);
+  // After the whole comment row so Letterboxd’s floated person/body cols don’t wrap the button over the text.
+  item.appendChild(slot);
+}
+
+function syncCommentButtons() {
+  if (settings().translateComments === false) {
+    document
+      .querySelectorAll(`.${BTN_CLASS}[data-lbp-translate-kind="comment"]`)
+      .forEach((el) => {
+        el.closest('.lbp-translate-comment-slot')?.remove();
+        el.remove();
+      });
+    document.querySelectorAll(`[${MARK_ATTR}="comment"]`).forEach((el) => {
+      el.removeAttribute(MARK_ATTR);
+    });
+    document.querySelectorAll(`li.comment .${RESULT_CLASS}`).forEach((el) => el.remove());
+    return;
+  }
+  findCommentItems().forEach((item) => ensureCommentButton(item));
 }
 
 function getTargetForButton(btn) {
@@ -230,7 +304,15 @@ function getTargetForButton(btn) {
     const textEl = findDescriptionTextEl();
     return textEl ? { textEl, host: textEl.parentElement || textEl } : null;
   }
-  const card = btn.closest('article.production-viewing');
+  if (kind === 'comment') {
+    const item = btn.closest('li.comment');
+    if (!item) return null;
+    const textEl = findCommentTextEl(item);
+    return textEl
+      ? { textEl, host: textEl, card: item, isComment: true }
+      : null;
+  }
+  const card = closestReviewHost(btn);
   if (!card) return null;
   const textEl = findReviewTextEl(card);
   return textEl ? { textEl, host: textEl.parentElement || textEl, card } : null;
@@ -263,7 +345,7 @@ function extractReviewHtml(raw) {
 }
 
 /**
- * Fetch full review HTML from Letterboxd when the body is truncated.
+ * Fetch full review/comment HTML from Letterboxd when the body is truncated.
  * @returns {Promise<string | null>}
  */
 async function loadFullReviewHtml(textEl) {
@@ -287,7 +369,10 @@ function expandReviewBody(textEl) {
   textEl.classList.remove('js-truncated');
   textEl.style.maxHeight = 'none';
   textEl.style.overflow = 'visible';
-  const wrap = textEl.closest('.js-review') || textEl.parentElement;
+  const wrap =
+    textEl.closest('.js-review') ||
+    textEl.closest('.js-collapsible-text') ||
+    textEl.parentElement;
   if (wrap) {
     wrap.style.maxHeight = 'none';
     wrap.style.overflow = 'visible';
@@ -295,9 +380,14 @@ function expandReviewBody(textEl) {
 }
 
 function clearBelowResult(host, textEl) {
-  const reviewCard = textEl?.closest?.('article.production-viewing');
-  if (reviewCard) {
-    reviewCard.querySelectorAll(`.${RESULT_CLASS}`).forEach((el) => el.remove());
+  const reviewHost = closestReviewHost(textEl) || closestReviewHost(host);
+  if (reviewHost) {
+    reviewHost.querySelectorAll(`.${RESULT_CLASS}`).forEach((el) => el.remove());
+    return;
+  }
+  const comment = textEl?.closest?.('li.comment') || host?.closest?.('li.comment');
+  if (comment) {
+    comment.querySelectorAll(`.${RESULT_CLASS}`).forEach((el) => el.remove());
     return;
   }
   host?.querySelectorAll?.(`.${RESULT_CLASS}`).forEach((el) => el.remove());
@@ -307,47 +397,90 @@ function clearBelowResult(host, textEl) {
   if (next?.classList?.contains(RESULT_CLASS)) next.remove();
 }
 
-function mountBelowResult(textEl, host, translatedHtml, isReview) {
-  clearBelowResult(host, textEl);
-  const box = document.createElement('div');
-  box.className = isReview ? `${RESULT_CLASS} ${RESULT_CLASS}--card` : RESULT_CLASS;
-
-  if (isReview) {
-    box.innerHTML = `
-      <div class="lbp-translate-result__head">${escapeHtml(t('translateResultLabel'))}</div>
-      <div class="lbp-translate-result__body">${translatedHtml}</div>
-    `;
-    const reviewWrap = textEl.closest('.js-review') || textEl;
-    reviewWrap.insertAdjacentElement('afterend', box);
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => box.classList.add('is-in'));
-    });
-    return box;
+/**
+ * Place “below” translation where Letterboxd floats won’t wrap it over the original.
+ * @param {Element} textEl
+ * @param {HTMLElement} box
+ * @param {boolean} isComment
+ */
+function placeBelowResult(textEl, box, isComment) {
+  if (isComment) {
+    const comment = textEl.closest('li.comment');
+    const slot = comment?.querySelector('.lbp-translate-comment-slot');
+    if (slot) {
+      slot.insertAdjacentElement('beforebegin', box);
+      return;
+    }
+    const body = textEl.closest('.comment-body') || textEl;
+    body.insertAdjacentElement('afterend', box);
+    return;
   }
 
-  box.innerHTML = translatedHtml;
-  const slot = textEl.closest('section.production-synopsis')?.querySelector(
-    '.lbp-translate-desc-slot',
-  );
-  if (slot) slot.insertAdjacentElement('beforebegin', box);
-  else textEl.insertAdjacentElement('afterend', box);
+  // Film-page review cards: keep previous placement after the review text wrap.
+  if (textEl.closest('article.production-viewing')) {
+    const wrap = textEl.closest('.js-review') || textEl;
+    wrap.insertAdjacentElement('afterend', box);
+    return;
+  }
+
+  // Standalone review page: stay inside the review column, under the prose —
+  // never after section.js-review (that escapes the col-12 float and overlaps).
+  const bodyWrap =
+    textEl.closest('.body-text') || textEl.closest('div.review') || textEl;
+  bodyWrap.insertAdjacentElement('afterend', box);
+}
+
+function mountBelowResult(textEl, host, translatedHtml, isComment = false) {
+  clearBelowResult(host, textEl);
+  const box = document.createElement('div');
+  box.className = `${RESULT_CLASS} ${RESULT_CLASS}--card`;
+  box.innerHTML = `
+    <div class="lbp-translate-result__head">${escapeHtml(t('translateResultLabel'))}</div>
+    <div class="lbp-translate-result__body">${translatedHtml}</div>
+  `;
+
+  const synopsis = textEl.closest('section.production-synopsis');
+  if (synopsis) {
+    const slot = synopsis.querySelector('.lbp-translate-desc-slot');
+    if (slot) slot.insertAdjacentElement('beforebegin', box);
+    else textEl.insertAdjacentElement('afterend', box);
+  } else {
+    placeBelowResult(textEl, box, isComment);
+  }
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => box.classList.add('is-in'));
+  });
   return box;
 }
 
 /**
  * @returns {Promise<'ok' | 'same' | 'error' | 'skip'>}
  */
-async function applyTranslation({ textEl, host, card, btn, isReview, expand = true }) {
+async function applyTranslation({
+  textEl,
+  host,
+  card,
+  btn,
+  isReview,
+  isComment = false,
+  expand = true,
+}) {
   if (!textEl) return 'skip';
   if (btn?.getAttribute(STATE_ATTR) === 'translated') return 'skip';
   if (textEl.hasAttribute(ORIG_ATTR) && displayMode() === 'replace') return 'skip';
-  if (isReview && card?.querySelector?.(`.${RESULT_CLASS}`)) return 'skip';
+
+  const resultHost = card || textEl.closest('li.comment');
+  if ((isReview || isComment) && resultHost?.querySelector?.(`.${RESULT_CLASS}`)) {
+    return 'skip';
+  }
 
   let sourceHtml = textEl.hasAttribute(ORIG_ATTR)
     ? textEl.getAttribute(ORIG_ATTR)
     : textEl.innerHTML;
 
-  if (isReview && expand) {
+  const shouldExpand = expand && (isReview || isComment);
+  if (shouldExpand) {
     const fullHtml = await loadFullReviewHtml(textEl);
     if (fullHtml) {
       const fullPlain = htmlToPlain(fullHtml);
@@ -388,7 +521,7 @@ async function applyTranslation({ textEl, host, card, btn, isReview, expand = tr
   const mode = displayMode();
 
   if (mode === 'below') {
-    mountBelowResult(textEl, host, translatedHtml, isReview);
+    mountBelowResult(textEl, host, translatedHtml, isComment);
     if (btn) {
       btn.setAttribute(STATE_ATTR, 'translated');
       setButtonLabel(btn, 'hide');
@@ -400,7 +533,7 @@ async function applyTranslation({ textEl, host, card, btn, isReview, expand = tr
     textEl.setAttribute(ORIG_ATTR, sourceHtml);
   }
   textEl.innerHTML = translatedHtml;
-  if (isReview && expand) expandReviewBody(textEl);
+  if (shouldExpand) expandReviewBody(textEl);
   if (btn) {
     btn.setAttribute(STATE_ATTR, 'translated');
     setButtonLabel(btn, 'original');
@@ -416,10 +549,11 @@ async function onTranslateClick(e) {
 
   const target = getTargetForButton(btn);
   if (!target) return;
-  const { textEl, host, card } = target;
+  const { textEl, host, card, isComment = false } = target;
   const mode = displayMode();
   const state = btn.getAttribute(STATE_ATTR) || 'idle';
-  const isReview = btn.getAttribute('data-lbp-translate-kind') === 'review';
+  const kind = btn.getAttribute('data-lbp-translate-kind');
+  const isReview = kind === 'review';
 
   if (mode === 'replace' && state === 'translated') {
     const orig = textEl.getAttribute(ORIG_ATTR);
@@ -437,7 +571,7 @@ async function onTranslateClick(e) {
     return;
   }
 
-  await applyTranslation({ textEl, host, card, btn, isReview });
+  await applyTranslation({ textEl, host, card, btn, isReview, isComment });
 }
 
 function ensureTranslateClicks() {
@@ -516,11 +650,9 @@ function syncAutoTranslate() {
 
   if (!enabled) {
     stopAutoTranslate();
-    document
-      .querySelectorAll(`article.production-viewing[${AUTO_ATTR}="busy"]`)
-      .forEach((el) => {
-        el.removeAttribute(AUTO_ATTR);
-      });
+    document.querySelectorAll(`[${AUTO_ATTR}="busy"]`).forEach((el) => {
+      el.removeAttribute(AUTO_ATTR);
+    });
     return;
   }
 
@@ -566,5 +698,6 @@ export function syncTranslateUi(nextSettings) {
 
   ensureDescriptionButton();
   syncReviewButtons();
+  syncCommentButtons();
   syncAutoTranslate();
 }

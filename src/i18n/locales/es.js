@@ -73,11 +73,12 @@ export default {
   cacheClearGtx: 'Vaciar traducciones',
 
   translateGroupMain: 'Traducción',
-  translateGroupMainHint: 'Traduce sinopsis y reseñas con Google Translate.',
+  translateGroupMainHint: 'Traduce sinopsis, reseñas y comentarios con Google Translate.',
   translateGroupTargets: 'Qué traducir',
   translateGroupTargetsHint: 'Elige qué bloques de la página muestran el botón Traducir.',
   showTranslate: 'Activar traducción',
-  showTranslateHint: 'Muestra botones Traducir en sinopsis y reseñas (Google Translate).',
+  showTranslateHint:
+    'Muestra botones Traducir en sinopsis, reseñas y comentarios (Google Translate).',
   translateTargetLocale: 'Idioma de destino',
   translateTargetLocaleHint:
     'Idioma al que traducir. «Igual que la interfaz» sigue Ajustes → General → Idioma de la interfaz.',
@@ -89,10 +90,12 @@ export default {
   translateDescription: 'Traducir sinopsis',
   translateDescriptionHint: 'Botón bajo la sinopsis en páginas de películas.',
   translateReviews: 'Traducir reseñas',
-  translateReviewsHint: 'Botón en cada tarjeta de reseña.',
+  translateReviewsHint: 'Botón en tarjetas de reseña y en páginas de reseña individuales.',
   translateReviewsAuto: 'Traducir reseñas automáticamente',
   translateReviewsAutoHint:
     'Cuando una reseña entra en vista, traducirla automáticamente. Desactivado por defecto.',
+  translateComments: 'Traducir comentarios',
+  translateCommentsHint: 'Botón bajo cada comentario en páginas de reseña.',
   translateButton: 'Traducir',
   translateShowOriginal: 'Mostrar original',
   translateHide: 'Ocultar traducción',

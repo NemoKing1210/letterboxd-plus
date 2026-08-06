@@ -73,11 +73,12 @@ export default {
   cacheClearGtx: 'Очистить переводы',
 
   translateGroupMain: 'Перевод',
-  translateGroupMainHint: 'Перевод синопсисов и обзоров через Google Translate.',
+  translateGroupMainHint: 'Перевод синопсисов, обзоров и комментариев через Google Translate.',
   translateGroupTargets: 'Что переводить',
   translateGroupTargetsHint: 'Выберите блоки страницы с кнопкой «Перевести».',
   showTranslate: 'Включить перевод',
-  showTranslateHint: 'Показывать кнопки «Перевести» у синопсиса фильма и обзоров (Google Translate).',
+  showTranslateHint:
+    'Показывать кнопки «Перевести» у синопсиса, обзоров и комментариев (Google Translate).',
   translateTargetLocale: 'Целевой язык',
   translateTargetLocaleHint:
     'Язык перевода. «Как интерфейс» следует настройке Общие → Язык интерфейса.',
@@ -89,10 +90,12 @@ export default {
   translateDescription: 'Переводить синопсис фильма',
   translateDescriptionHint: 'Кнопка под синопсисом на странице фильма.',
   translateReviews: 'Переводить обзоры',
-  translateReviewsHint: 'Кнопка на каждой карточке обзора.',
+  translateReviewsHint: 'Кнопка на карточках обзоров и на отдельных страницах обзоров.',
   translateReviewsAuto: 'Автоперевод обзоров',
   translateReviewsAutoHint:
     'Когда обзор появляется в зоне видимости, переводить его автоматически. По умолчанию выкл.',
+  translateComments: 'Переводить комментарии',
+  translateCommentsHint: 'Кнопка под каждым комментарием на странице обзора.',
   translateButton: 'Перевести',
   translateShowOriginal: 'Показать оригинал',
   translateHide: 'Скрыть перевод',

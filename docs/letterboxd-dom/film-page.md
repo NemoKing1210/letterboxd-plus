@@ -396,7 +396,8 @@ incomplete.
 | Collapsible | `.js-collapsible-text` | Truncation chrome | medium |
 | Actions | `.viewing-actions` / `.review-actions` | Like / etc. | high |
 
-**Used by:** content translation (`src/features/translate/`).
+**Used by:** content translation (`src/features/translate/`) — film-page cards;
+standalone review pages are in [review-page.md](./review-page.md).
 
 ---
 

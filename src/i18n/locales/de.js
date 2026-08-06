@@ -73,11 +73,13 @@ export default {
   cacheClearGtx: 'Übersetzungen leeren',
 
   translateGroupMain: 'Übersetzung',
-  translateGroupMainHint: 'Film-Synopsen und Reviews mit Google Translate übersetzen.',
+  translateGroupMainHint:
+    'Film-Synopsen, Reviews und Kommentare mit Google Translate übersetzen.',
   translateGroupTargets: 'Was übersetzt wird',
   translateGroupTargetsHint: 'Wähle, welche Seitenblöcke eine Übersetzen-Schaltfläche erhalten.',
   showTranslate: 'Übersetzung aktivieren',
-  showTranslateHint: 'Übersetzen-Schaltflächen bei Synopsen und Reviews anzeigen (Google Translate).',
+  showTranslateHint:
+    'Übersetzen-Schaltflächen bei Synopsen, Reviews und Kommentaren anzeigen (Google Translate).',
   translateTargetLocale: 'Zielsprache',
   translateTargetLocaleHint:
     'Sprache der Übersetzung. „Wie Oberfläche“ folgt Einstellungen → Allgemein → Oberflächensprache.',
@@ -89,10 +91,12 @@ export default {
   translateDescription: 'Filmsynopsis übersetzen',
   translateDescriptionHint: 'Schaltfläche unter der Synopsis auf Filmseiten.',
   translateReviews: 'Reviews übersetzen',
-  translateReviewsHint: 'Schaltfläche auf jeder Review-Karte.',
+  translateReviewsHint: 'Schaltfläche auf Review-Karten und einzelnen Review-Seiten.',
   translateReviewsAuto: 'Reviews automatisch übersetzen',
   translateReviewsAutoHint:
     'Wenn ein Review in den sichtbaren Bereich scrollt, automatisch übersetzen. Standardmäßig aus.',
+  translateComments: 'Kommentare übersetzen',
+  translateCommentsHint: 'Schaltfläche unter jedem Kommentar auf Review-Seiten.',
   translateButton: 'Übersetzen',
   translateShowOriginal: 'Original anzeigen',
   translateHide: 'Übersetzung ausblenden',

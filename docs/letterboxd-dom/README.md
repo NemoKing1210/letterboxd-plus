@@ -20,6 +20,7 @@ ratings sidebar, etc.) so agents and humans know **what can be read** and
 | Page | URL pattern | Doc | Status |
 |------|-------------|-----|--------|
 | Film | `/film/{slug}/` | [film-page.md](./film-page.md) | Documented |
+| Review / viewing | `/{username}/film/{slug}/` | [review-page.md](./review-page.md) | Documented |
 | Film poster card | lists / grids / similar | [poster-card.md](./poster-card.md) | Documented |
 | Film cast (tab / deep link) | `/film/{slug}/cast/` | Same tabs as film page | Covered in film-page |
 | Film crew | `/film/{slug}/crew/` | Same | Covered in film-page |
@@ -54,6 +55,7 @@ ratings sidebar, etc.) so agents and humans know **what can be read** and
 - `src/features/film-mini-profile/posters.js` — poster card identity + user hints
 - `src/features/ratings/` — film sidebar rating mounts
 - `src/features/cast/` — cast list enhancement
+- `src/features/translate/` — synopsis, review cards, review page body + comments
 
 ## Adding a new page
 

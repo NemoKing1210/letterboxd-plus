@@ -53,6 +53,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   translateDescription: true,
   translateReviews: true,
   translateReviewsAuto: false,
+  translateComments: true,
   cacheHours: 24,
   cacheFilmMiniProfile: true,
   cacheRottenTomatoes: true,

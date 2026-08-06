@@ -61,6 +61,7 @@ function normalizeSettings(value) {
     translateDescription: raw.translateDescription !== false,
     translateReviews: raw.translateReviews !== false,
     translateReviewsAuto: raw.translateReviewsAuto === true,
+    translateComments: raw.translateComments !== false,
     cacheHours: Number.isFinite(cacheHours)
       ? Math.max(0, Math.min(CACHE_HOURS_MAX, cacheHours))
       : DEFAULT_SETTINGS.cacheHours,

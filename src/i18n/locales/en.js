@@ -70,11 +70,12 @@ export default {
   cacheClearMc: 'Clear MC',
   cacheClearGtx: 'Clear translations',
   translateGroupMain: 'Translation',
-  translateGroupMainHint: 'Translate film synopses and reviews with Google Translate.',
+  translateGroupMainHint: 'Translate film synopses, reviews, and comments with Google Translate.',
   translateGroupTargets: 'What to translate',
   translateGroupTargetsHint: 'Choose which page blocks get a Translate button.',
   showTranslate: 'Enable translation',
-  showTranslateHint: 'Show Translate buttons on film synopses and reviews (Google Translate).',
+  showTranslateHint:
+    'Show Translate buttons on film synopses, reviews, and comments (Google Translate).',
   translateTargetLocale: 'Target language',
   translateTargetLocaleHint:
     'Language to translate into. “Same as interface” follows Settings → General → Interface language.',
@@ -86,10 +87,12 @@ export default {
   translateDescription: 'Translate film synopsis',
   translateDescriptionHint: 'Button under the synopsis on film pages.',
   translateReviews: 'Translate reviews',
-  translateReviewsHint: 'Button on each review card.',
+  translateReviewsHint: 'Button on review cards and on standalone review pages.',
   translateReviewsAuto: 'Auto-translate reviews',
   translateReviewsAutoHint:
     'When a review scrolls into view, translate it automatically. Off by default.',
+  translateComments: 'Translate comments',
+  translateCommentsHint: 'Button under each comment on review pages.',
   translateButton: 'Translate',
   translateShowOriginal: 'Show original',
   translateHide: 'Hide translation',

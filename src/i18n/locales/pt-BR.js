@@ -73,11 +73,12 @@ export default {
   cacheClearGtx: 'Limpar traduções',
 
   translateGroupMain: 'Tradução',
-  translateGroupMainHint: 'Traduzir sinopses e críticas com o Google Translate.',
+  translateGroupMainHint: 'Traduzir sinopses, críticas e comentários com o Google Translate.',
   translateGroupTargets: 'O que traduzir',
   translateGroupTargetsHint: 'Escolha quais blocos da página mostram o botão Traduzir.',
   showTranslate: 'Ativar tradução',
-  showTranslateHint: 'Mostrar botões Traduzir em sinopses e críticas (Google Translate).',
+  showTranslateHint:
+    'Mostrar botões Traduzir em sinopses, críticas e comentários (Google Translate).',
   translateTargetLocale: 'Idioma de destino',
   translateTargetLocaleHint:
     'Idioma para o qual traduzir. “Igual à interface” segue Configurações → Geral → Idioma da interface.',
@@ -89,10 +90,12 @@ export default {
   translateDescription: 'Traduzir sinopse do filme',
   translateDescriptionHint: 'Botão abaixo da sinopse nas páginas de filmes.',
   translateReviews: 'Traduzir críticas',
-  translateReviewsHint: 'Botão em cada cartão de crítica.',
+  translateReviewsHint: 'Botão em cartões de crítica e em páginas de crítica individuais.',
   translateReviewsAuto: 'Traduzir críticas automaticamente',
   translateReviewsAutoHint:
     'Quando uma crítica entra na tela, traduzi-la automaticamente. Desativado por padrão.',
+  translateComments: 'Traduzir comentários',
+  translateCommentsHint: 'Botão abaixo de cada comentário nas páginas de crítica.',
   translateButton: 'Traduzir',
   translateShowOriginal: 'Mostrar original',
   translateHide: 'Ocultar tradução',
