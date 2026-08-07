@@ -319,14 +319,27 @@ a.lbp-ump__section-title:focus-visible {
 
 .lbp-ump__footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: stretch;
+  gap: 8px;
   padding: 10px 12px;
   background: #242b33;
   border-top: 1px solid #456;
 }
 
 .lbp-ump__cta {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
   text-decoration: none;
+}
+
+.lbp-ump__cta:focus-visible {
+  outline: 2px solid rgba(64, 188, 244, 0.55);
+  outline-offset: 2px;
 }
 
 .lbp-ump__bone {
