@@ -7,6 +7,7 @@ const DEFAULT_SETTINGS_FALLBACK = {
   umpShowLocation: true,
   umpShowFavorites: true,
   umpShowRecent: true,
+  umpShowLevels: true,
   cacheHours: 24,
   cacheUserMiniProfile: true,
 };

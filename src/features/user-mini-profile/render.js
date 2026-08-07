@@ -1,5 +1,6 @@
 import { formatNumber, t } from '../../i18n/index.js';
 import { escapeAttr, escapeHtml } from '../../utils/html.js';
+import { levelNameKey, resolveLevel } from './levels.js';
 import { currentSettings } from './state.js';
 
 export function profileUrlForUsername(username) {
@@ -84,6 +85,76 @@ function renderHero(ctx) {
         <div class="lbp-ump__name-row">${titleHtml}${badgeHtml}</div>
         ${handleHtml}
       </div>
+    </div>
+  `;
+}
+
+function renderLevel(ctx) {
+  const settings = currentSettings();
+  if (settings.umpShowLevels === false) return '';
+
+  const films = ctx.profile?.stats?.films;
+  const level = resolveLevel(films);
+
+  if (!level && ctx.loadingProfile) {
+    return `
+      <div class="lbp-ump__section lbp-ump__level is-skeleton" aria-hidden="true">
+        <div class="lbp-ump__level-head">
+          ${skelBone('lbp-ump__bone--level-badge')}
+          ${skelBone('lbp-ump__bone--level-title')}
+        </div>
+        ${skelBone('lbp-ump__bone--level-bar')}
+        ${skelBone('lbp-ump__bone--level-meta')}
+      </div>
+    `;
+  }
+  if (!level) return '';
+
+  const name = t(levelNameKey(level.id));
+  const nextName = level.nextId ? t(levelNameKey(level.nextId)) : '';
+  const pct = Math.round(level.progress * 1000) / 10;
+  const isMax = level.nextMin == null;
+  const progressLabel = isMax
+    ? t('umpLevelMax')
+    : t('umpLevelProgress', {
+        current: formatNumber(level.films),
+        next: formatNumber(level.nextMin),
+      });
+  const footHtml = isMax
+    ? `<div class="lbp-ump__level-foot">
+        <span class="lbp-ump__level-counts">${escapeHtml(progressLabel)}</span>
+      </div>`
+    : `<div class="lbp-ump__level-foot">
+        <span class="lbp-ump__level-counts">${escapeHtml(progressLabel)}</span>
+        <span class="lbp-ump__level-meta">${escapeHtml(
+          t('umpLevelToNext', {
+            count: formatNumber(level.filmsToNext),
+            name: nextName,
+          }),
+        )}</span>
+      </div>`;
+
+  const ariaMax = isMax ? level.films : level.nextMin;
+
+  return `
+    <div class="lbp-ump__section lbp-ump__level" aria-label="${escapeAttr(t('umpLevelSection'))}">
+      <div class="lbp-ump__level-head">
+        <span class="lbp-ump__level-badge">${escapeHtml(
+          t('umpLevelLabel', { level: formatNumber(level.level) }),
+        )}</span>
+        <span class="lbp-ump__level-name">${escapeHtml(name)}</span>
+      </div>
+      <div
+        class="lbp-ump__level-bar"
+        role="progressbar"
+        aria-valuemin="${level.min}"
+        aria-valuemax="${ariaMax}"
+        aria-valuenow="${level.films}"
+        aria-label="${escapeAttr(progressLabel)}"
+      >
+        <span class="lbp-ump__level-bar-fill" style="width: ${pct}%"></span>
+      </div>
+      ${footHtml}
     </div>
   `;
 }
@@ -311,12 +382,20 @@ function renderFooter(ctx) {
 
 const BODY_SECTIONS = [
   { id: 'hero', render: (ctx) => renderHero(ctx) },
+  { id: 'level', render: (ctx) => renderLevel(ctx) },
   { id: 'location', render: (ctx) => renderLocation(ctx) },
   { id: 'bio', render: (ctx) => renderBio(ctx) },
   { id: 'stats', render: (ctx) => renderStats(ctx) },
   { id: 'favorites', render: (ctx) => renderFavorites(ctx) },
   { id: 'recent', render: (ctx) => renderRecent(ctx) },
 ];
+
+function cardTierClass(ctx) {
+  const settings = currentSettings();
+  if (settings.umpShowLevels === false) return '';
+  const level = resolveLevel(ctx.profile?.stats?.films);
+  return level ? ` lbp-ump__card--tier-${level.tier}` : '';
+}
 
 export function renderCard(ctx) {
   const parts = [];
@@ -327,7 +406,7 @@ export function renderCard(ctx) {
   const loadingClass =
     ctx.loadingProfile && !ctx.profile ? ' is-skeleton-loading' : '';
   return `
-    <div class="lbp-ump__card${loadingClass}">
+    <div class="lbp-ump__card${loadingClass}${cardTierClass(ctx)}">
       <div class="lbp-ump__body">${parts.join('')}</div>
       ${renderFooter(ctx)}
     </div>

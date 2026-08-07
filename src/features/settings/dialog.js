@@ -81,6 +81,7 @@ const UMP_DEPENDENT_KEYS = Object.freeze([
   'umpShowLocation',
   'umpShowFavorites',
   'umpShowRecent',
+  'umpShowLevels',
 ]);
 
 function translateTabBadge(draft) {
@@ -427,6 +428,12 @@ export function openSettings() {
                   draft.umpShowStats,
                   t('umpShowStats'),
                   t('umpShowStatsHint'),
+                ),
+                switchHtml(
+                  'umpShowLevels',
+                  draft.umpShowLevels,
+                  t('umpShowLevels'),
+                  t('umpShowLevelsHint'),
                 ),
                 switchHtml(
                   'umpShowLocation',
