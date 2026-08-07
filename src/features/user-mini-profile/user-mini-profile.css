@@ -205,50 +205,72 @@ a.lbp-ump__section-title:focus-visible {
 }
 
 .lbp-ump__stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
-  gap: 4px 6px;
-  padding-top: 10px;
-  border-top: 1px solid #456;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  border: 1px solid #3d4854;
+  border-radius: 3px;
+  background: #242b33;
 }
 
 .lbp-ump__stat {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: flex-start;
+  gap: 4px;
   min-width: 0;
+  padding: 10px 4px 9px;
   text-align: center;
   text-decoration: none;
   color: inherit;
+  transition: background-color 0.15s ease;
 }
 
-.lbp-ump__stat:hover .lbp-ump__stat-value,
-.lbp-ump__stat:focus-visible .lbp-ump__stat-value {
-  color: var(--lbp-blue, #40bcf4);
+.lbp-ump__stat + .lbp-ump__stat {
+  border-left: 1px solid #456;
+}
+
+a.lbp-ump__stat:hover,
+a.lbp-ump__stat:focus-visible {
+  background: #303840;
   outline: none;
+}
+
+a.lbp-ump__stat:hover .lbp-ump__stat-value,
+a.lbp-ump__stat:focus-visible .lbp-ump__stat-value {
+  color: var(--lbp-blue, #40bcf4);
+}
+
+a.lbp-ump__stat:focus-visible {
+  outline: 2px solid rgba(64, 188, 244, 0.55);
+  outline-offset: -2px;
+  z-index: 1;
 }
 
 .lbp-ump__stat-value {
   color: #fff;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .lbp-ump__stat-label {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  max-width: 100%;
   color: #789;
   font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  line-height: 1.15;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 .lbp-ump__poster-row {
@@ -389,9 +411,16 @@ a.lbp-ump__section-title:focus-visible {
   height: 10px;
 }
 
-.lbp-ump__bone--stat {
-  width: 100%;
-  height: 28px;
+.lbp-ump__stats .lbp-ump__bone--stat {
+  flex: 1 1 0;
+  width: auto;
+  height: 46px;
+  margin: 0;
+  border-radius: 0;
+}
+
+.lbp-ump__stats .lbp-ump__bone--stat + .lbp-ump__bone--stat {
+  border-left: 1px solid #456;
 }
 
 .lbp-ump__bone--section {
@@ -424,6 +453,10 @@ a.lbp-ump__section-title:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .lbp-ump,
   .lbp-ump.is-leaving {
+    transition: none;
+  }
+
+  .lbp-ump__stat {
     transition: none;
   }
 
