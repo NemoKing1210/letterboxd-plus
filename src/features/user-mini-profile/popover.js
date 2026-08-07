@@ -98,8 +98,8 @@ export function positionPopover(anchor) {
   const el = ensurePopover();
   const rect = anchor.getBoundingClientRect();
   const pad = 10;
-  const cardW = el.offsetWidth || 300;
-  const cardH = el.offsetHeight || 280;
+  const cardW = el.offsetWidth || 340;
+  const cardH = el.offsetHeight || 420;
   let left = rect.right + pad;
   let top = rect.top + rect.height / 2 - cardH / 2;
 

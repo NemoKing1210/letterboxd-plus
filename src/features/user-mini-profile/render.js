@@ -28,6 +28,18 @@ function formatCompactCount(value) {
   return formatNumber(n);
 }
 
+function formatStars(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n <= 0) return '';
+  const rounded = Math.round(n * 10) / 10;
+  const label =
+    Number.isInteger(rounded) ||
+    Math.abs(rounded * 2 - Math.round(rounded * 2)) < 1e-9
+      ? String(rounded)
+      : rounded.toFixed(1);
+  return `${label}★`;
+}
+
 function renderHero(ctx) {
   const profile = ctx.profile;
   const loading = Boolean(ctx.loadingProfile && !profile);
@@ -127,6 +139,7 @@ function renderStats(ctx) {
         ${skelBone('lbp-ump__bone--stat')}
         ${skelBone('lbp-ump__bone--stat')}
         ${skelBone('lbp-ump__bone--stat')}
+        ${skelBone('lbp-ump__bone--stat')}
       </div>
     `;
   }
@@ -183,6 +196,109 @@ function renderStats(ctx) {
   return `<div class="lbp-ump__section lbp-ump__stats" aria-label="${escapeAttr(t('miniUserStats'))}">${bits.join('')}</div>`;
 }
 
+function renderPosterThumb(film, { showRating = false } = {}) {
+  const href = film.filmUrl || `/film/${encodeURIComponent(film.slug)}/`;
+  const title = film.title || film.slug;
+  const img = film.posterUrl
+    ? `<img src="${escapeAttr(film.posterUrl)}" alt="" loading="lazy" decoding="async">`
+    : `<span class="lbp-ump__poster-ph" aria-hidden="true"></span>`;
+  const ratingHtml =
+    showRating && film.rating != null
+      ? `<span class="lbp-ump__poster-rating">${escapeHtml(formatStars(film.rating))}</span>`
+      : showRating
+        ? `<span class="lbp-ump__poster-rating lbp-ump__poster-rating--empty" aria-hidden="true"></span>`
+        : '';
+  return `
+    <a class="lbp-ump__poster" href="${escapeAttr(href)}" title="${escapeAttr(title)}">
+      <span class="lbp-ump__poster-frame">${img}</span>
+      ${ratingHtml}
+    </a>
+  `;
+}
+
+function renderPosterSkeleton(withRating = false) {
+  const rating = withRating
+    ? `<span class="lbp-ump__poster-rating" aria-hidden="true">${skelBone('lbp-ump__bone--rating')}</span>`
+    : '';
+  return `
+    <span class="lbp-ump__poster is-skeleton" aria-hidden="true">
+      <span class="lbp-ump__poster-frame">${skelBone('lbp-ump__bone--poster')}</span>
+      ${rating}
+    </span>
+  `;
+}
+
+function renderPosterSection({
+  title,
+  films,
+  loading,
+  showRating = false,
+  sectionHref = '',
+}) {
+  if (loading) {
+    const bones = Array.from({ length: 4 }, () =>
+      renderPosterSkeleton(showRating),
+    ).join('');
+    return `
+      <section class="lbp-ump__section lbp-ump__films" aria-hidden="true">
+        <h3 class="lbp-ump__section-title">${skelBone('lbp-ump__bone--section')}</h3>
+        <div class="lbp-ump__poster-row">${bones}</div>
+      </section>
+    `;
+  }
+  if (!films?.length) return '';
+
+  const heading = sectionHref
+    ? `<a class="lbp-ump__section-title" href="${escapeAttr(sectionHref)}">${escapeHtml(title)}</a>`
+    : `<h3 class="lbp-ump__section-title">${escapeHtml(title)}</h3>`;
+
+  return `
+    <section class="lbp-ump__section lbp-ump__films" aria-label="${escapeAttr(title)}">
+      ${heading}
+      <div class="lbp-ump__poster-row">
+        ${films.map((film) => renderPosterThumb(film, { showRating })).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function renderFavorites(ctx) {
+  const settings = currentSettings();
+  if (settings.umpShowFavorites === false) return '';
+
+  const profile = ctx.profile;
+  const loading = Boolean(ctx.loadingProfile && !profile);
+  const films = profile?.favorites || [];
+  const profileUrl =
+    profile?.profileUrl || profileUrlForUsername(ctx.username);
+
+  return renderPosterSection({
+    title: t('miniUserFavorites'),
+    films,
+    loading,
+    sectionHref: profileUrl,
+  });
+}
+
+function renderRecent(ctx) {
+  const settings = currentSettings();
+  if (settings.umpShowRecent === false) return '';
+
+  const profile = ctx.profile;
+  const loading = Boolean(ctx.loadingProfile && !profile);
+  const films = profile?.recent || [];
+  const username = profile?.username || ctx.username;
+  const filmsUrl = `/${encodeURIComponent(username)}/films/`;
+
+  return renderPosterSection({
+    title: t('miniUserRecent'),
+    films,
+    loading,
+    showRating: true,
+    sectionHref: filmsUrl,
+  });
+}
+
 function renderFooter(ctx) {
   const profileUrl =
     ctx.profile?.profileUrl || profileUrlForUsername(ctx.username);
@@ -198,6 +314,8 @@ const BODY_SECTIONS = [
   { id: 'location', render: (ctx) => renderLocation(ctx) },
   { id: 'bio', render: (ctx) => renderBio(ctx) },
   { id: 'stats', render: (ctx) => renderStats(ctx) },
+  { id: 'favorites', render: (ctx) => renderFavorites(ctx) },
+  { id: 'recent', render: (ctx) => renderRecent(ctx) },
 ];
 
 export function renderCard(ctx) {

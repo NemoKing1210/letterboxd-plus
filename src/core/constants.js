@@ -57,6 +57,8 @@ export const DEFAULT_SETTINGS = Object.freeze({
   umpShowBio: true,
   umpShowStats: true,
   umpShowLocation: true,
+  umpShowFavorites: true,
+  umpShowRecent: true,
   showTranslate: true,
   translateTargetLocale: 'auto',
   translateDisplayMode: 'replace',

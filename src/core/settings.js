@@ -61,6 +61,8 @@ function normalizeSettings(value) {
     umpShowBio: raw.umpShowBio !== false,
     umpShowStats: raw.umpShowStats !== false,
     umpShowLocation: raw.umpShowLocation !== false,
+    umpShowFavorites: raw.umpShowFavorites !== false,
+    umpShowRecent: raw.umpShowRecent !== false,
     showTranslate: raw.showTranslate !== false,
     translateTargetLocale,
     translateDisplayMode,

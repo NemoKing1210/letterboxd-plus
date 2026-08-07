@@ -5,6 +5,8 @@ const DEFAULT_SETTINGS_FALLBACK = {
   umpShowBio: true,
   umpShowStats: true,
   umpShowLocation: true,
+  umpShowFavorites: true,
+  umpShowRecent: true,
   cacheHours: 24,
   cacheUserMiniProfile: true,
 };
