@@ -1,6 +1,7 @@
 /**
  * First path segments that are never Letterboxd member profile homes.
- * Shared by person-credit URL validation and user mini-profile targets.
+ * Includes person-credit roots (`actor`, `writer`, `crew`, …) so those
+ * paths are not mistaken for `/{username}/` profiles.
  */
 export const RESERVED_ROOT_SEGMENTS = Object.freeze(
   new Set([
