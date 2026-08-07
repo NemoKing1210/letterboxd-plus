@@ -256,6 +256,280 @@
   color: var(--lbp-blue, #40bcf4);
 }
 
+/* Tier theming — accent via --lbp-fmp-tier*; card wash + cover ring */
+.lbp-fmp__card[class*='lbp-fmp__card--tier-'] {
+  background:
+    radial-gradient(
+      ellipse 130% 90% at 12% -10%,
+      var(--lbp-fmp-tier-glow, transparent),
+      transparent 58%
+    ),
+    linear-gradient(
+      160deg,
+      var(--lbp-fmp-tier-wash, #323a46) 0%,
+      #2c3440 48%,
+      var(--lbp-fmp-tier-deep, #242b33) 100%
+    );
+}
+
+.lbp-fmp__card[class*='lbp-fmp__card--tier-'] .lbp-fmp__cover {
+  border-width: 2px;
+  border-color: var(--lbp-fmp-tier, #5a6a7a);
+  box-shadow:
+    0 0 0 3px var(--lbp-fmp-tier-ring, transparent),
+    0 0 18px var(--lbp-fmp-tier-glow, transparent);
+}
+
+.lbp-fmp__card[class*='lbp-fmp__card--tier-'] .lbp-fmp__footer {
+  border-top-color: var(--lbp-fmp-tier-line, #456);
+  background: linear-gradient(
+    180deg,
+    var(--lbp-fmp-tier-footer, #242b33) 0%,
+    #1d2329 100%
+  );
+}
+
+.lbp-fmp__card[class*='lbp-fmp__card--tier-'] .lbp-fmp__stats {
+  border-color: var(--lbp-fmp-tier-line, #3d4854);
+  background: rgba(29, 35, 41, 0.72);
+}
+
+.lbp-fmp__card--tier-poor {
+  --lbp-fmp-tier: #678;
+  --lbp-fmp-tier-text: #c8d4dc;
+  --lbp-fmp-tier-wash: #303846;
+  --lbp-fmp-tier-deep: #262c34;
+  --lbp-fmp-tier-glow: rgba(120, 140, 160, 0.12);
+  --lbp-fmp-tier-ring: rgba(120, 140, 160, 0.12);
+  --lbp-fmp-tier-line: #3d4854;
+  --lbp-fmp-tier-panel: rgba(48, 56, 68, 0.85);
+  --lbp-fmp-tier-footer: #242b33;
+  --lbp-fmp-tier-bar-from: #556676;
+  border-color: #445566;
+}
+
+.lbp-fmp__card--tier-weak {
+  --lbp-fmp-tier: #7a92a8;
+  --lbp-fmp-tier-text: #d0dce6;
+  --lbp-fmp-tier-wash: #34404c;
+  --lbp-fmp-tier-deep: #252d36;
+  --lbp-fmp-tier-glow: rgba(122, 146, 168, 0.28);
+  --lbp-fmp-tier-ring: rgba(122, 146, 168, 0.2);
+  --lbp-fmp-tier-line: rgba(122, 146, 168, 0.4);
+  --lbp-fmp-tier-panel: rgba(52, 68, 84, 0.9);
+  --lbp-fmp-tier-footer: #2a343e;
+  --lbp-fmp-tier-bar-from: #5a7088;
+  border-color: #5a7088;
+}
+
+.lbp-fmp__card--tier-fair {
+  --lbp-fmp-tier: #6f9aba;
+  --lbp-fmp-tier-text: #d4e4f0;
+  --lbp-fmp-tier-wash: #2e4458;
+  --lbp-fmp-tier-deep: #243038;
+  --lbp-fmp-tier-glow: rgba(111, 154, 186, 0.32);
+  --lbp-fmp-tier-ring: rgba(111, 154, 186, 0.22);
+  --lbp-fmp-tier-line: rgba(111, 154, 186, 0.42);
+  --lbp-fmp-tier-panel: rgba(46, 72, 92, 0.92);
+  --lbp-fmp-tier-footer: #283848;
+  --lbp-fmp-tier-bar-from: #4a7898;
+  border-color: #4f7a98;
+}
+
+.lbp-fmp__card--tier-mixed {
+  --lbp-fmp-tier: #5eb0d4;
+  --lbp-fmp-tier-text: #dff0f8;
+  --lbp-fmp-tier-wash: #2a4e62;
+  --lbp-fmp-tier-deep: #223440;
+  --lbp-fmp-tier-glow: rgba(94, 176, 212, 0.36);
+  --lbp-fmp-tier-ring: rgba(94, 176, 212, 0.25);
+  --lbp-fmp-tier-line: rgba(94, 176, 212, 0.45);
+  --lbp-fmp-tier-panel: rgba(40, 82, 102, 0.94);
+  --lbp-fmp-tier-footer: #264454;
+  --lbp-fmp-tier-bar-from: #3a88a8;
+  border-color: #4a8eae;
+}
+
+.lbp-fmp__card--tier-solid {
+  --lbp-fmp-tier: #40bcf4;
+  --lbp-fmp-tier-text: #d8f4ff;
+  --lbp-fmp-tier-wash: #1e4860;
+  --lbp-fmp-tier-deep: #1e3444;
+  --lbp-fmp-tier-glow: rgba(64, 188, 244, 0.4);
+  --lbp-fmp-tier-ring: rgba(64, 188, 244, 0.28);
+  --lbp-fmp-tier-line: rgba(64, 188, 244, 0.48);
+  --lbp-fmp-tier-panel: rgba(32, 80, 108, 0.95);
+  --lbp-fmp-tier-footer: #1e4054;
+  --lbp-fmp-tier-bar-from: #2a88b8;
+  border-color: #40a8d4;
+}
+
+.lbp-fmp__card--tier-bronze {
+  --lbp-fmp-tier: #c8944a;
+  --lbp-fmp-tier-text: #f0d4a8;
+  --lbp-fmp-tier-wash: #4a3828;
+  --lbp-fmp-tier-deep: #2e2820;
+  --lbp-fmp-tier-glow: rgba(200, 148, 74, 0.42);
+  --lbp-fmp-tier-ring: rgba(200, 148, 74, 0.28);
+  --lbp-fmp-tier-line: rgba(200, 148, 74, 0.5);
+  --lbp-fmp-tier-panel: rgba(78, 56, 32, 0.95);
+  --lbp-fmp-tier-footer: #3a2e22;
+  --lbp-fmp-tier-bar-from: #8a6230;
+  border-color: #a07840;
+}
+
+.lbp-fmp__card--tier-silver {
+  --lbp-fmp-tier: #c0d0dc;
+  --lbp-fmp-tier-text: #eef4f8;
+  --lbp-fmp-tier-wash: #3e4a56;
+  --lbp-fmp-tier-deep: #2a3038;
+  --lbp-fmp-tier-glow: rgba(192, 208, 220, 0.4);
+  --lbp-fmp-tier-ring: rgba(192, 208, 220, 0.28);
+  --lbp-fmp-tier-line: rgba(192, 208, 220, 0.48);
+  --lbp-fmp-tier-panel: rgba(64, 78, 90, 0.95);
+  --lbp-fmp-tier-footer: #343e48;
+  --lbp-fmp-tier-bar-from: #8898a8;
+  border-color: #8a9eae;
+}
+
+.lbp-fmp__card--tier-gold {
+  --lbp-fmp-tier: #e0b84a;
+  --lbp-fmp-tier-text: #ffe9a0;
+  --lbp-fmp-tier-wash: #4e4020;
+  --lbp-fmp-tier-deep: #322c1c;
+  --lbp-fmp-tier-glow: rgba(224, 184, 74, 0.48);
+  --lbp-fmp-tier-ring: rgba(224, 184, 74, 0.32);
+  --lbp-fmp-tier-line: rgba(224, 184, 74, 0.55);
+  --lbp-fmp-tier-panel: rgba(86, 68, 24, 0.96);
+  --lbp-fmp-tier-footer: #3e3418;
+  --lbp-fmp-tier-bar-from: #a88828;
+  border-color: #c4a03a;
+}
+
+.lbp-fmp__card--tier-platinum {
+  --lbp-fmp-tier: #d0e4f0;
+  --lbp-fmp-tier-text: #f4fafc;
+  --lbp-fmp-tier-wash: #3a4e5e;
+  --lbp-fmp-tier-deep: #283440;
+  --lbp-fmp-tier-glow: rgba(176, 208, 228, 0.48);
+  --lbp-fmp-tier-ring: rgba(176, 208, 228, 0.32);
+  --lbp-fmp-tier-line: rgba(176, 208, 228, 0.52);
+  --lbp-fmp-tier-panel: rgba(56, 80, 98, 0.96);
+  --lbp-fmp-tier-footer: #304454;
+  --lbp-fmp-tier-bar-from: #88a8bc;
+  border-color: #9ab8cc;
+}
+
+.lbp-fmp__card--tier-sapphire {
+  --lbp-fmp-tier: #4a9ae0;
+  --lbp-fmp-tier-text: #b8dcff;
+  --lbp-fmp-tier-wash: #1e3e68;
+  --lbp-fmp-tier-deep: #1a2c44;
+  --lbp-fmp-tier-glow: rgba(74, 154, 224, 0.5);
+  --lbp-fmp-tier-ring: rgba(74, 154, 224, 0.34);
+  --lbp-fmp-tier-line: rgba(74, 154, 224, 0.55);
+  --lbp-fmp-tier-panel: rgba(28, 68, 112, 0.96);
+  --lbp-fmp-tier-footer: #1e3a58;
+  --lbp-fmp-tier-bar-from: #2868b0;
+  border-color: #3a7ec4;
+}
+
+.lbp-fmp__card--tier-ruby {
+  --lbp-fmp-tier: #e05a70;
+  --lbp-fmp-tier-text: #ffc0cc;
+  --lbp-fmp-tier-wash: #582030;
+  --lbp-fmp-tier-deep: #341820;
+  --lbp-fmp-tier-glow: rgba(224, 90, 112, 0.48);
+  --lbp-fmp-tier-ring: rgba(224, 90, 112, 0.34);
+  --lbp-fmp-tier-line: rgba(224, 90, 112, 0.55);
+  --lbp-fmp-tier-panel: rgba(96, 32, 48, 0.96);
+  --lbp-fmp-tier-footer: #441c28;
+  --lbp-fmp-tier-bar-from: #a03048;
+  border-color: #b84458;
+}
+
+.lbp-fmp__card--tier-emerald {
+  --lbp-fmp-tier: #3cbc6e;
+  --lbp-fmp-tier-text: #b8f0cc;
+  --lbp-fmp-tier-wash: #1e4834;
+  --lbp-fmp-tier-deep: #1a3028;
+  --lbp-fmp-tier-glow: rgba(60, 188, 110, 0.48);
+  --lbp-fmp-tier-ring: rgba(60, 188, 110, 0.34);
+  --lbp-fmp-tier-line: rgba(60, 188, 110, 0.55);
+  --lbp-fmp-tier-panel: rgba(28, 84, 56, 0.96);
+  --lbp-fmp-tier-footer: #1e3e2c;
+  --lbp-fmp-tier-bar-from: #24884c;
+  border-color: #2e9a58;
+}
+
+.lbp-fmp__card--tier-diamond {
+  --lbp-fmp-tier: #7ad4f0;
+  --lbp-fmp-tier-text: #d8f6ff;
+  --lbp-fmp-tier-wash: #1e4e62;
+  --lbp-fmp-tier-deep: #1a3444;
+  --lbp-fmp-tier-glow: rgba(122, 212, 240, 0.55);
+  --lbp-fmp-tier-ring: rgba(122, 212, 240, 0.38);
+  --lbp-fmp-tier-line: rgba(122, 212, 240, 0.58);
+  --lbp-fmp-tier-panel: rgba(32, 88, 112, 0.97);
+  --lbp-fmp-tier-footer: #1e4458;
+  --lbp-fmp-tier-bar-from: #3a98b8;
+  border-color: #5ab8d4;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 28px rgba(122, 212, 240, 0.18);
+}
+
+.lbp-fmp__card--tier-master {
+  --lbp-fmp-tier: #3ec8b4;
+  --lbp-fmp-tier-text: #b8f4ea;
+  --lbp-fmp-tier-wash: #1a4a44;
+  --lbp-fmp-tier-deep: #1a3230;
+  --lbp-fmp-tier-glow: rgba(62, 200, 180, 0.52);
+  --lbp-fmp-tier-ring: rgba(62, 200, 180, 0.38);
+  --lbp-fmp-tier-line: rgba(62, 200, 180, 0.58);
+  --lbp-fmp-tier-panel: rgba(24, 88, 80, 0.97);
+  --lbp-fmp-tier-footer: #1a403c;
+  --lbp-fmp-tier-bar-from: #249888;
+  border-color: #2eaea0;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 28px rgba(62, 200, 180, 0.18);
+}
+
+.lbp-fmp__card--tier-legend {
+  --lbp-fmp-tier: #ff8a3a;
+  --lbp-fmp-tier-text: #ffd0a8;
+  --lbp-fmp-tier-wash: #5a3018;
+  --lbp-fmp-tier-deep: #362018;
+  --lbp-fmp-tier-glow: rgba(255, 138, 58, 0.55);
+  --lbp-fmp-tier-ring: rgba(255, 138, 58, 0.4);
+  --lbp-fmp-tier-line: rgba(255, 138, 58, 0.6);
+  --lbp-fmp-tier-panel: rgba(104, 52, 20, 0.97);
+  --lbp-fmp-tier-footer: #442414;
+  --lbp-fmp-tier-bar-from: #c85a20;
+  border-color: #e07830;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 32px rgba(255, 138, 58, 0.22);
+}
+
+.lbp-fmp__card--tier-hallOfFame {
+  --lbp-fmp-tier: #f0d060;
+  --lbp-fmp-tier-text: #fff2b8;
+  --lbp-fmp-tier-wash: #5a4820;
+  --lbp-fmp-tier-deep: #382e18;
+  --lbp-fmp-tier-glow: rgba(240, 208, 96, 0.58);
+  --lbp-fmp-tier-ring: rgba(240, 208, 96, 0.42);
+  --lbp-fmp-tier-line: rgba(240, 208, 96, 0.62);
+  --lbp-fmp-tier-panel: rgba(104, 82, 24, 0.98);
+  --lbp-fmp-tier-footer: #463818;
+  --lbp-fmp-tier-bar-from: #c4a028;
+  border-color: #e8c84a;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 36px rgba(240, 208, 96, 0.28);
+}
+
 .lbp-fmp__section {
   margin-top: 12px;
 }

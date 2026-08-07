@@ -54,6 +54,7 @@ function normalizeSettings(value) {
     fmpShowRuntime: raw.fmpShowRuntime !== false,
     fmpShowDescription: raw.fmpShowDescription !== false,
     fmpShowStats: raw.fmpShowStats !== false,
+    fmpShowLevels: raw.fmpShowLevels !== false,
     fmpShowExternalScores: raw.fmpShowExternalScores !== false,
     fmpShowQuickLinks: raw.fmpShowQuickLinks !== false,
     showUserMiniProfile: raw.showUserMiniProfile !== false,

@@ -4,6 +4,7 @@ import {
 } from '../../core/constants.js';
 import { formatNumber, t } from '../../i18n/index.js';
 import { escapeAttr, escapeHtml } from '../../utils/html.js';
+import { resolveFilmLevel } from './levels.js';
 import { currentSettings } from './state.js';
 
 export function filmUrlForSlug(slug) {
@@ -531,6 +532,13 @@ const BODY_SECTIONS = [
   { id: 'quickLinks', render: (ctx) => renderQuickLinks(ctx) },
 ];
 
+function cardTierClass(ctx) {
+  const settings = currentSettings();
+  if (settings.fmpShowLevels === false) return '';
+  const level = resolveFilmLevel(ctx.profile?.rating);
+  return level ? ` lbp-fmp__card--tier-${level.tier}` : '';
+}
+
 export function renderCard(ctx) {
   const parts = [];
   for (const section of BODY_SECTIONS) {
@@ -540,7 +548,7 @@ export function renderCard(ctx) {
   const loadingClass =
     ctx.loadingProfile && !ctx.profile ? ' is-skeleton-loading' : '';
   return `
-    <div class="lbp-fmp__card${loadingClass}">
+    <div class="lbp-fmp__card${loadingClass}${cardTierClass(ctx)}">
       <div class="lbp-fmp__body">${parts.join('')}</div>
       ${renderFooter(ctx)}
     </div>

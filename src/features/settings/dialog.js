@@ -70,6 +70,7 @@ const FMP_DEPENDENT_KEYS = Object.freeze([
   'fmpShowRuntime',
   'fmpShowDescription',
   'fmpShowStats',
+  'fmpShowLevels',
   'fmpShowExternalScores',
   'fmpShowQuickLinks',
 ]);
@@ -365,6 +366,12 @@ export function openSettings() {
                     draft.fmpShowStats,
                     t('fmpShowStats'),
                     t('fmpShowStatsHint'),
+                  ),
+                  switchHtml(
+                    'fmpShowLevels',
+                    draft.fmpShowLevels,
+                    t('fmpShowLevels'),
+                    t('fmpShowLevelsHint'),
                   ),
                 ),
               ),
