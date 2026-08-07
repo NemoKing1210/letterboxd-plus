@@ -210,7 +210,7 @@ a[data-lbp-ump-hover='1'] {
 
 .lbp-ump__level-bar {
   position: relative;
-  height: 6px;
+  height: 8px;
   overflow: hidden;
   border-radius: 2px;
   background: #1d2329;
@@ -254,286 +254,297 @@ a[data-lbp-ump-hover='1'] {
   white-space: nowrap;
 }
 
+/* Tier theming — accent via --lbp-ump-tier*; card wash + avatar ring + level panel */
+.lbp-ump__card[class*='lbp-ump__card--tier-'] {
+  background:
+    radial-gradient(
+      ellipse 130% 90% at 12% -10%,
+      var(--lbp-ump-tier-glow, transparent),
+      transparent 58%
+    ),
+    linear-gradient(
+      160deg,
+      var(--lbp-ump-tier-wash, #323a46) 0%,
+      #2c3440 48%,
+      var(--lbp-ump-tier-deep, #242b33) 100%
+    );
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__avatar {
+  border-width: 2px;
+  border-color: var(--lbp-ump-tier, #5a6a7a);
+  box-shadow:
+    0 0 0 3px var(--lbp-ump-tier-ring, transparent),
+    0 0 18px var(--lbp-ump-tier-glow, transparent);
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__level {
+  border-color: var(--lbp-ump-tier-line, #3d4854);
+  background:
+    linear-gradient(
+      135deg,
+      var(--lbp-ump-tier-panel, rgba(36, 43, 51, 0.95)) 0%,
+      rgba(29, 35, 41, 0.92) 100%
+    );
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__level-badge {
+  border-color: var(--lbp-ump-tier-line, #3d4854);
+  background: rgba(16, 20, 24, 0.55);
+  color: var(--lbp-ump-tier-text, #c8d4dc);
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__level-name {
+  color: var(--lbp-ump-tier-text, #fff);
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__level-bar {
+  border-color: var(--lbp-ump-tier-line, #3d4854);
+  background: rgba(16, 20, 24, 0.65);
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__level-bar-fill {
+  background: linear-gradient(
+    90deg,
+    var(--lbp-ump-tier-bar-from, #678),
+    var(--lbp-ump-tier, #9ab)
+  );
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__footer {
+  border-top-color: var(--lbp-ump-tier-line, #456);
+  background: linear-gradient(
+    180deg,
+    var(--lbp-ump-tier-footer, #242b33) 0%,
+    #1d2329 100%
+  );
+}
+
+.lbp-ump__card[class*='lbp-ump__card--tier-'] .lbp-ump__stats {
+  border-color: var(--lbp-ump-tier-line, #3d4854);
+  background: rgba(29, 35, 41, 0.72);
+}
+
+.lbp-ump__card--tier-newcomer {
+  --lbp-ump-tier: #678;
+  --lbp-ump-tier-text: #c8d4dc;
+  --lbp-ump-tier-wash: #303846;
+  --lbp-ump-tier-deep: #262c34;
+  --lbp-ump-tier-glow: rgba(120, 140, 160, 0.12);
+  --lbp-ump-tier-ring: rgba(120, 140, 160, 0.12);
+  --lbp-ump-tier-line: #3d4854;
+  --lbp-ump-tier-panel: rgba(48, 56, 68, 0.85);
+  --lbp-ump-tier-footer: #242b33;
+  --lbp-ump-tier-bar-from: #556676;
+  border-color: #445566;
+}
+
 .lbp-ump__card--tier-explorer {
-  border-color: #4a5a6a;
-}
-
-.lbp-ump__card--tier-explorer .lbp-ump__avatar {
-  border-color: #5a6a7a;
-}
-
-.lbp-ump__card--tier-explorer .lbp-ump__level-badge {
-  border-color: #4a5a6a;
-  color: #b8c4ce;
-}
-
-.lbp-ump__card--tier-explorer .lbp-ump__level-bar-fill {
-  background: #6a7a8a;
+  --lbp-ump-tier: #7a92a8;
+  --lbp-ump-tier-text: #d0dce6;
+  --lbp-ump-tier-wash: #34404c;
+  --lbp-ump-tier-deep: #252d36;
+  --lbp-ump-tier-glow: rgba(122, 146, 168, 0.28);
+  --lbp-ump-tier-ring: rgba(122, 146, 168, 0.2);
+  --lbp-ump-tier-line: rgba(122, 146, 168, 0.4);
+  --lbp-ump-tier-panel: rgba(52, 68, 84, 0.9);
+  --lbp-ump-tier-footer: #2a343e;
+  --lbp-ump-tier-bar-from: #5a7088;
+  border-color: #5a7088;
 }
 
 .lbp-ump__card--tier-regular {
-  border-color: #4f6578;
-}
-
-.lbp-ump__card--tier-regular .lbp-ump__avatar {
-  border-color: #5c7588;
-}
-
-.lbp-ump__card--tier-regular .lbp-ump__level-badge {
-  border-color: #4f6578;
-  color: #c0d0dc;
-}
-
-.lbp-ump__card--tier-regular .lbp-ump__level-bar-fill {
-  background: #6f889c;
+  --lbp-ump-tier: #6f9aba;
+  --lbp-ump-tier-text: #d4e4f0;
+  --lbp-ump-tier-wash: #2e4458;
+  --lbp-ump-tier-deep: #243038;
+  --lbp-ump-tier-glow: rgba(111, 154, 186, 0.32);
+  --lbp-ump-tier-ring: rgba(111, 154, 186, 0.22);
+  --lbp-ump-tier-line: rgba(111, 154, 186, 0.42);
+  --lbp-ump-tier-panel: rgba(46, 72, 92, 0.92);
+  --lbp-ump-tier-footer: #283848;
+  --lbp-ump-tier-bar-from: #4a7898;
+  border-color: #4f7a98;
 }
 
 .lbp-ump__card--tier-enthusiast {
-  border-color: #5a7080;
-}
-
-.lbp-ump__card--tier-enthusiast .lbp-ump__avatar {
-  border-color: #6a8494;
-}
-
-.lbp-ump__card--tier-enthusiast .lbp-ump__level-badge {
-  border-color: #5a7080;
-  color: #d0dce4;
-}
-
-.lbp-ump__card--tier-enthusiast .lbp-ump__level-bar-fill {
-  background: #7a94a4;
+  --lbp-ump-tier: #5eb0d4;
+  --lbp-ump-tier-text: #dff0f8;
+  --lbp-ump-tier-wash: #2a4e62;
+  --lbp-ump-tier-deep: #223440;
+  --lbp-ump-tier-glow: rgba(94, 176, 212, 0.36);
+  --lbp-ump-tier-ring: rgba(94, 176, 212, 0.25);
+  --lbp-ump-tier-line: rgba(94, 176, 212, 0.45);
+  --lbp-ump-tier-panel: rgba(40, 82, 102, 0.94);
+  --lbp-ump-tier-footer: #264454;
+  --lbp-ump-tier-bar-from: #3a88a8;
+  border-color: #4a8eae;
 }
 
 .lbp-ump__card--tier-bronze {
-  border-color: #8a6a3e;
-}
-
-.lbp-ump__card--tier-bronze .lbp-ump__avatar {
-  border-color: #a07a48;
-}
-
-.lbp-ump__card--tier-bronze .lbp-ump__level {
-  border-color: rgba(160, 122, 72, 0.45);
-}
-
-.lbp-ump__card--tier-bronze .lbp-ump__level-badge {
-  border-color: rgba(160, 122, 72, 0.55);
-  color: #d4b08a;
-}
-
-.lbp-ump__card--tier-bronze .lbp-ump__level-bar-fill {
-  background: #b8884c;
+  --lbp-ump-tier: #c8944a;
+  --lbp-ump-tier-text: #f0d4a8;
+  --lbp-ump-tier-wash: #4a3828;
+  --lbp-ump-tier-deep: #2e2820;
+  --lbp-ump-tier-glow: rgba(200, 148, 74, 0.42);
+  --lbp-ump-tier-ring: rgba(200, 148, 74, 0.28);
+  --lbp-ump-tier-line: rgba(200, 148, 74, 0.5);
+  --lbp-ump-tier-panel: rgba(78, 56, 32, 0.95);
+  --lbp-ump-tier-footer: #3a2e22;
+  --lbp-ump-tier-bar-from: #8a6230;
+  border-color: #a07840;
 }
 
 .lbp-ump__card--tier-silver {
-  border-color: #7a8a9a;
-}
-
-.lbp-ump__card--tier-silver .lbp-ump__avatar {
-  border-color: #9aabbb;
-}
-
-.lbp-ump__card--tier-silver .lbp-ump__level {
-  border-color: rgba(154, 171, 187, 0.4);
-}
-
-.lbp-ump__card--tier-silver .lbp-ump__level-badge {
-  border-color: rgba(154, 171, 187, 0.5);
-  color: #d0dce6;
-}
-
-.lbp-ump__card--tier-silver .lbp-ump__level-bar-fill {
-  background: #9ab;
+  --lbp-ump-tier: #c0d0dc;
+  --lbp-ump-tier-text: #eef4f8;
+  --lbp-ump-tier-wash: #3e4a56;
+  --lbp-ump-tier-deep: #2a3038;
+  --lbp-ump-tier-glow: rgba(192, 208, 220, 0.4);
+  --lbp-ump-tier-ring: rgba(192, 208, 220, 0.28);
+  --lbp-ump-tier-line: rgba(192, 208, 220, 0.48);
+  --lbp-ump-tier-panel: rgba(64, 78, 90, 0.95);
+  --lbp-ump-tier-footer: #343e48;
+  --lbp-ump-tier-bar-from: #8898a8;
+  border-color: #8a9eae;
 }
 
 .lbp-ump__card--tier-gold {
-  border-color: #9a7a2e;
-}
-
-.lbp-ump__card--tier-gold .lbp-ump__avatar {
+  --lbp-ump-tier: #e0b84a;
+  --lbp-ump-tier-text: #ffe9a0;
+  --lbp-ump-tier-wash: #4e4020;
+  --lbp-ump-tier-deep: #322c1c;
+  --lbp-ump-tier-glow: rgba(224, 184, 74, 0.48);
+  --lbp-ump-tier-ring: rgba(224, 184, 74, 0.32);
+  --lbp-ump-tier-line: rgba(224, 184, 74, 0.55);
+  --lbp-ump-tier-panel: rgba(86, 68, 24, 0.96);
+  --lbp-ump-tier-footer: #3e3418;
+  --lbp-ump-tier-bar-from: #a88828;
   border-color: #c4a03a;
 }
 
-.lbp-ump__card--tier-gold .lbp-ump__level {
-  border-color: rgba(196, 160, 58, 0.4);
-}
-
-.lbp-ump__card--tier-gold .lbp-ump__level-badge {
-  border-color: rgba(196, 160, 58, 0.5);
-  color: #e0c46a;
-}
-
-.lbp-ump__card--tier-gold .lbp-ump__level-bar-fill {
-  background: #c4a03a;
-}
-
 .lbp-ump__card--tier-platinum {
-  border-color: #7a8c9c;
-}
-
-.lbp-ump__card--tier-platinum .lbp-ump__avatar {
-  border-color: #b0c4d4;
-}
-
-.lbp-ump__card--tier-platinum .lbp-ump__level {
-  border-color: rgba(176, 196, 212, 0.4);
-}
-
-.lbp-ump__card--tier-platinum .lbp-ump__level-badge {
-  border-color: rgba(176, 196, 212, 0.5);
-  color: #d8e4ee;
-}
-
-.lbp-ump__card--tier-platinum .lbp-ump__level-bar-fill {
-  background: #a8bdd0;
+  --lbp-ump-tier: #d0e4f0;
+  --lbp-ump-tier-text: #f4fafc;
+  --lbp-ump-tier-wash: #3a4e5e;
+  --lbp-ump-tier-deep: #283440;
+  --lbp-ump-tier-glow: rgba(176, 208, 228, 0.48);
+  --lbp-ump-tier-ring: rgba(176, 208, 228, 0.32);
+  --lbp-ump-tier-line: rgba(176, 208, 228, 0.52);
+  --lbp-ump-tier-panel: rgba(56, 80, 98, 0.96);
+  --lbp-ump-tier-footer: #304454;
+  --lbp-ump-tier-bar-from: #88a8bc;
+  border-color: #9ab8cc;
 }
 
 .lbp-ump__card--tier-sapphire {
-  border-color: #3a6a9a;
-}
-
-.lbp-ump__card--tier-sapphire .lbp-ump__avatar {
-  border-color: #4a88c4;
-}
-
-.lbp-ump__card--tier-sapphire .lbp-ump__level {
-  border-color: rgba(74, 136, 196, 0.4);
-}
-
-.lbp-ump__card--tier-sapphire .lbp-ump__level-badge {
-  border-color: rgba(74, 136, 196, 0.5);
-  color: #8ab8e0;
-}
-
-.lbp-ump__card--tier-sapphire .lbp-ump__level-bar-fill {
-  background: #4a88c4;
+  --lbp-ump-tier: #4a9ae0;
+  --lbp-ump-tier-text: #b8dcff;
+  --lbp-ump-tier-wash: #1e3e68;
+  --lbp-ump-tier-deep: #1a2c44;
+  --lbp-ump-tier-glow: rgba(74, 154, 224, 0.5);
+  --lbp-ump-tier-ring: rgba(74, 154, 224, 0.34);
+  --lbp-ump-tier-line: rgba(74, 154, 224, 0.55);
+  --lbp-ump-tier-panel: rgba(28, 68, 112, 0.96);
+  --lbp-ump-tier-footer: #1e3a58;
+  --lbp-ump-tier-bar-from: #2868b0;
+  border-color: #3a7ec4;
 }
 
 .lbp-ump__card--tier-ruby {
-  border-color: #8a3a4a;
-}
-
-.lbp-ump__card--tier-ruby .lbp-ump__avatar {
-  border-color: #b84a5c;
-}
-
-.lbp-ump__card--tier-ruby .lbp-ump__level {
-  border-color: rgba(184, 74, 92, 0.4);
-}
-
-.lbp-ump__card--tier-ruby .lbp-ump__level-badge {
-  border-color: rgba(184, 74, 92, 0.5);
-  color: #e08a98;
-}
-
-.lbp-ump__card--tier-ruby .lbp-ump__level-bar-fill {
-  background: #b84a5c;
+  --lbp-ump-tier: #e05a70;
+  --lbp-ump-tier-text: #ffc0cc;
+  --lbp-ump-tier-wash: #582030;
+  --lbp-ump-tier-deep: #341820;
+  --lbp-ump-tier-glow: rgba(224, 90, 112, 0.48);
+  --lbp-ump-tier-ring: rgba(224, 90, 112, 0.34);
+  --lbp-ump-tier-line: rgba(224, 90, 112, 0.55);
+  --lbp-ump-tier-panel: rgba(96, 32, 48, 0.96);
+  --lbp-ump-tier-footer: #441c28;
+  --lbp-ump-tier-bar-from: #a03048;
+  border-color: #b84458;
 }
 
 .lbp-ump__card--tier-emerald {
-  border-color: #2a7a4a;
-}
-
-.lbp-ump__card--tier-emerald .lbp-ump__avatar {
-  border-color: #3a9a5c;
-}
-
-.lbp-ump__card--tier-emerald .lbp-ump__level {
-  border-color: rgba(58, 154, 92, 0.4);
-}
-
-.lbp-ump__card--tier-emerald .lbp-ump__level-badge {
-  border-color: rgba(58, 154, 92, 0.5);
-  color: #7acc98;
-}
-
-.lbp-ump__card--tier-emerald .lbp-ump__level-bar-fill {
-  background: #3a9a5c;
+  --lbp-ump-tier: #3cbc6e;
+  --lbp-ump-tier-text: #b8f0cc;
+  --lbp-ump-tier-wash: #1e4834;
+  --lbp-ump-tier-deep: #1a3028;
+  --lbp-ump-tier-glow: rgba(60, 188, 110, 0.48);
+  --lbp-ump-tier-ring: rgba(60, 188, 110, 0.34);
+  --lbp-ump-tier-line: rgba(60, 188, 110, 0.55);
+  --lbp-ump-tier-panel: rgba(28, 84, 56, 0.96);
+  --lbp-ump-tier-footer: #1e3e2c;
+  --lbp-ump-tier-bar-from: #24884c;
+  border-color: #2e9a58;
 }
 
 .lbp-ump__card--tier-diamond {
-  border-color: #5a9aba;
-}
-
-.lbp-ump__card--tier-diamond .lbp-ump__avatar {
-  border-color: #7ac4e0;
-}
-
-.lbp-ump__card--tier-diamond .lbp-ump__level {
-  border-color: rgba(122, 196, 224, 0.4);
-}
-
-.lbp-ump__card--tier-diamond .lbp-ump__level-badge {
-  border-color: rgba(122, 196, 224, 0.5);
-  color: #b0e0f0;
-}
-
-.lbp-ump__card--tier-diamond .lbp-ump__level-bar-fill {
-  background: #6ab4d0;
+  --lbp-ump-tier: #7ad4f0;
+  --lbp-ump-tier-text: #d8f6ff;
+  --lbp-ump-tier-wash: #1e4e62;
+  --lbp-ump-tier-deep: #1a3444;
+  --lbp-ump-tier-glow: rgba(122, 212, 240, 0.55);
+  --lbp-ump-tier-ring: rgba(122, 212, 240, 0.38);
+  --lbp-ump-tier-line: rgba(122, 212, 240, 0.58);
+  --lbp-ump-tier-panel: rgba(32, 88, 112, 0.97);
+  --lbp-ump-tier-footer: #1e4458;
+  --lbp-ump-tier-bar-from: #3a98b8;
+  border-color: #5ab8d4;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 28px rgba(122, 212, 240, 0.18);
 }
 
 .lbp-ump__card--tier-master {
-  border-color: #2a8a7a;
-}
-
-.lbp-ump__card--tier-master .lbp-ump__avatar {
-  border-color: #3ab0a0;
-}
-
-.lbp-ump__card--tier-master .lbp-ump__level {
-  border-color: rgba(58, 176, 160, 0.4);
-}
-
-.lbp-ump__card--tier-master .lbp-ump__level-badge {
-  border-color: rgba(58, 176, 160, 0.5);
-  color: #7ad4c4;
-}
-
-.lbp-ump__card--tier-master .lbp-ump__level-bar-fill {
-  background: #3ab0a0;
+  --lbp-ump-tier: #3ec8b4;
+  --lbp-ump-tier-text: #b8f4ea;
+  --lbp-ump-tier-wash: #1a4a44;
+  --lbp-ump-tier-deep: #1a3230;
+  --lbp-ump-tier-glow: rgba(62, 200, 180, 0.52);
+  --lbp-ump-tier-ring: rgba(62, 200, 180, 0.38);
+  --lbp-ump-tier-line: rgba(62, 200, 180, 0.58);
+  --lbp-ump-tier-panel: rgba(24, 88, 80, 0.97);
+  --lbp-ump-tier-footer: #1a403c;
+  --lbp-ump-tier-bar-from: #249888;
+  border-color: #2eaea0;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 28px rgba(62, 200, 180, 0.18);
 }
 
 .lbp-ump__card--tier-legend {
-  border-color: #c46a28;
-}
-
-.lbp-ump__card--tier-legend .lbp-ump__avatar {
+  --lbp-ump-tier: #ff8a3a;
+  --lbp-ump-tier-text: #ffd0a8;
+  --lbp-ump-tier-wash: #5a3018;
+  --lbp-ump-tier-deep: #362018;
+  --lbp-ump-tier-glow: rgba(255, 138, 58, 0.55);
+  --lbp-ump-tier-ring: rgba(255, 138, 58, 0.4);
+  --lbp-ump-tier-line: rgba(255, 138, 58, 0.6);
+  --lbp-ump-tier-panel: rgba(104, 52, 20, 0.97);
+  --lbp-ump-tier-footer: #442414;
+  --lbp-ump-tier-bar-from: #c85a20;
   border-color: #e07830;
-}
-
-.lbp-ump__card--tier-legend .lbp-ump__level {
-  border-color: rgba(224, 120, 48, 0.4);
-}
-
-.lbp-ump__card--tier-legend .lbp-ump__level-badge {
-  border-color: rgba(224, 120, 48, 0.5);
-  color: #f0a060;
-}
-
-.lbp-ump__card--tier-legend .lbp-ump__level-bar-fill {
-  background: #e07830;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 32px rgba(255, 138, 58, 0.22);
 }
 
 .lbp-ump__card--tier-hallOfFame {
-  border-color: #d4af37;
-}
-
-.lbp-ump__card--tier-hallOfFame .lbp-ump__avatar {
+  --lbp-ump-tier: #f0d060;
+  --lbp-ump-tier-text: #fff2b8;
+  --lbp-ump-tier-wash: #5a4820;
+  --lbp-ump-tier-deep: #382e18;
+  --lbp-ump-tier-glow: rgba(240, 208, 96, 0.58);
+  --lbp-ump-tier-ring: rgba(240, 208, 96, 0.42);
+  --lbp-ump-tier-line: rgba(240, 208, 96, 0.62);
+  --lbp-ump-tier-panel: rgba(104, 82, 24, 0.98);
+  --lbp-ump-tier-footer: #463818;
+  --lbp-ump-tier-bar-from: #c4a028;
   border-color: #e8c84a;
-}
-
-.lbp-ump__card--tier-hallOfFame .lbp-ump__level {
-  border-color: rgba(212, 175, 55, 0.45);
-}
-
-.lbp-ump__card--tier-hallOfFame .lbp-ump__level-badge {
-  border-color: rgba(212, 175, 55, 0.55);
-  color: #f0d878;
-}
-
-.lbp-ump__card--tier-hallOfFame .lbp-ump__level-bar-fill {
-  background: #d4af37;
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.72),
+    0 0 36px rgba(240, 208, 96, 0.28);
 }
 
 .lbp-ump__location {
