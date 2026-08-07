@@ -5,7 +5,7 @@ import {
   FILM_HOVER_OPEN_MS,
 } from '../../core/constants.js';
 import { debounce } from '../../utils/debounce.js';
-import { hidePopover as hideFilmPopover } from '../film-mini-profile/popover.js';
+import { hidePopover as hideFilmPopover, isOpenFromUserCard as isFilmOpenFromUserCard } from '../film-mini-profile/popover.js';
 import { HOVER_ATTR, UMP_SKIP } from './constants.js';
 import { ensureProfileFetch } from './enrich.js';
 import {
@@ -117,6 +117,8 @@ function scheduleOpen(anchor, hit) {
 
 function scheduleClose() {
   if (isContextMenuMode()) return;
+  // Keep the user card while a nested film mini-profile is open from it.
+  if (isFilmOpenFromUserCard()) return;
   window.clearTimeout(state.openTimer);
   window.clearTimeout(state.closeTimer);
   state.closeTimer = window.setTimeout(() => {

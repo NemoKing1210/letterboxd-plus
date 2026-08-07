@@ -1,7 +1,8 @@
 /* Film mini-profile — Letterboxd / settings-panel language (see DESIGN.md) */
 
 .film-poster[data-lbp-fmp-hover='1'],
-.react-component[data-component-class='LazyPoster'][data-lbp-fmp-hover='1'] {
+.react-component[data-component-class='LazyPoster'][data-lbp-fmp-hover='1'],
+.lbp-ump__poster[data-lbp-fmp-hover='1'] {
   outline: 1px solid rgba(64, 188, 244, 0.35);
 }
 
@@ -17,6 +18,11 @@
     transform 0.18s ease;
   font: 13px/1.45 'Graphik Web', GraphikWeb, Arial, Helvetica, sans-serif;
   color: var(--lbp-text, #f3f6f8);
+}
+
+/* Sit above the parent user mini-profile when opened from its posters. */
+.lbp-fmp.lbp-fmp--nested {
+  z-index: 1000006;
 }
 
 .lbp-fmp.is-open {

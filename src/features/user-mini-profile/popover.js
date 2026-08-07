@@ -1,12 +1,38 @@
 import { FILM_LEAVE_MS } from '../../core/constants.js';
 import { HOVER_ATTR, POPOVER_ID } from './constants.js';
 import { state } from './state.js';
+import { isOpenFromUserCard as isFilmOpenFromUserCard } from '../film-mini-profile/popover.js';
 
 /** @type {(() => void) | null} */
 let onPopoverLeave = null;
 
 export function setPopoverLeaveHandler(handler) {
   onPopoverLeave = handler;
+}
+
+/** Cancel a pending hover-close without hiding the card. */
+export function cancelCloseTimer() {
+  window.clearTimeout(state.closeTimer);
+  window.clearTimeout(state.openTimer);
+}
+
+/** Schedule close via the leave handler (hover mode). */
+export function requestClose() {
+  onPopoverLeave?.();
+}
+
+/**
+ * Close only if the pointer is not currently over the user card.
+ * Used after a nested film card closes into empty space.
+ */
+export function requestCloseIfIdle() {
+  const el = state.popoverEl;
+  if (!el?.classList.contains('is-open')) return;
+  if (el.matches?.(':hover')) {
+    cancelCloseTimer();
+    return;
+  }
+  onPopoverLeave?.();
 }
 
 export function ensurePopover() {
@@ -21,7 +47,17 @@ export function ensurePopover() {
   state.popoverEl.addEventListener('pointerenter', () => {
     window.clearTimeout(state.closeTimer);
   });
-  state.popoverEl.addEventListener('pointerleave', () => {
+  state.popoverEl.addEventListener('pointerleave', (event) => {
+    const related = event.relatedTarget;
+    const fmp = document.getElementById('lbp-film-mini-profile');
+    if (related && fmp?.contains?.(related)) {
+      window.clearTimeout(state.closeTimer);
+      return;
+    }
+    if (isFilmOpenFromUserCard()) {
+      window.clearTimeout(state.closeTimer);
+      return;
+    }
     onPopoverLeave?.();
   });
   document.body.appendChild(state.popoverEl);

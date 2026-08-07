@@ -12,6 +12,7 @@ import {
   FMP_SKIP,
   HOVER_ATTR,
   POSTER_SELECTOR,
+  UMP_POPOVER_SELECTOR,
 } from './constants.js';
 import {
   ensureProfileFetch,
@@ -21,20 +22,27 @@ import {
 import {
   ensurePopover,
   hidePopover,
+  isOpenFromUserCard,
   openPopover,
   positionPopover,
+  setPopoverEnterHandler,
   setPopoverLeaveHandler,
 } from './popover.js';
 import {
   clearAllPosterMarks,
   isEligiblePoster,
   markPoster,
+  umpPosterRoot,
 } from './posters.js';
 import { scheduleFilmPreload, stopFilmPreload } from './preload.js';
 import { renderCard, renderError } from './render.js';
 import { currentSettings, setSettingsRef, state } from './state.js';
 import { syncFilmMiniProfileTranslate } from '../translate/index.js';
-import { hidePopover as hideUserPopover } from '../user-mini-profile/popover.js';
+import {
+  cancelCloseTimer as cancelUserCloseTimer,
+  hidePopover as hideUserPopover,
+  requestCloseIfIdle as requestUserCloseIfIdle,
+} from '../user-mini-profile/popover.js';
 
 function decoratePosters(root = document) {
   if (currentSettings().showFilmMiniProfile === false) {
@@ -105,8 +113,14 @@ async function showForPoster(
   poster,
   { slug, title, year, posterHint, userHint },
 ) {
-  hideUserPopover({ immediate: true });
+  const nestedInUserCard = Boolean(poster.closest?.(UMP_POPOVER_SELECTOR));
+  if (nestedInUserCard) {
+    cancelUserCloseTimer();
+  } else {
+    hideUserPopover({ immediate: true });
+  }
   const el = ensurePopover();
+  el.classList.toggle('lbp-fmp--nested', nestedInUserCard);
   state.activePoster = poster;
   state.activeSlug = slug;
   const seq = ++state.fetchSeq;
@@ -240,16 +254,28 @@ function scheduleClose() {
   if (isContextMenuMode()) return;
   window.clearTimeout(state.openTimer);
   window.clearTimeout(state.closeTimer);
+  const wasNested = isOpenFromUserCard();
   state.closeTimer = window.setTimeout(() => {
     hidePopover();
+    if (wasNested) requestUserCloseIfIdle();
   }, FILM_HOVER_CLOSE_MS);
 }
 
 setPopoverLeaveHandler(scheduleClose);
+setPopoverEnterHandler(() => {
+  cancelUserCloseTimer();
+});
 
 function resolvePoster(target) {
   if (!target || target.nodeType !== 1) return null;
+  // Prefer an explicit UMP thumb even when nested under the user card.
+  const umpPoster = umpPosterRoot(target);
+  if (umpPoster) {
+    if (!isEligiblePoster(umpPoster)) return null;
+    return markPoster(umpPoster);
+  }
   if (target.closest?.(FMP_SKIP)) return null;
+  if (target.closest?.(UMP_POPOVER_SELECTOR)) return null;
   const poster = target.closest?.(POSTER_SELECTOR);
   if (!poster || !isEligiblePoster(poster)) return null;
   return markPoster(poster);
@@ -265,6 +291,9 @@ function onPointerOver(event) {
   if (currentSettings().showFilmMiniProfile === false) return;
   const hit = resolvePoster(event.target);
   if (!hit) return;
+  if (hit.poster.closest?.(UMP_POPOVER_SELECTOR)) {
+    cancelUserCloseTimer();
+  }
   warmPoster(hit);
   if (isContextMenuMode()) return;
   if (

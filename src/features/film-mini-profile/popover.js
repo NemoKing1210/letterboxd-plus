@@ -4,9 +4,26 @@ import { state } from './state.js';
 
 /** @type {(() => void) | null} */
 let onPopoverLeave = null;
+/** @type {(() => void) | null} */
+let onPopoverEnter = null;
 
 export function setPopoverLeaveHandler(handler) {
   onPopoverLeave = handler;
+}
+
+export function setPopoverEnterHandler(handler) {
+  onPopoverEnter = handler;
+}
+
+/**
+ * True when the film mini-profile is open for a poster inside the user card.
+ * Used so the parent user card stays mounted under a nested film card.
+ */
+export function isOpenFromUserCard() {
+  if (!state.popoverEl?.classList.contains('is-open')) return false;
+  const poster = state.activePoster;
+  if (!poster || !document.contains(poster)) return false;
+  return Boolean(poster.closest?.('#lbp-user-mini-profile, .lbp-ump'));
 }
 
 export function ensurePopover() {
@@ -20,6 +37,7 @@ export function ensurePopover() {
   state.popoverEl.setAttribute('aria-hidden', 'true');
   state.popoverEl.addEventListener('pointerenter', () => {
     window.clearTimeout(state.closeTimer);
+    onPopoverEnter?.();
   });
   state.popoverEl.addEventListener('pointerleave', () => {
     onPopoverLeave?.();
@@ -39,6 +57,7 @@ function finishHidePopover() {
   }
   if (!state.popoverEl) return;
   state.popoverEl.classList.remove('is-open', 'is-leaving', 'is-loading', 'is-ready');
+  state.popoverEl.classList.remove('lbp-fmp--nested');
   state.popoverEl.setAttribute('aria-hidden', 'true');
   state.popoverEl.innerHTML = '';
   state.activePoster?.removeAttribute?.(HOVER_ATTR);

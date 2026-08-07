@@ -268,10 +268,16 @@ function renderStats(ctx) {
 }
 
 function renderPosterThumb(film, { showRating = false } = {}) {
-  const href = film.filmUrl || `/film/${encodeURIComponent(film.slug)}/`;
-  const title = film.title || film.slug;
+  const slug = String(film.slug || '').trim().toLowerCase();
+  const href = film.filmUrl || (slug ? `/film/${encodeURIComponent(slug)}/` : '#');
+  const title = film.title || film.slug || '';
+  const year =
+    Number.isFinite(Number(film.year)) && Number(film.year) > 0
+      ? Number(film.year)
+      : null;
+  const displayName = year ? `${title} (${year})` : title;
   const img = film.posterUrl
-    ? `<img src="${escapeAttr(film.posterUrl)}" alt="" loading="lazy" decoding="async">`
+    ? `<img src="${escapeAttr(film.posterUrl)}" alt="${escapeAttr(displayName || title)}" loading="lazy" decoding="async">`
     : `<span class="lbp-ump__poster-ph" aria-hidden="true"></span>`;
   const ratingHtml =
     showRating && film.rating != null
@@ -279,8 +285,12 @@ function renderPosterThumb(film, { showRating = false } = {}) {
       : showRating
         ? `<span class="lbp-ump__poster-rating lbp-ump__poster-rating--empty" aria-hidden="true"></span>`
         : '';
+  const slugAttr = slug ? ` data-item-slug="${escapeAttr(slug)}"` : '';
+  const nameAttr = displayName
+    ? ` data-item-full-display-name="${escapeAttr(displayName)}"`
+    : '';
   return `
-    <a class="lbp-ump__poster" href="${escapeAttr(href)}" title="${escapeAttr(title)}">
+    <a class="lbp-ump__poster" href="${escapeAttr(href)}" title="${escapeAttr(title)}"${slugAttr}${nameAttr}>
       <span class="lbp-ump__poster-frame">${img}</span>
       ${ratingHtml}
     </a>

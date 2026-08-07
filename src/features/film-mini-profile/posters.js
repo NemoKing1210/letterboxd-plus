@@ -7,8 +7,19 @@ import {
   MARK_ATTR,
   POSTER_SELECTOR,
   PRELOAD_ATTR,
+  UMP_POSTER_SELECTOR,
 } from './constants.js';
 import { state } from './state.js';
+
+export function isUmpPoster(el) {
+  return Boolean(el?.matches?.(UMP_POSTER_SELECTOR) || el?.closest?.(UMP_POSTER_SELECTOR));
+}
+
+export function umpPosterRoot(el) {
+  if (!el) return null;
+  if (el.matches?.(UMP_POSTER_SELECTOR)) return el;
+  return el.closest?.(UMP_POSTER_SELECTOR) || null;
+}
 
 export function parsePosterSlug(poster) {
   const roots = [
@@ -16,6 +27,7 @@ export function parsePosterSlug(poster) {
     poster.closest?.('.react-component[data-component-class="LazyPoster"]'),
     poster.closest?.('[data-item-slug], [data-film-slug], [data-item-link]'),
     poster.querySelector?.('[data-item-slug], [data-film-slug], [data-item-link]'),
+    umpPosterRoot(poster),
   ].filter(Boolean);
 
   for (const root of roots) {
@@ -46,12 +58,14 @@ export function parsePosterTitle(poster, slug) {
     poster,
     poster.closest?.('.react-component[data-component-class="LazyPoster"]'),
     poster.querySelector?.('[data-item-name], [data-item-full-display-name]'),
+    umpPosterRoot(poster),
   ].filter(Boolean);
 
   for (const root of roots) {
     const name =
       root.getAttribute?.('data-item-full-display-name') ||
       root.getAttribute?.('data-item-name') ||
+      root.getAttribute?.('title') ||
       '';
     if (name) return name.replace(/\s+\(\d{4}\)\s*$/, '').trim() || name.trim();
   }
@@ -68,11 +82,13 @@ export function parsePosterYear(poster) {
     poster,
     poster.closest?.('.react-component[data-component-class="LazyPoster"]'),
     poster.querySelector?.('[data-item-name], [data-item-full-display-name]'),
+    umpPosterRoot(poster),
   ].filter(Boolean);
   for (const root of roots) {
     const name =
       root.getAttribute?.('data-item-full-display-name') ||
       root.getAttribute?.('data-item-name') ||
+      root.getAttribute?.('title') ||
       '';
     const match = name.match(/\((\d{4})\)\s*$/);
     if (match) return Number(match[1]);
@@ -149,7 +165,8 @@ function posterRoots(poster) {
       ? poster
       : poster.querySelector?.('.poster.film-poster, .film-poster') ||
         poster.closest?.('.poster.film-poster, .film-poster');
-  return [...new Set([poster, lazy, filmPoster].filter(Boolean))];
+  const ump = umpPosterRoot(poster);
+  return [...new Set([poster, lazy, filmPoster, ump].filter(Boolean))];
 }
 
 function parsePosterLiked(root) {
@@ -262,7 +279,9 @@ export function clearPosterMark(poster) {
 export function isEligiblePoster(poster) {
   if (!poster || poster.nodeType !== 1) return false;
   if (poster.closest(FMP_SKIP)) return false;
-  if (poster.closest(FILM_POSTER_SKIP_ANCESTOR)) return false;
+  const ump = umpPosterRoot(poster);
+  // UMP thumbs live inside the user card; skip the page-poster ancestor list.
+  if (!ump && poster.closest(FILM_POSTER_SKIP_ANCESTOR)) return false;
   if (
     !poster.matches?.(POSTER_SELECTOR) &&
     !poster.classList?.contains('film-poster')
