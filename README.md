@@ -2,17 +2,21 @@
 
 [![CI](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/NemoKing1210/letterboxd-plus/actions/workflows/ci.yml)
 [![Install userscript](https://img.shields.io/badge/Install-userscript-00e054?style=for-the-badge&labelColor=14181c)](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/letterboxd-plus.user.js)
-[![License: MIT](https://img.shields.io/badge/License-MIT-40bcf4?style=for-the-badge&labelColor=14181c)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.7.3-ff8000?style=for-the-badge&labelColor=14181c)](package.json)
+[![License: MIT](https://img.shields.io/badge/License-MIT-40bcf4?style=for-the-badge&labelColor=14181c)](https://github.com/NemoKing1210/letterboxd-plus/blob/main/LICENSE)
+[![Version](https://img.shields.io/badge/version-0.23.1-ff8000?style=for-the-badge&labelColor=14181c)](https://github.com/NemoKing1210/letterboxd-plus/blob/main/package.json)
+
+**English** · [Русский](https://github.com/NemoKing1210/letterboxd-plus/blob/main/README.ru.md) · [Español](https://github.com/NemoKing1210/letterboxd-plus/blob/main/README.es.md) · [Português (Brasil)](https://github.com/NemoKing1210/letterboxd-plus/blob/main/README.pt-BR.md) · [Deutsch](https://github.com/NemoKing1210/letterboxd-plus/blob/main/README.de.md) · [Français](https://github.com/NemoKing1210/letterboxd-plus/blob/main/README.fr.md) · [简体中文](https://github.com/NemoKing1210/letterboxd-plus/blob/main/README.zh-CN.md)
 
 A lightweight userscript that extends
-[Letterboxd](https://letterboxd.com/) with external film ratings and useful
-interface improvements — while keeping the site familiar.
+[Letterboxd](https://letterboxd.com/) with external film ratings, richer cast
+and crew lists, hover mini-cards, and on-page translation — while keeping the
+site familiar.
 
-Letterboxd Plus adds Rotten Tomatoes and Metacritic scores directly to film
-pages, hover mini-cards on poster grids, enriches Cast with actor portraits
-and roles, and provides a native-looking settings panel. It requires no API
-key and runs entirely in your browser.
+Letterboxd Plus adds Rotten Tomatoes and Metacritic scores to film pages,
+enriches Cast and Crew with portraits, shows detailed mini-cards for films and
+members, translates synopses, reviews, and comments, and provides a
+native-looking settings panel. It requires no API key and runs entirely in your
+browser.
 
 Compatible with [Tampermonkey](https://www.tampermonkey.net/),
 [Violentmonkey](https://violentmonkey.github.io/),
@@ -20,9 +24,25 @@ Compatible with [Tampermonkey](https://www.tampermonkey.net/),
 [ScriptCat](https://scriptcat.org/), and other managers that support the
 `// ==UserScript==` metadata block.
 
-> **Status:** early development. The current release focuses on a reliable
-> foundation, settings, and external film ratings. More Letterboxd
-> enhancements can be added as independent feature modules.
+> **Status:** `0.23.1`. Ratings, enhanced Cast and Crew, film and member
+> mini-cards, translation, cache controls, and a seven-language interface are
+> available. More Letterboxd enhancements can be added as independent feature
+> modules.
+
+> The script's `@updateURL` / `@downloadURL` point at GitHub `main` — the raw
+> install URL below is always the newest build.
+
+## Screenshots
+
+The real userscript running on live Letterboxd pages.
+
+![Letterboxd Plus settings panel with General, Film, User card, Translation, Cache, and About tabs](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/docs/screenshots/settings-panel.png)
+
+| | |
+|---|---|
+| ![Rotten Tomatoes, Metacritic, and average rating sections in the film sidebar](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/docs/screenshots/ratings.png)<br>**External ratings** — Tomatometer, Popcornmeter, Metascore, User Score, and a combined average | ![Cast list with actor portraits and roles](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/docs/screenshots/enhanced-cast.png)<br>**Enhanced cast** — portraits, names, and roles, loaded as cards approach the viewport |
+| ![Crew page with portraits for directors, producers, and writers](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/docs/screenshots/crew.png)<br>**Enhanced crew** — the same portrait treatment for directors, producers, writers, and the rest of the crew | ![Film mini-card on a poster hover showing ratings, cast, genres, and a synopsis](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/docs/screenshots/film-mini-card.png)<br>**Film mini-cards** — ratings, cast, genres, runtime, synopsis, quick links, and a Translate button on poster hover |
+| ![Member mini-card showing level, stats, location, favorite films, and recent activity](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/docs/screenshots/user-mini-card.png)<br>**Member mini-cards** — level and tier progress, stats, location, favorites, and recent activity | ![A film synopsis with the Spanish translation shown below the original](https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/docs/screenshots/translation.png)<br>**Translation** — synopses, reviews, and comments, shown below the original or replacing it |
 
 ## Quick install
 
@@ -50,83 +70,110 @@ https://raw.githubusercontent.com/NemoKing1210/letterboxd-plus/main/letterboxd-p
 
 ### Manual install
 
-1. Open [`letterboxd-plus.user.js`](letterboxd-plus.user.js).
+1. Open
+   [`letterboxd-plus.user.js`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/letterboxd-plus.user.js)
+   in this repository (or run `npm run build` after cloning).
 2. Copy the complete file.
 3. Create a new script in your userscript manager.
 4. Paste the file, save it, and reload Letterboxd.
 
 ## Features
 
-### Rotten Tomatoes ratings
+### External ratings
 
-On Letterboxd film pages, the script adds a compact ratings section to the
-native sidebar:
+On Letterboxd film pages, the script adds compact sections to the native
+sidebar:
 
-- **Tomatometer** critic score;
-- **Certified Fresh** status when available;
-- optional **Popcornmeter** audience score;
-- critic review and audience rating counts;
-- direct link to the matched Rotten Tomatoes film page;
-- loading skeletons and non-blocking empty/error states.
+- **Rotten Tomatoes** — Tomatometer critic score, Certified Fresh status when
+  available, optional Popcornmeter audience score, critic review and audience
+  rating counts, and a direct link to the matched film page.
+- **Metacritic** — Metascore with critic review count, optional User Score
+  with rating count, score-band accents, and a direct link to the matched movie
+  page.
+- **Average rating** — combines the Letterboxd rating with every enabled,
+  available external score. Values are normalized to Letterboxd's five-point
+  scale and averaged equally; unavailable scores are omitted.
 
-The script uses the film title and release year to disambiguate search results.
-Letterboxd's TMDB identifier is used as the local cache key.
+Both providers use the film title and release year to disambiguate results, and
+Letterboxd's TMDB identifier is used as the local cache key. Loading skeletons
+and non-blocking empty/error states keep the page usable when a provider is
+slow or unavailable.
 
-### Metacritic ratings
-
-An independent Metacritic section appears alongside the Rotten Tomatoes data:
-
-- **Metascore** with critic review count;
-- optional **User Score** with rating count;
-- direct link to the strictly matched Metacritic movie page;
-- Metacritic score-band accents, loading skeletons, and non-blocking failures.
-
-Matches require the normalized title and a release year within one year of the
-Letterboxd metadata, which avoids silently selecting unrelated films or
-remakes.
-
-### Average rating
-
-The final sidebar section combines the Letterboxd rating with every enabled,
-available external score. Values are normalized to Letterboxd's five-point
-scale and averaged equally; unavailable scores are omitted.
-
-### Enhanced cast
+### Enhanced cast and crew
 
 The Cast section can display compact cards with each actor's portrait, name,
-and role. Portraits are read from the actor's public Letterboxd page only as
-cards approach the viewport, with at most three page requests in flight.
-The first ten actors are shown initially; the rest remain unloaded until
-**Show All** is selected and their cards approach the viewport.
+and role. The Crew page receives the same treatment for directors, producers,
+writers, and other crew members.
+
+Portraits are read from public Letterboxd person pages only as cards approach
+the viewport, with a small request limit. The first ten cast members are shown
+initially; the rest remain unloaded until **Show All** is selected and their
+cards approach the viewport. Results are kept in memory only.
 
 ### Film mini-cards
 
-Hovering a poster in lists, browse, diary, watchlists, search, and similar
-films opens a compact mini-card with:
+Hovering a poster in lists, browse, diary, watchlists, search, and similar-film
+grids opens a compact mini-card with:
 
-- poster, title, year, and Letterboxd average rating;
-- directors and genre chips;
+- poster, title, year, Letterboxd community rating, and your own status
+  (watched, liked, watchlist, rating);
+- directors, cast, genre chips, tagline, runtime, and a short synopsis;
 - Tomatometer and Metascore pills when those providers are enabled;
-- a short synopsis and a direct link to the film page.
+- rating-level hints, quick links, and a direct link to the film page;
+- a **Translate** button for the synopsis.
 
 The main poster on a film page is excluded. Loading is progressive and
-non-blocking, with optional viewport preload controlled from settings.
+non-blocking, with optional viewport preload controlled from settings. The card
+can open on hover or on right-click, depending on your preference.
+
+### Member mini-cards
+
+Hovering a member avatar or profile link anywhere on Letterboxd opens a member
+mini-card with:
+
+- display name, username, avatar, and a link to the full profile;
+- **level and tier** — a progress bar with points and the next tier;
+- stats for films, films this year, lists, following, and followers;
+- bio, location, favorite films, and recent activity when the profile exposes
+  them.
+
+The card is skipped inside the site header and inside other mini-cards. Like
+film cards, it can open on hover or on right-click and can preload as avatars
+approach the viewport.
+
+### Translation
+
+The built-in translation feature can translate:
+
+- **film synopses** on film pages and inside film mini-cards;
+- **reviews** on review cards and standalone review pages;
+- **comments** under reviews.
+
+Translation targets one of the seven interface languages or follows the
+interface language. Choose whether translated text **replaces** the original
+(with a toggle back) or appears **below** it. Reviews can also translate
+automatically as they scroll into view, off by default.
+
+Translation uses Google's free endpoint — no API key. Each block has its own
+Translate button, and every scope can be switched off in settings.
 
 ### Settings
 
 Open **Letterboxd Plus** from:
 
 - the Letterboxd account dropdown, immediately after the native **Settings**
-  item;
+  item (highlighted in brand green);
 - the userscript manager menu through **Letterboxd Plus settings**.
 
 The accessible tabbed panel follows Letterboxd's visual language and contains:
 
-- **General** — interface language;
-- **Film page** — rating-provider visibility and enhanced Cast cards;
-- **Film card** — hover mini-card visibility and preload;
-- **Cache** — storage meter, active and expired entry statistics, cache
-  duration, and manual cleanup;
+- **General** — interface language and toast position;
+- **Film** — rating-provider visibility, enhanced Cast and Crew, film
+  mini-card behavior and content;
+- **User card** — member mini-card behavior and content;
+- **Translation** — target language, display mode, and translation scopes;
+- **Cache** — storage meter, per-type statistics, retention, per-source cache
+  switches, and manual cleanup;
 - **About** — project description, version, license, repository, and author
   information.
 
@@ -155,14 +202,14 @@ can be selected under **Settings → General → Interface language**.
 
 - Successful Rotten Tomatoes and Metacritic responses are cached through
   userscript storage with separate provider keys.
-- Film mini-card scrapes are cached under separate `film:mini:` keys using the
-  same configurable duration.
+- Film and member mini-card scrapes, and translations, use their own cache
+  keys and can each be switched off on the Cache tab.
 - Cache duration is configurable from `0` to `168` hours.
 - A duration of `0` always requests fresh data.
 - The cache tab shows current usage against a conservative 5 MB advisory
   budget.
-- Active and expired ratings are measured separately and can be cleared
-  without resetting settings.
+- Active and expired entries are measured separately and can be cleared per
+  type without resetting settings.
 - Requests have a fixed timeout and errors never prevent Letterboxd from
   loading.
 - Failed requests and missing matches are not stored as successful ratings.
@@ -171,7 +218,7 @@ can be selected under **Settings → General → Interface language**.
 
 | Site | URL pattern | Behavior |
 |------|-------------|----------|
-| Letterboxd | `https://letterboxd.com/*` | Navigation settings entry and film-page enhancements |
+| Letterboxd | `https://letterboxd.com/*` | Navigation settings entry, ratings, cast and crew, mini-cards, and translation |
 | Letterboxd (`www`) | `https://www.letterboxd.com/*` | Same behavior for the alternate host |
 
 Ratings are mounted only when the page exposes film metadata through
@@ -198,20 +245,26 @@ Letterboxd film page
                             render in Letterboxd sidebar
 ```
 
-The page scanner is idempotent and observes dynamic DOM changes, so React
-navigation updates can restore the account-menu entry without creating
+Mini-cards request the public Letterboxd film or member page through
+same-origin browser requests and read the data already present there. The page
+scanner is idempotent and observes dynamic DOM changes, so React navigation
+updates can restore the account-menu entry and feature mounts without creating
 duplicates.
 
-## Data source and limitations
+## Data sources and limitations
 
 Rotten Tomatoes and Metacritic do not provide supported public APIs for this
 use case. Letterboxd Plus reads publicly available Rotten Tomatoes pages and
 the JSON endpoints used by Metacritic's own website through
 `GM_xmlhttpRequest`.
 
-Enhanced Cast reads public Letterboxd actor pages through same-origin browser
-requests and displays the portrait URL already supplied there. Results are
-kept only in memory; no actor biography or portrait data is persisted.
+Enhanced Cast and Crew read public Letterboxd person pages through same-origin
+browser requests and display the portrait URL already supplied there. Results
+are kept only in memory; no person biography or portrait data is persisted.
+
+Translation sends the selected text to Google's public translation endpoint.
+Translated text is cached locally in userscript storage unless the translation
+cache is switched off.
 
 This has several practical consequences:
 
@@ -222,8 +275,8 @@ This has several practical consequences:
 - Availability can vary by network or region.
 
 These cases are handled as reduced functionality rather than Letterboxd page
-failures. The script does not submit ratings, modify Rotten Tomatoes data, or
-require account credentials.
+failures. The script does not submit ratings, modify Rotten Tomatoes or
+Metacritic data, or require account credentials.
 
 ## Updates
 
@@ -254,15 +307,21 @@ letterboxd-plus/
 │   ├── api/
 │   │   ├── normalize-title.js        # Shared title normalization
 │   │   ├── film-profile.js           # Film page scrape for mini-cards
+│   │   ├── user-profile.js           # Member page scrape for mini-cards
 │   │   ├── letterboxd-person.js      # Lazy Letterboxd portrait lookup
 │   │   ├── rotten-tomatoes.js        # RT search and scorecard parsing
-│   │   └── metacritic.js             # Metacritic search and score parsing
+│   │   ├── metacritic.js             # Metacritic search and score parsing
+│   │   └── google-translate.js       # Translation request and cache
 │   ├── features/
 │   │   ├── index.js                  # Page-scan feature registry
+│   │   ├── apply-settings.js         # Live settings application
 │   │   ├── ratings/                  # Sidebar RT / Metacritic / average
 │   │   ├── cast/                     # Enhanced cast portraits
+│   │   ├── crew/                     # Enhanced crew portraits
 │   │   ├── film-mini-profile/        # Poster hover mini-cards
+│   │   ├── user-mini-profile/        # Member hover mini-cards
 │   │   ├── settings/                 # Account-menu entry and settings dialog
+│   │   ├── translate/                # Synopses, reviews, comments
 │   │   └── toast/                    # Toast notifications
 │   ├── i18n/
 │   │   ├── meta.js                   # Locale lists, names, flags, aliases
@@ -270,9 +329,13 @@ letterboxd-plus/
 │   │   └── index.js                  # t(), configureLocale, formatNumber
 │   ├── utils/
 │   │   ├── debounce.js               # Shared debounce helper
-│   │   └── html.js                   # HTML attribute/text escaping
+│   │   ├── html.js                   # HTML attribute/text escaping
+│   │   └── letterboxd-username.js    # Username parsing helpers
 │   └── styles/
 │       └── tokens.css                # Shared design tokens and media queries
+├── docs/
+│   ├── letterboxd-dom/               # Stable selectors and page data maps
+│   └── screenshots/                  # README screenshots
 ├── scripts/
 │   ├── copy-dist.mjs                 # Copy dist artifacts to repository root
 │   ├── verify-artifacts.mjs          # Verify dist and root files match
@@ -285,6 +348,9 @@ letterboxd-plus/
 ├── AGENTS.md                         # Repository guidance for coding agents
 ├── DESIGN.md                         # Visual language and Letterboxd UI tokens
 ├── CLAUDE.md                         # Claude entry point for AGENTS.md
+├── SECURITY.md                       # Vulnerability reporting policy
+├── README.md                         # English README
+├── README.ru.md                      # Localized READMEs
 └── LICENSE                           # MIT license
 ```
 
@@ -302,16 +368,16 @@ letterboxd-plus/
 |-------|-------|
 | `@namespace` | `https://github.com/NemoKing1210/letterboxd-plus` |
 | `@match` | Letterboxd apex and `www` hosts |
-| `@connect` | Rotten Tomatoes hosts and `backend.metacritic.com` |
+| `@connect` | Rotten Tomatoes hosts, `backend.metacritic.com`, and `translate.googleapis.com` |
 | `@run-at` | `document-idle` |
 | `@license` | MIT |
 | `@updateURL` / `@downloadURL` | Raw GitHub userscript on `main` |
 
 | Grant | Purpose |
 |-------|---------|
-| `GM_xmlhttpRequest` | Request external rating providers across origins |
-| `GM_getValue` / `GM_setValue` | Persist settings and successful rating cache |
-| `GM_listValues` / `GM_deleteValue` | Measure and clear cached rating entries |
+| `GM_xmlhttpRequest` | Request external rating providers and the translation endpoint |
+| `GM_getValue` / `GM_setValue` | Persist settings, rating cache, and translations |
+| `GM_listValues` / `GM_deleteValue` | Measure and clear cached entries |
 | `GM_addStyle` | Inject the bundled interface styles |
 | `GM_registerMenuCommand` | Open settings from the userscript manager |
 
@@ -319,7 +385,8 @@ No access tokens, API keys, passwords, or Letterboxd session data are stored.
 
 ## Development
 
-Requires [Node.js 22](https://nodejs.org/) as specified by [`.nvmrc`](.nvmrc).
+Requires [Node.js 22](https://nodejs.org/) as specified by
+[`.nvmrc`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/.nvmrc).
 
 ```bash
 npm install
@@ -329,9 +396,10 @@ npm run verify:artifacts   # Verify dist and root artifacts are identical
 npm run ci                 # Build and run all repository checks
 ```
 
-Edit source files under [`src/`](src/). Userscript metadata is defined in
-[`vite.config.js`](vite.config.js), and the version comes from
-[`package.json`](package.json).
+Edit source files under `src/`. Userscript metadata is defined in
+[`vite.config.js`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/vite.config.js),
+and the version comes from
+[`package.json`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/package.json).
 
 After every change:
 
@@ -342,13 +410,21 @@ After every change:
 Do not edit minified generated artifacts directly and do not commit temporary
 localhost update URLs.
 
+See also:
+
+- [`AGENTS.md`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/AGENTS.md) — architecture notes for AI coding agents
+- [`DESIGN.md`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/DESIGN.md) — visual language and Letterboxd UI tokens
+- [`docs/letterboxd-dom/`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/docs/letterboxd-dom/README.md) — stable page selectors and data maps
+- [`SECURITY.md`](https://github.com/NemoKing1210/letterboxd-plus/blob/main/SECURITY.md) — how to report a vulnerability
+
 ## Affiliation
 
 Letterboxd Plus is an independent community project. It is **not affiliated
-with or endorsed by Letterboxd, Rotten Tomatoes, Metacritic, Fandango, or
-their owners**. All product names and trademarks belong to their respective
+with or endorsed by Letterboxd, Rotten Tomatoes, Metacritic, Fandango, Google,
+or their owners**. All product names and trademarks belong to their respective
 owners.
 
 ## License
 
-[MIT](LICENSE) — Copyright © 2026 NemoKing
+[MIT](https://github.com/NemoKing1210/letterboxd-plus/blob/main/LICENSE) —
+Copyright © 2026 NemoKing

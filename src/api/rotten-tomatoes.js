@@ -72,6 +72,29 @@ function findMovieUrl(html, title, year) {
   return movieUrl.origin === ROTTEN_TOMATOES_ORIGIN ? movieUrl.href : null;
 }
 
+/**
+ * Rotten Tomatoes used to expose `score`; current scorecards publish the same
+ * value as a percentage string in `scorePercent`. Accept both shapes.
+ */
+function readScore(scoreGroup) {
+  const raw = scoreGroup?.score ?? scoreGroup?.scorePercent;
+  if (raw == null || raw === '') return null;
+  const value = Number(String(raw).replace('%', '').trim());
+  return Number.isFinite(value) ? value : null;
+}
+
+function readCount(scoreGroup) {
+  const direct = Number(
+    scoreGroup?.reviewCount || scoreGroup?.ratingCount || 0,
+  );
+  if (Number.isFinite(direct) && direct > 0) return direct;
+
+  // Audience ratings are now reported as a banded label, e.g.
+  // "5,000+ Verified Ratings". Use the stated lower bound.
+  const banded = String(scoreGroup?.bandedRatingCount || '').match(/[\d,]+/);
+  return banded ? Number(banded[0].replace(/,/g, '')) || 0 : 0;
+}
+
 function parseScorecard(html, url) {
   const document = new DOMParser().parseFromString(html, 'text/html');
   const raw = document.querySelector('#media-scorecard-json')?.textContent;
@@ -80,16 +103,14 @@ function parseScorecard(html, url) {
   const scorecard = JSON.parse(raw);
   const critics = scorecard.criticsScore || {};
   const audience = scorecard.audienceScore || {};
-  const criticsScore = Number(critics.score);
-  const audienceScore = Number(audience.score);
 
   return {
     url,
-    criticsScore: Number.isFinite(criticsScore) ? criticsScore : null,
-    audienceScore: Number.isFinite(audienceScore) ? audienceScore : null,
+    criticsScore: readScore(critics),
+    audienceScore: readScore(audience),
     isCertifiedFresh: critics.certified === true,
-    criticsCount: Number(critics.reviewCount || critics.ratingCount) || 0,
-    audienceCount: Number(audience.reviewCount || audience.ratingCount) || 0,
+    criticsCount: readCount(critics),
+    audienceCount: readCount(audience),
   };
 }
 

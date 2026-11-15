@@ -605,7 +605,7 @@ a.lbp-ump__section-title:focus-visible {
   justify-content: flex-start;
   gap: 4px;
   min-width: 0;
-  padding: 10px 4px 9px;
+  padding: 10px 2px 9px;
   text-align: center;
   text-decoration: none;
   color: inherit;
@@ -651,7 +651,7 @@ a.lbp-ump__stat:focus-visible {
   color: #789;
   font-size: 8px;
   font-weight: 800;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
   line-height: 1.2;
   word-break: break-word;
